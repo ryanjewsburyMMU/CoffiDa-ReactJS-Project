@@ -21,8 +21,10 @@ import CreatePost from './comps/createPost'
 import Profile from './comps/profile'
 import Search from './comps/search'
 import Feed from './comps/feed'
-import Login from './comps/login'
+//import Login from './comps/login'
 
+
+import ProfileStack from './comps/profileStack'
 
 const Stack = createStackNavigator()
 
@@ -39,65 +41,14 @@ export default class DB extends Component{
             <NavigationContainer>
                 <Drawer.Navigator>
                     <Drawer.Screen name="ProfileStack" component={ProfileStack}/>
-                    <Drawer.Screen name="Settings" component={Settings}/>
-                    <Drawer.Screen name="login_temp" component={login_temp}/>
+                    {/* <Drawer.Screen name="Settings" component={Settings}/>
+                    <Drawer.Screen name="login_temp" component={login_temp}/> */}
                 </Drawer.Navigator>
                 </NavigationContainer>
 	)}
 }
 
 
-
-class ProfileStack extends Component{
-    render(){
-        return(
-            <Stack.Navigator>
-                <Stack.Screen name="Profile" component={Profile}/> 
-            </Stack.Navigator>
-
-        )
-    }
-}
-
-
-class FeedStack extends Component{
-    render(){
-        return(
-            <Stack.Navigator>
-                <Stack.Screen name="Feed" component={Feed}/> 
-            </Stack.Navigator>
-
-        )
-    }
-}
-
-
-class SearchStack extends Component{
-    render(){
-        return(
-            <Stack.Navigator>
-                <Stack.Screen name="Search" component={Search}/> 
-            </Stack.Navigator>
-
-        )
-    }
-}
-
-
-
-
-
-
-class CreatePostStack extends Component{
-    render(){
-        return(
-            <Stack.Navigator>
-                <Stack.Screen name="CreatePost" component={CreatePost}/> 
-            </Stack.Navigator>
-
-        )
-    }
-}
 
 
 
