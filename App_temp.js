@@ -41,8 +41,8 @@ export default class DB extends Component{
             <NavigationContainer>
                 <Drawer.Navigator>
                     <Drawer.Screen name="ProfileStack" component={ProfileStack}/>
-                    {/* <Drawer.Screen name="Settings" component={Settings}/>
-                    <Drawer.Screen name="login_temp" component={login_temp}/> */}
+                    <Drawer.Screen name="Settings" component={Settings}/>
+                    <Drawer.Screen name="login_temp" component={login_temp}/>
                 </Drawer.Navigator>
                 </NavigationContainer>
 	)}
