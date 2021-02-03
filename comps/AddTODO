@@ -1,0 +1,29 @@
+import React, {Component} from 'react';
+
+import {Text, View, Button, TextInput} from 'react-native';
+
+
+class AddTODO extends Component{
+	constructor(props){
+		super(props);
+
+		this.state = {
+			list = [];
+		}
+	}
+
+	handleListEntry = (item) => {
+		this.setState((list.push(item)))
+	}
+
+
+	render(){
+		return (
+			<View>
+				<TextInput placeholder="Add Thing To Do" onChangeText={this.handleListEntry} value = {this.state.list}
+			</View>
+		);
+	}
+
+}
+export default AddTODO;
