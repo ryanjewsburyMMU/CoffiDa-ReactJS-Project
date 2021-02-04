@@ -75,11 +75,12 @@ export default class login_temp extends Component{
 		})
 
 		.then((response) => response.json())
-		.then((responseJson) => {
+		.then(async(responseJson) => {
 			this.setState({
 				user_details: responseJson
 			})
 			console.log(this.state.user_details)
+
 		})
 		.catch((error) => {
 			console.log(error)
