@@ -10,11 +10,12 @@ export default class Profile extends Component{
 
 	 	render(){
 			const navigation = this.props.navigation;
+			const name = "Ryan"
 
 	 		return(
 	 			<View style={styles.container}>
 	 				<View style={styles.header}>
-						<Text style={styles.title}>Hello, There!</Text>
+						<Text style={styles.title}>Hello, {name}!</Text>
 					</View>
 					<View style={styles.footer}>
 							<Text style={styles.loginTitle}>Login:</Text>

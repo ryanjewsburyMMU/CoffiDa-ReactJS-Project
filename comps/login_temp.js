@@ -12,7 +12,8 @@ export default class login_temp extends Component{
 			email: "",
 			password: "",
 			id:"",
-			token:""
+			token:"",
+			user_details: ""
 		}
 	}
 
@@ -64,6 +65,26 @@ export default class login_temp extends Component{
 
 
 
+
+	async get_getInfo () {
+		console.log("Get Request Made For details")
+		return fetch("http://10.0.2.2:3333/api/1.0.0/user/" + await AsyncStorage.getItem('@user_id'),
+			{
+			method: 'get',
+			headers: {'Content-Type': 'application/json', 'X-Authorization' : await AsyncStorage.getItem('@session_token')},
+		})
+
+		.then((response) => response.json())
+		.then((responseJson) => {
+			this.setState({
+				user_details: responseJson
+			})
+			console.log(this.state.user_details)
+		})
+		.catch((error) => {
+			console.log(error)
+		})
+	}
 
 
 
@@ -128,6 +149,10 @@ export default class login_temp extends Component{
 						<Button title="Login" onPress={()=> this.post_login()} />
 						<Button title="Logout" onPress={()=> this.post_logout()} />
 						<Button title="Test Async" onPress={() => this.testFunction()} ></Button>
+						<Button title="Test Get Info" onPress={() => this.get_getInfo()} ></Button>
+
+						<Text>{this.state.user_details.first_name}</Text>
+
 				</View>
 			)}
 }
