@@ -17,7 +17,7 @@ import SplashScreen from './comps/splashScreen'
 import login_temp from './comps/login_temp'
 import SignUp from './comps/signup'
 import CreatePost from './comps/createPost'
-//import Home_Tab from './comps/home_tab'
+import Home_Tab from './comps/home_tab'
 import Profile from './comps/profile'
 import Search from './comps/search'
 import Feed from './comps/feed'
@@ -40,6 +40,7 @@ export default class DB extends Component{
 		return(
             <NavigationContainer>
                 <Drawer.Navigator>
+                    <Drawer.Screen name="Home_Tab" component={Home_Tab}/>
                     <Drawer.Screen name="ProfileStack" component={ProfileStack}/>
                     <Drawer.Screen name="Settings" component={Settings}/>
                     <Drawer.Screen name="login_temp" component={login_temp}/>

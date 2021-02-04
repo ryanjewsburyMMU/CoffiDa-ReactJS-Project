@@ -86,6 +86,7 @@ const styles = StyleSheet.create({
 		borderTopRightRadius: 10,
 		borderBottomLeftRadius: 10,
 		borderBottomRightRadius: 10,
+		elevation: 5
 	},
 	signupButton: {
 		alignItems: "center",
@@ -100,6 +101,7 @@ const styles = StyleSheet.create({
 		borderBottomRightRadius: 10,
 		borderColor:'#eaca97',
 		borderWidth: 1,
+		elevation: 5
 	},
 	textinput:{
 		marginBottom:10,

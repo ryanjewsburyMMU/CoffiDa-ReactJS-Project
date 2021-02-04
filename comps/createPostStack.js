@@ -6,11 +6,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import {Text, View, Button,TouchableOpacity} from 'react-native';
 
-import CreatePost from '/comps/createPost'
+import CreatePost from './comps/createPost'
 
 const Stack = createStackNavigator()
 
-class CreatePostStack extends Component{
+export default class CreatePostStack extends Component{
     render(){
         return(
             <Stack.Navigator>

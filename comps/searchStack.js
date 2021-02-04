@@ -1,9 +1,11 @@
 import 'react-native-gesture-handler'
 import { NavigationContainer} from '@react-navigation/native';
 import React, {Component} from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
 
-import {Text, View, Button,TouchableOpacity} from 'react-native';
+const Stack = createStackNavigator()
 
+import Search from './search'
 
 export default class SearchStack extends Component{
     render(){

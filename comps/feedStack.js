@@ -1,10 +1,11 @@
 import 'react-native-gesture-handler'
 import { NavigationContainer} from '@react-navigation/native';
 import React, {Component} from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
 
-import {Text, View, Button,TouchableOpacity} from 'react-native';
+const Stack = createStackNavigator()
 
-
+import Feed from './feed'
 
 export default class FeedStack extends Component{
     render(){
