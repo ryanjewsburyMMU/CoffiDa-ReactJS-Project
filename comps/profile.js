@@ -1,56 +1,51 @@
 import React, {Component, useEffect, useState} from 'react';
 
-import {Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions,TouchableOpacity,} from 'react-native';
+import {Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions,TouchableOpacity, forceUpdate} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Login from './login'
+import SignUp from './signup'
 
 
+export default class Profile extends Component{
+	constructor(props){
+		super(props)
+		this.state = {
+			isLoggedIn: true,
+			user_details: []
+		}
+	}
+	componentDidMount (){
+			this.unsubscribe = this.props.navigation.addListener('focus', () => {
+				this.checkLoggedIn()
+				console.log("Screen Aciviated")
 
-class NotLoggedIn extends Component{
-	render(){
-		const createReviewIcon = <Icon name="edit" size={30} color="#eaca97" />;
-		const updateIcon = <Icon name="feed" size={30} color="#eaca97" />;
-		const discountIcon = <Icon name="money" size={30} color="#eaca97" />;
-		const userIcon = <Icon name="users" size={30} color="#fff" />;
+		})
+	}
+	componentWillUnmount(){
+		this.unsubscribe()
+		}
+	
+	checkLoggedIn = async () => {
+		const navigation = this.props.navigation;
 
-		return(
-			<View style={styles.container}>
-			<View style={styles.header}>
-			   <Text style={styles.title}>Welcome, Stranger!</Text>
-		   </View>
-		   <View style={styles.footer}>
-			   <Button title="test" onPress={this.testFunction}/>
-			   <Text style={styles.sub_text}> We've noticed your not signed in! Creating a FREE account gives you access to tons of great features such as:</Text>
-			   <ScrollView>
-				<TouchableOpacity style={styles.card}>
-					<Text>{createReviewIcon}</Text>
-					<Text>Create Your Own Review!</Text>
-				</TouchableOpacity>
-				<TouchableOpacity style={styles.card}>
-					<Text>{updateIcon}</Text>
-					<Text>Get Notifications And Updates!</Text>
-				</TouchableOpacity>
-				<TouchableOpacity style={styles.card}>
-					<Text>{discountIcon}</Text>
-					<Text>Recieve Unique Discounts!</Text>
-				</TouchableOpacity>
-				<TouchableOpacity style={styles.card_login}>
-					<Text>{userIcon}</Text>
-					<Text style={styles.text}>Click Here to Login Or Signup Today!</Text>
-				</TouchableOpacity>	
-				</ScrollView>
-		   </View>
-		</View>
-		)}
-}
+		const token = await AsyncStorage.getItem('@session_token')
+        console.log("token is === " + token)
 
+        if (token === null) {
+			navigation.navigate('Login')
 
+        } else {
+		  navigation.navigate('Profile')
+		  this.get_getInfo()
+        }
+	}
 
-class IsLoggedIn extends Component{
 
 	async post_logout () {
+		const navigation = this.props.navigation
 		console.log("Post Request Made For Logout")
 		return fetch("http://10.0.2.2:3333/api/1.0.0/user/logout",
 			{
@@ -65,6 +60,7 @@ class IsLoggedIn extends Component{
 					{
 						console.log("Logged Out")
 						AsyncStorage.clear()
+						navigation.navigate("Login")
 					}
 				if(response.status == "400")
 					{
@@ -87,82 +83,51 @@ class IsLoggedIn extends Component{
 
 
 
-	render(){
-		const createReviewIcon = <Icon name="edit" size={30} color="#eaca97" />;
-		const updateIcon = <Icon name="feed" size={30} color="#eaca97" />;
-		const discountIcon = <Icon name="money" size={30} color="#eaca97" />;
-		const userIcon = <Icon name="users" size={30} color="#fff" />;
+	async get_getInfo () {
+		console.log("Get Request Made For details")
+		return fetch("http://10.0.2.2:3333/api/1.0.0/user/" + await AsyncStorage.getItem('@user_id'),
+			{
+			method: 'get',
+			headers: {'Content-Type': 'application/json', 'X-Authorization' : await AsyncStorage.getItem('@session_token')},
+		})
 
-		return(
-			<View style={styles.container}>
-			<View style={styles.header}>
-			   <Text style={styles.title}>Welcome, User!</Text>
-		   </View>
-		   <View style={styles.footer}>
-			   <Text style={styles.sub_text}> Welcome to your profile page! Here you can view your details, make changes or log out!</Text>
-			   <ScrollView>
-				<TouchableOpacity style={styles.card}>
-					<Text>{createReviewIcon}</Text>
-					<Text>View my Details</Text>
-				</TouchableOpacity>
-				<TouchableOpacity style={styles.card}>
-					<Text>{updateIcon}</Text>
-					<Text>Edit My Details</Text>
-				</TouchableOpacity>
-				<TouchableOpacity style={styles.card_login} onPress={this.post_logout}>
-					<Text>{userIcon}</Text>
-					<Text style={styles.text}>Click Here to Logout!</Text>
-				</TouchableOpacity>	
-				</ScrollView>
-		   </View>
-		</View>
-		)}
-}
-
-
-
-
-export default class Profile extends Component{
-	constructor(props){
-		super(props)
-		this.state = {
-			isLoggedIn: true
-		}
+		.then((response) => response.json())
+		.then((responseJson) => {
+			this.setState({
+				user_details: responseJson
+			})
+			console.log(this.state.user_details)
+		})
+		.catch((error) => {
+			console.log(error)
+		})
 	}
 
-	async componentDidMount (){
-        const name = await AsyncStorage.getItem('@user_name')
 
-        console.log("name is === " + name)
-
-        if (name === null) {
-			console.log(this.state.isLoggedIn)
-			this.setState({isLoggedIn: false})
-        } else {
-		  console.log(this.state.isLoggedIn)
-          this.setState({isLoggedIn: true})
-        }
-	}
 	 	render(){
 			const navigation = this.props.navigation;
-	 		return(
-			<View style={styles.container}>
-				{/* {this.state.isLoggedIn ? <NotLoggedIn/>: <View><Text>View 2</Text></View>} */}
-				<IsLoggedIn />
-				</View>
 
-	 			
+	 		return(
+	 			<View style={styles.container}>
+	 				<View style={styles.header}>
+						<Text style={styles.title}>Hello, {this.state.user_details.first_name}</Text>
+					</View>
+					<View style={styles.footer}>
+						<Button title="Edit Profile" onPress={() => this.get_getInfo}/>	
+						<Text>{this.state.user_details.first_name} {this.state.user_details.last_name}</Text>
+						<Text>{this.state.user_details.email}</Text>
+						<Button title="Logout" onPress={() => console.log("Log Out pressed (NO FUNCTIONAILITY YET)")}/>
+
+
+					</View>
+	 			</View>
 	)}
 }
-
-
-
-
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-        backgroundColor: '#eaca97',
+		backgroundColor: '#eaca97',
 	},
 	guest:{
 		marginTop: 10,
@@ -170,8 +135,9 @@ const styles = StyleSheet.create({
 	},
 	header:{
 		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center'
+		justifyContent: 'flex-end',
+		marginLeft: 20,
+		marginBottom: 10
 	},
 	footer:{
 		flex: 5,
@@ -183,45 +149,55 @@ const styles = StyleSheet.create({
 	},
 	text:{
 		color: '#fff',
-		marginTop: 10,
-		fontWeight: "bold",
-
+		marginBottom: 20
 	},
 	title:{
-        display: 'flex',
 		color: '#fff',
 		fontSize: 30,
-		fontWeight: "bold",
+		fontWeight: "bold"
 	},
-	sub_text:{
-		fontSize: 15,
-		marginBottom: 10,
-		textAlign: 'center',
-		marginBottom: 30
+	loginTitle:{
+		color: '#502b10',
+		fontSize: 20,
+		fontWeight: 'bold',
+		marginBottom: 10
 	},
-	card:{
-		justifyContent: 'center',
-		alignItems: 'center',
+	subtitle:{
+		marginBottom: 20
+	},
+	loginButton: {
+		alignItems: "center",
+		width: "100%",
+		height:40,
+		backgroundColor: "#eaca97",
+		padding: 10,
+		marginTop: 20,
+		borderTopLeftRadius: 10,
+		borderTopRightRadius: 10,
+		borderBottomLeftRadius: 10,
+		borderBottomRightRadius: 10,
+	},
+	signupButton: {
+		alignItems: "center",
+		width: "100%",
+		height:40,
+		backgroundColor: "#fff",
+		padding: 10,
+		marginTop: 20,
+		borderTopLeftRadius: 10,
+		borderTopRightRadius: 10,
+		borderBottomLeftRadius: 10,
+		borderBottomRightRadius: 10,
 		borderColor:'#eaca97',
-		borderWidth: 5,
-		padding: 10,
-		marginBottom: 10,
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		borderBottomLeftRadius: 30,
-		borderBottomRightRadius: 30,
+		borderWidth: 1,
 	},
-	card_login: {
-		justifyContent: 'center',
-		alignItems: 'center',
-		backgroundColor:'#eaca97',
-		padding: 10,
-		marginBottom: 10,
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		borderBottomLeftRadius: 30,
-		borderBottomRightRadius: 30,
-
-	},
+	textinput:{
+		marginBottom:10,
+		borderColor:'#eaca97',
+		borderWidth: 1,
+		borderTopLeftRadius: 10,
+		borderTopRightRadius: 10,
+		borderBottomLeftRadius: 10,
+		borderBottomRightRadius: 10,
+	}
 })
-

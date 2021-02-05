@@ -40,10 +40,10 @@ export default class DB extends Component{
 		return(
             <NavigationContainer>
                 <Drawer.Navigator>
-                    <Drawer.Screen name="Home_Tab" component={Home_Tab}/>
-                    <Drawer.Screen name="ProfileStack" component={ProfileStack}/>
+                    <Drawer.Screen name="Home" component={Home_Tab}/>
+                    <Drawer.Screen name="Profile" component={ProfileStack}/>
                     <Drawer.Screen name="Settings" component={Settings}/>
-                    <Drawer.Screen name="login_temp" component={login_temp}/>
+                    <Drawer.Screen name="Login" component={login_temp}/>
                 </Drawer.Navigator>
                 </NavigationContainer>
 	)}

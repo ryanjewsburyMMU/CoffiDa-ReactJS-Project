@@ -24,7 +24,9 @@ export default class SignUp extends Component{
 	}
 
 
-	post_signup = (navigation) =>{
+	post_signup = () =>{
+		const navigation = this.props.navigation;
+
 		// Check if both passwords entered are the same
 		if(this.state.password == this.state.password_confirm)
 		{
@@ -65,6 +67,7 @@ export default class SignUp extends Component{
 			.then((rjson)=> {
 				console.log(rjson.id)
 				this.setState({id: rjson.id})
+				navigation.goBack()
 			})
 			.catch((errors)=>{
 				console.log("Error")
@@ -92,8 +95,12 @@ export default class SignUp extends Component{
 							<TextInput style={styles.textinput} placeholder="Password" onChangeText={(text) => {this.setState({password: text})}}/>
 							<TextInput style={styles.textinput} placeholder="Confirm Password" onChangeText={(text) => {this.setState({password_confirm: text})}}/>
 							<TouchableOpacity
-							onPress={()=> this.post_signup(navigation)} style={styles.loginButton}>							
-							<Text>Sign Up:</Text>
+								onPress={()=> this.post_signup()} style={styles.loginButton}>							
+								<Text>Sign Up:</Text>
+							</TouchableOpacity>
+							<TouchableOpacity
+								onPress={()=> this.props.navigation.goBack()} style={styles.signupButton}>							
+								<Text>Go Back:</Text>
 							</TouchableOpacity>
 
 					</View>
@@ -113,7 +120,7 @@ const styles = StyleSheet.create({
 		marginBottom: 10
 	},
 	footer:{
-		flex: 2,
+		flex: 3,
 		backgroundColor: '#fff',
 		borderTopLeftRadius: 30,
 		borderTopRightRadius: 30,
@@ -164,6 +171,10 @@ const styles = StyleSheet.create({
 	textinput:{
 		marginBottom:10,
 		borderColor:'#eaca97',
-		borderWidth: 1
+		borderWidth: 1,
+		borderTopLeftRadius: 10,
+		borderTopRightRadius: 10,
+		borderBottomLeftRadius: 10,
+		borderBottomRightRadius: 10,
 	}
 })

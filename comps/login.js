@@ -1,12 +1,86 @@
 import React, {Component, useEffect, useState} from 'react';
 
-import {Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions,TouchableOpacity,} from 'react-native';
+import {Text, View, TextInput,  StyleSheet,TouchableOpacity, Button, Alert} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default class Login extends Component{
-
-	emptyFunction = () =>{
-			console.log("Testing")
+	constructor(props){
+		super(props)
+		this.state = {
+			email: "",
+			password: "",
 		}
+	}
+
+	componentDidMount (){
+		this.unsubscribe = this.props.navigation.addListener('focus', () => {
+			this.checkLoggedIn()
+			console.log("Screen Aciviated")
+
+	})
+}
+	componentWillUnmount(){
+		this.unsubscribe()
+		}
+
+	checkLoggedIn = async () => {
+		const navigation = this.props.navigation;
+
+		const token = await AsyncStorage.getItem('@session_token')
+		console.log("token is === " + token)
+
+		if (token != null) {
+		navigation.navigate('Profile')
+		}
+	}
+
+
+	async post_login () {
+		const navigation = this.props.navigation;
+
+		console.log("Post Request Made For Login")
+		return fetch("http://10.0.2.2:3333/api/1.0.0/user/login",
+			{
+				method: 'post',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					email: this.state.email,
+					password: this.state.password
+				})
+			})
+			.then((response)=> {
+				if (parseInt(response.status) == 200)
+				{
+					console.log("Login Success - Code: " + response.status)
+					Alert.alert("Login Successful (" +response.status+")", "Test")
+					return response.json();					
+				}
+				if (parseInt(response.status) == 400)
+				{
+					console.log("Login Unsucesful - Code: " + response.status)		
+					Alert.alert("Incorrect Details (" +response.status+")", "Please ensure your email and password are correct, if the problem persits please contact our team for more support.")
+	
+				}
+				if (parseInt(response.status) == 500)
+				{
+					console.log("Server Error, Please try again soon.  " + response.status)	
+					Alert.alert("Connection Error", "We are struggling to connect with you! Please try again or contact our team for further support.")
+				}
+			})
+			.then(async(responseJson) => {
+				console.log(responseJson.token)
+				await AsyncStorage.setItem('@session_token', String(responseJson.token))
+				await AsyncStorage.setItem('@user_id', String(responseJson.id))
+				navigation.navigate("Profile")
+			})
+			.catch((error) => {
+				console.log(error);
+			})
+	}
+
+
+
 
 	 	render(){
 			const navigation = this.props.navigation;
@@ -18,17 +92,18 @@ export default class Login extends Component{
 					</View>
 					<View style={styles.footer}>
 							<Text style={styles.loginTitle}>Login:</Text>
-							<TextInput style={styles.textinput}placeholder="Email"/>
-							<TextInput style={styles.textinput}placeholder="Password"/>
-							<TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('DB')}>
+							<TextInput style={styles.textinput}placeholder="Email" onChangeText={(text) => {this.setState({email: text})}}/>
+							<TextInput style={styles.textinput}placeholder="Password" onChangeText={(text) => {this.setState({password: text})}}/>
+							<TouchableOpacity style={styles.loginButton} onPress={() => {this.post_login()}}>
 								<Text style={styles.text}>Login</Text>
 							</TouchableOpacity>
-							<TouchableOpacity style={styles.signupButton} onPress={() => navigation.navigate('SignUp')}>
+							<TouchableOpacity style={styles.signupButton} onPress={() => this.props.navigation.navigate('SignUp')}>
 								<Text>Sign Up</Text>
 							</TouchableOpacity>
 							<TouchableOpacity>
 								<Text style={styles.guest}>Continue As a Guest</Text>
 							</TouchableOpacity>
+
 					</View>
 	 			</View>
 	)}
