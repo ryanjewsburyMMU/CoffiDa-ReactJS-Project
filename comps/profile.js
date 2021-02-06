@@ -9,6 +9,7 @@ import Login from './login'
 import SignUp from './signup'
 
 
+
 export default class Profile extends Component{
 	constructor(props){
 		super(props)
@@ -92,11 +93,14 @@ export default class Profile extends Component{
 		})
 
 		.then((response) => response.json())
-		.then((responseJson) => {
+		.then(async(responseJson) => {
 			this.setState({
 				user_details: responseJson
 			})
-			console.log(this.state.user_details)
+			console.log(responseJson)
+			await AsyncStorage.setItem('@userName', this.state.user_details.first_name)
+			await AsyncStorage.setItem('@userLastName', this.state.user_details.last_name)
+			await AsyncStorage.setItem('@userEmail', this.state.user_details.email)
 		})
 		.catch((error) => {
 			console.log(error)
@@ -106,6 +110,8 @@ export default class Profile extends Component{
 
 	 	render(){
 			const navigation = this.props.navigation;
+			const myIcon1 = <Icon name="rocket" size={30} color="#900" />;
+
 
 	 		return(
 	 			<View style={styles.container}>
@@ -113,18 +119,35 @@ export default class Profile extends Component{
 						<Text style={styles.title}>Hello, {this.state.user_details.first_name}</Text>
 					</View>
 					<View style={styles.footer}>
-						<Button title="Edit Profile" onPress={() => this.get_getInfo}/>	
-						<Text>{this.state.user_details.first_name} {this.state.user_details.last_name}</Text>
-						<Text>{this.state.user_details.email}</Text>
-						<Button title="Logout" onPress={() => console.log("Log Out pressed (NO FUNCTIONAILITY YET)")}/>
-
-
+						<Text style={styles.loginTitle}>Your Details:</Text>
+						<Text style={styles.text}>Full Name: {this.state.user_details.first_name} {this.state.user_details.last_name}</Text>
+						<Text style={styles.text}>E-Mail: {this.state.user_details.email}</Text>
+						<Text style={styles.text}>Your Unique ID: {this.state.user_details.user_id}</Text>
+						<TouchableOpacity style={styles.signupButton} onPress={() => navigation.navigate("Profile_Details")}>
+							<Text>Edit Profile</Text>
+						</TouchableOpacity> 
+						<TouchableOpacity style={styles.signupButton} onPress={() => console.log("Take to stack page")}>
+							<Text>Favourite Locations</Text>
+						</TouchableOpacity> 
+						<TouchableOpacity style={styles.signupButton} onPress={() => console.log("Take to stack page")}>
+							<Text>My Reviews</Text>
+						</TouchableOpacity> 
+						<TouchableOpacity style={styles.signupButton} onPress={() => console.log("Take to stack page")}>
+							<Text>Liked Reviews</Text>
+						</TouchableOpacity> 
+						<TouchableOpacity style={styles.loginButton} onPress={() => {this.post_logout()}}>
+							<Text>Sign Out</Text>
+						</TouchableOpacity> 
+			
 					</View>
 	 			</View>
 	)}
 }
 
 const styles = StyleSheet.create({
+	test: {
+		textAlign: 'right'
+	},
 	container: {
 		flex: 1,
 		backgroundColor: '#eaca97',
@@ -148,19 +171,20 @@ const styles = StyleSheet.create({
 		paddingVertical: 50
 	},
 	text:{
-		color: '#fff',
-		marginBottom: 20
+		textAlign: 'center',
+		marginBottom: 10,
 	},
 	title:{
 		color: '#fff',
 		fontSize: 30,
-		fontWeight: "bold"
+		fontWeight: "bold",
 	},
 	loginTitle:{
 		color: '#502b10',
 		fontSize: 20,
 		fontWeight: 'bold',
-		marginBottom: 10
+		marginBottom: 10,
+		textAlign: 'center'
 	},
 	subtitle:{
 		marginBottom: 20
@@ -183,13 +207,13 @@ const styles = StyleSheet.create({
 		height:40,
 		backgroundColor: "#fff",
 		padding: 10,
-		marginTop: 20,
 		borderTopLeftRadius: 10,
 		borderTopRightRadius: 10,
 		borderBottomLeftRadius: 10,
 		borderBottomRightRadius: 10,
 		borderColor:'#eaca97',
 		borderWidth: 1,
+		marginBottom: 30
 	},
 	textinput:{
 		marginBottom:10,

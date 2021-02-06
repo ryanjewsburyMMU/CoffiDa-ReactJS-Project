@@ -2,6 +2,8 @@ import React, {Component, useEffect, useState} from 'react';
 
 import {Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions,TouchableOpacity,} from 'react-native';
 
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 export default class Search extends Component{
 
 	emptyFunction = () =>{
@@ -10,6 +12,8 @@ export default class Search extends Component{
 
 	 	render(){
 			const navigation = this.props.navigation;
+			const myIcon = <Icon name="rocket" size={30} color="#900" />;
+
 
 	 		return(
 	 			<View style={styles.container}>
@@ -36,8 +40,6 @@ const styles = StyleSheet.create({
 		flex: 1,
                 justifyContent: 'center',
                 alignItems: 'center'
-
-
 	},
 	footer:{
 		flex: 5,

@@ -9,7 +9,7 @@ import {Text, View, Button,TouchableOpacity} from 'react-native';
 import Profile from './profile'
 import SignUp from './signup'
 import Login from './login'
-
+import Profile_Details from './profile_details'
 
 const Stack = createStackNavigator()
 
@@ -23,6 +23,8 @@ export default class ProfileStack extends Component{
                 <Stack.Screen name="Profile" component={Profile}/> 
                 <Stack.Screen name="SignUp" component={SignUp}/> 
                 <Stack.Screen name="Login" component={Login}/> 
+                <Stack.Screen name="Profile_Details" component={Profile_Details}/> 
+
             </Stack.Navigator>
 
         )
