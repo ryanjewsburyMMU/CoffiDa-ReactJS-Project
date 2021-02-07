@@ -1,9 +1,8 @@
 import React, { Component, useEffect, useState } from 'react';
 
-import { Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions, TouchableOpacity, } from 'react-native';
+import { Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions, TouchableOpacity, Object} from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { reduceEachTrailingCommentRange } from 'typescript';
 
 export default class ReviewPage extends Component {
     constructor(props) {
@@ -35,9 +34,11 @@ export default class ReviewPage extends Component {
             })
 
             .then(async (responseJson) => {
-                console.log(responseJson)
-                const result = Object.keys(responseJson).map(key => ({ [key]: responseJson[key] }))
-                console.log(result);
+                // console.log(responseJson)
+                const result = Object.values(responseJson)
+                console.log("Result is")
+                console.log(result)
+                // console.log(result);
                 this.setState({ location_data: result })
             })
             .catch((error) => {
@@ -54,13 +55,22 @@ export default class ReviewPage extends Component {
 
     render() {
         const navigation = this.props.navigation;
-        const location_data = this.state.location_data
-        const reviews = location_data.map(locationData)
+        console.log("logging data")
+        console.log(this.state.location_data)
 
         return (
-            <Text></Text>
+            <View>
+                {
+                    this.state.location_data.map((rowdata, i)=>
+                    <View>
+                        {rowdata.location_id}
+                    </View>
+                    )
+                }
+            </View>
         )
-        }
+
+    }
 }
 
 const styles = StyleSheet.create({
