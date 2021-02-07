@@ -6,12 +6,15 @@ import { createStackNavigator } from '@react-navigation/stack';
 const Stack = createStackNavigator()
 
 import Feed from './feed'
+import ReviewPage from './reviewPage'
 
 export default class FeedStack extends Component{
     render(){
         return(
             <Stack.Navigator>
                 <Stack.Screen name="Feed" component={Feed}/> 
+                <Stack.Screen name="ReviewPage" component={ReviewPage}/> 
+
             </Stack.Navigator>
 
         )

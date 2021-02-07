@@ -7,7 +7,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Tab = createBottomTabNavigator()
 
-import Feed from './feed'
+import FeedStack from './feedStack'
 import Search from './search'
 import CreatePost from './createPost'
 
@@ -20,7 +20,7 @@ export default class Home_Tab extends Component{
                 tabBarIcon: ({focused, color, size}) => {
                     let iconName;
 
-                    if (route.name == 'Feed'){
+                    if (route.name == 'FeedStack'){
                         iconName = focused ? 'home' : 'home-outline'
                     }else if (route.name == 'Search'){
                         iconName = focused ? 'search' : 'search-outline'
@@ -36,11 +36,9 @@ export default class Home_Tab extends Component{
                 activeTintColor : '#eaca97',
                 inactiveTintColor : 'gray'
             }}
-            
-            
             >
-                <Tab.Screen name="Feed" component={Feed}/>
                 <Tab.Screen name="Search" component={Search}/>
+                <Tab.Screen name="FeedStack" component={FeedStack}/>
                 <Tab.Screen name="CreatePost" component={CreatePost}/>
 
             </Tab.Navigator>
