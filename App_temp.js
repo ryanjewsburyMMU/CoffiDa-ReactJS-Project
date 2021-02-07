@@ -10,9 +10,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-
-
 import SplashScreen from './comps/splashScreen'
 import login_temp from './comps/login_temp'
 import SignUp from './comps/signup'
@@ -22,7 +19,6 @@ import Profile from './comps/profile'
 import Search from './comps/search'
 import Feed from './comps/feed'
 //import Login from './comps/login'
-
 
 import ProfileStack from './comps/profileStack'
 
