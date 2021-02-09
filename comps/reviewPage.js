@@ -1,17 +1,30 @@
 import React, { Component, useEffect, useState } from 'react';
 
-import { Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions, TouchableOpacity, Object} from 'react-native';
+import { Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions, TouchableOpacity, Object, ActivityIndicator } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import Reviews from './reviews'
 
 export default class ReviewPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            location_data: [],
-            current_id: null
+            review_data: [],
+            current_id: null,
+            isLoading : true
         }
     }
+
+    componentDidMount() {
+        this.unsubscribe = this.props.navigation.addListener('focus', () => {
+            const route = this.props.route
+            const { id } = route.params;
+            this.setState({ current_id: id })
+            this.get_locations(id)
+        })
+    }
+
 
     async get_locations(id) {
         console.log("Finding Locations")
@@ -34,39 +47,27 @@ export default class ReviewPage extends Component {
             })
 
             .then(async (responseJson) => {
-                // console.log(responseJson)
-                const result = Object.values(responseJson)
                 console.log("Result is")
-                console.log(result)
-                // console.log(result);
-                this.setState({ location_data: result })
+                console.log(responseJson)
+                this.setState({ review_data: responseJson })
             })
             .catch((error) => {
                 console.log("error = " + error)
             })
     }
 
-    componentDidMount() {
-        const route = this.props.route
-        const { id } = route.params;
-        this.setState({ current_id: id })
-        this.get_locations(id)
-    }
-
     render() {
         const navigation = this.props.navigation;
-        console.log("logging data")
-        console.log(this.state.location_data)
-
+        const reviewData = this.state.review_data;
+        
+        
+        if (this.state.review_data == "") {
+            return <View><ActivityIndicator size="large" />
+            </View>
+        }
         return (
             <View>
-                {
-                    this.state.location_data.map((rowdata, i)=>
-                    <View>
-                        {rowdata.location_id}
-                    </View>
-                    )
-                }
+                <Reviews reviewData={reviewData} />
             </View>
         )
 

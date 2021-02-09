@@ -40,7 +40,7 @@ export default class Feed extends Component {
 				if (response.status == "401") {
 					console.log("error 401")
 				}
-				else {  
+				else {
 					console.log("ELSE TRIGGERED")
 				}
 			})
@@ -57,7 +57,6 @@ export default class Feed extends Component {
 
 	render() {
 		const navigation = this.props.navigation;
-		const location_data = this.state.location_data
 		const favourite_icon = <Icon name="heart-o" size={30} color="#900" />;
 
 
@@ -71,7 +70,7 @@ export default class Feed extends Component {
 
 						<Text style={styles.loginTitle}></Text>
 						<View>
-							{location_data.map((locationData, index) => (
+							{this.state.location_data.map((locationData, index) => (
 								<View key={index}>
 									<View style={styles.loginButton}>
 										<Text style={styles.locationTitle}>{locationData.location_name}</Text>
@@ -91,8 +90,11 @@ export default class Feed extends Component {
 											<Text>{favourite_icon}</Text>
 										</TouchableOpacity>
 
-									<TouchableOpacity style={styles.reviewButton} onPress={() => {navigation.navigate("ReviewPage", {id: locationData.location_id})}}>
-										<Text style={styles.text}>See Reviews for {locationData.location_name}</Text>
+										<TouchableOpacity style={styles.reviewButton} onPress={() => { navigation.navigate("ReviewPage", { id: locationData.location_id }) }}>
+											<Text style={styles.text}>See Reviews for {locationData.location_name}</Text>
+										</TouchableOpacity>
+										<TouchableOpacity style={styles.signupButton} onPress={() => { navigation.navigate("CreateReviewPage", { id: locationData.location_id, name: locationData.location_name }) }}>
+											<Text>Write a Review For {locationData.location_name}</Text>
 										</TouchableOpacity>
 									</View>
 								</View>
@@ -156,7 +158,8 @@ const styles = StyleSheet.create({
 	},
 	favourite: {
 		justifyContent: 'center',
-		alignItems: 'center'	},
+		alignItems: 'center'
+	},
 	reviewButton: {
 		alignItems: "center",
 		width: "100%",
@@ -168,6 +171,20 @@ const styles = StyleSheet.create({
 		borderTopRightRadius: 10,
 		borderBottomLeftRadius: 10,
 		borderBottomRightRadius: 10,
+	},
+	signupButton: {
+		alignItems: "center",
+		width: "100%",
+		height:40,
+		backgroundColor: "#fff",
+		padding: 10,
+		marginTop: 20,
+		borderTopLeftRadius: 10,
+		borderTopRightRadius: 10,
+		borderBottomLeftRadius: 10,
+		borderBottomRightRadius: 10,
+		borderColor:'#eaca97',
+		borderWidth: 1,
 	},
 
 })
