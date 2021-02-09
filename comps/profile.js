@@ -129,7 +129,7 @@ export default class Profile extends Component{
 						<TouchableOpacity style={styles.signupButton} onPress={() => console.log("Take to stack page")}>
 							<Text>Favourite Locations</Text>
 						</TouchableOpacity> 
-						<TouchableOpacity style={styles.signupButton} onPress={() => console.log("Take to stack page")}>
+						<TouchableOpacity style={styles.signupButton} onPress={() => navigation.navigate("App")}>
 							<Text>My Reviews</Text>
 						</TouchableOpacity> 
 						<TouchableOpacity style={styles.signupButton} onPress={() => console.log("Take to stack page")}>

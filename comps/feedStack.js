@@ -16,8 +16,6 @@ export default class FeedStack extends Component{
                 <Stack.Screen name="Feed" component={Feed}/> 
                 <Stack.Screen name="ReviewPage" component={ReviewPage}/> 
                 <Stack.Screen name="CreateReviewPage" component={CreateReviewPage}/> 
-
-
             </Stack.Navigator>
 
         )

@@ -24,7 +24,6 @@ export default class Reviews extends Component {
                         <View key={index}>
                             <Text>{locationData.review_id}</Text>
                             <Text>{locationData.review_body}</Text>
-
                         </View>
                     ))}
                 </View>
