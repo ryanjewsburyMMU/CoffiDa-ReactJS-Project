@@ -27,6 +27,7 @@ export default class App extends Component {
 		this.newTest()
 	}
 
+
 	async get_getInfo() {
 		console.log("Get Request Made For details")
 		return fetch("http://10.0.2.2:3333/api/1.0.0/user/" + await AsyncStorage.getItem('@user_id'),
@@ -47,8 +48,6 @@ export default class App extends Component {
 				console.log(error)
 			})
 	}
-
-
 	async delete_review(review_id, location_id){
 		return fetch("http://10.0.2.2:3333/api/1.0.0/location/"+location_id + "/review/" +review_id,
 		{
