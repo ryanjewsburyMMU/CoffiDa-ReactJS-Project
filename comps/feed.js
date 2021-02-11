@@ -7,19 +7,56 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScrollView } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import DoubleClick from 'react-native-double-tap';
+
+
+
 
 export default class Feed extends Component {
 	constructor(props) {
 		super(props),
 			this.state = {
 				isLoading: true,
-				location_data: []
+				location_data: [],
+				favourite_locations: [],
+				favourite_locations_id: []
+
 			}
 	}
 
 	componentDidMount() {
 		this.get_locations();
+		this.get_getInfo();
 	}
+
+
+	async get_getInfo() {
+		console.log("Get Request Made For details")
+		return fetch("http://10.0.2.2:3333/api/1.0.0/user/" + await AsyncStorage.getItem('@user_id'),
+			{
+				method: 'get',
+				headers: { 'Content-Type': 'application/json', 'X-Authorization': await AsyncStorage.getItem('@session_token') },
+			})
+
+			.then((response) => response.json())
+			.then(async (responseJson) => {
+				this.setState({
+					favourite_locations: responseJson.favourite_locations
+				})
+				const new_list = []
+				this.state.favourite_locations.forEach((item) => {
+					new_list.push(item.location_id)
+				});
+				this.setState({ favourite_locations_id: new_list })
+				console.log("ID OF FAV LOCATIONS:")
+				console.log(this.state.favourite_locations_id)
+
+			})
+			.catch((error) => {
+				console.log(error)
+			})
+	}
+
 
 	async get_locations() {
 		console.log("Finding Locations")
@@ -46,8 +83,6 @@ export default class Feed extends Component {
 			})
 
 			.then(async (responseJson) => {
-				console.log(responseJson)
-
 				this.setState({ location_data: responseJson })
 			})
 			.catch((error) => {
@@ -55,11 +90,56 @@ export default class Feed extends Component {
 			})
 	}
 
+
+
+
+
+	isFavourited(currentID) {
+		var favourite_icon = <Icon name="heart" size={30} color="#900" />
+		var not_favourite_icon = <Icon name="heart-o" size={30} color="#900" />
+		var currentIcon
+
+
+		if (this.state.favourite_locations_id.includes(currentID) == true) {
+			return (
+				<View>
+					<DoubleClick
+						singleTap={() => {
+							console.log("You have unfavourited " + currentID);
+							currentIcon = not_favourite_icon
+						}}
+						doubleTap={() => {
+							console.log("You have favourited " + currentID);
+							currentIcon = favourite_icon
+						}}
+						delay={200}
+					>
+					<Text>click me</Text>
+					</DoubleClick>					
+					<Text>{currentIcon}</Text>
+				</View>)
+		}
+		else {
+			currentIcon = not_favourite_icon
+			return (
+				<View>
+					<DoubleClick
+						singleTap={() => {
+							console.log("You have unfavourited " + currentID);
+						}}
+						doubleTap={() => {
+							console.log("You have favourited " + currentID);
+						}}
+						delay={200}
+					>
+						<Text>{currentIcon}</Text>
+					</DoubleClick>
+				</View>)
+		}
+	}
 	render() {
 		const navigation = this.props.navigation;
-		const favourite_icon = <Icon name="heart-o" size={30} color="#900" />;
-
-
+		const favourite_icon = <Icon name="heart-o" size={30} color="#900" />
 		return (
 			<View style={styles.container}>
 				<View style={styles.header}>
@@ -86,9 +166,7 @@ export default class Feed extends Component {
 									</View>
 									<View style={styles.favourite}>
 										<Text>Favourite This Location?</Text>
-										<TouchableOpacity onPress={() => { console.log("You favourited" + locationData.location_id) }}>
-											<Text>{favourite_icon}</Text>
-										</TouchableOpacity>
+										<Text>{this.isFavourited(locationData.location_id)}</Text>
 
 										<TouchableOpacity style={styles.reviewButton} onPress={() => { navigation.navigate("ReviewPage", { id: locationData.location_id }) }}>
 											<Text style={styles.text}>See Reviews for {locationData.location_name}</Text>
@@ -175,7 +253,7 @@ const styles = StyleSheet.create({
 	signupButton: {
 		alignItems: "center",
 		width: "100%",
-		height:40,
+		height: 40,
 		backgroundColor: "#fff",
 		padding: 10,
 		marginTop: 20,
@@ -183,7 +261,7 @@ const styles = StyleSheet.create({
 		borderTopRightRadius: 10,
 		borderBottomLeftRadius: 10,
 		borderBottomRightRadius: 10,
-		borderColor:'#eaca97',
+		borderColor: '#eaca97',
 		borderWidth: 1,
 	},
 
