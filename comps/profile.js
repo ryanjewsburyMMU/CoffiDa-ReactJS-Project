@@ -126,7 +126,7 @@ export default class Profile extends Component{
 						<TouchableOpacity style={styles.signupButton} onPress={() => navigation.navigate("Profile_Details")}>
 							<Text>Edit Profile</Text>
 						</TouchableOpacity> 
-						<TouchableOpacity style={styles.signupButton} onPress={() => console.log("Take to stack page")}>
+						<TouchableOpacity style={styles.signupButton} onPress={() => navigation.navigate("FavouriteLocations")}>
 							<Text>Favourite Locations</Text>
 						</TouchableOpacity> 
 						<TouchableOpacity style={styles.signupButton} onPress={() => navigation.navigate("App")}>

@@ -9,9 +9,6 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 import DoubleClick from 'react-native-double-tap';
 
-
-
-
 export default class Feed extends Component {
 	constructor(props) {
 		super(props),
@@ -19,7 +16,8 @@ export default class Feed extends Component {
 				isLoading: true,
 				location_data: [],
 				favourite_locations: [],
-				favourite_locations_id: []
+				favourite_locations_id: [],
+				current_state_icon: "Yes"
 
 			}
 	}
@@ -29,6 +27,80 @@ export default class Feed extends Component {
 		this.get_getInfo();
 	}
 
+
+	async post_addFavourite(location_id) {
+		const navigation = this.props.navigation;
+
+		console.log("Post Request Made For Add Fave")
+		return fetch("http://10.0.2.2:3333/api/1.0.0/location/" + location_id + "/favourite",
+			{
+				method: 'post',
+				headers: { 'Content-Type': 'application/json', 'X-Authorization': await AsyncStorage.getItem('@session_token') },
+			})
+			.then((response)=> {
+				if (parseInt(response.status) == 200)
+				{
+					console.log("Login Success - Code: " + response.status)
+					this.get_getInfo()
+				}
+				if (parseInt(response.status) == 400)
+				{
+					console.log(" Unsucesful - Code: " + response.status)		
+				}
+				if (parseInt(response.status) == 401)
+				{
+					console.log(" Unauthorised - Code: " + response.status)		
+				}
+				if (parseInt(response.status) == 404)
+				{
+					console.log(" Error updated - Code: " + response.status)		
+				}
+				if (parseInt(response.status) == 500)
+				{
+					console.log("Server Error, Please try again soon.  " + response.status)	
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+			})
+	}
+
+	async delete_removeFavourite(location_id) {
+		const navigation = this.props.navigation;
+
+		console.log("Post Request Made For Add Fave")
+		return fetch("http://10.0.2.2:3333/api/1.0.0/location/" + location_id + "/favourite",
+			{
+				method: 'delete',
+				headers: { 'Content-Type': 'application/json', 'X-Authorization': await AsyncStorage.getItem('@session_token') },
+			})
+			.then((response)=> {
+				if (parseInt(response.status) == 200)
+				{
+					console.log("Login Success - Code: " + response.status)
+					this.get_getInfo()
+				}
+				if (parseInt(response.status) == 400)
+				{
+					console.log(" Unsucesful - Code: " + response.status)		
+				}
+				if (parseInt(response.status) == 403)
+				{
+					console.log(" Forbidden - Code: " + response.status)		
+				}
+				if (parseInt(response.status) == 404)
+				{
+					console.log(" Error updated - Code: " + response.status)		
+				}
+				if (parseInt(response.status) == 500)
+				{
+					console.log("Server Error, Please try again soon.  " + response.status)	
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+			})
+	}
 
 	async get_getInfo() {
 		console.log("Get Request Made For details")
@@ -97,7 +169,6 @@ export default class Feed extends Component {
 	isFavourited(currentID) {
 		var favourite_icon = <Icon name="heart" size={30} color="#900" />
 		var not_favourite_icon = <Icon name="heart-o" size={30} color="#900" />
-		var currentIcon
 
 
 		if (this.state.favourite_locations_id.includes(currentID) == true) {
@@ -106,33 +177,34 @@ export default class Feed extends Component {
 					<DoubleClick
 						singleTap={() => {
 							console.log("You have unfavourited " + currentID);
-							currentIcon = not_favourite_icon
+							this.delete_removeFavourite(currentID)
 						}}
 						doubleTap={() => {
 							console.log("You have favourited " + currentID);
-							currentIcon = favourite_icon
+							this.post_addFavourite(currentID)
 						}}
 						delay={200}
 					>
-					<Text>click me</Text>
+					<Text>{favourite_icon}</Text>
 					</DoubleClick>					
-					<Text>{currentIcon}</Text>
 				</View>)
 		}
 		else {
-			currentIcon = not_favourite_icon
 			return (
 				<View>
 					<DoubleClick
 						singleTap={() => {
 							console.log("You have unfavourited " + currentID);
+							this.delete_removeFavourite(currentID)
+
 						}}
 						doubleTap={() => {
 							console.log("You have favourited " + currentID);
+							this.post_addFavourite(currentID)
 						}}
 						delay={200}
 					>
-						<Text>{currentIcon}</Text>
+						<Text>{not_favourite_icon}</Text>
 					</DoubleClick>
 				</View>)
 		}
@@ -168,7 +240,7 @@ export default class Feed extends Component {
 										<Text>Favourite This Location?</Text>
 										<Text>{this.isFavourited(locationData.location_id)}</Text>
 
-										<TouchableOpacity style={styles.reviewButton} onPress={() => { navigation.navigate("ReviewPage", { id: locationData.location_id }) }}>
+										<TouchableOpacity style={styles.reviewButton} onPress={() => { navigation.navigate("ReviewPage", { id: locationData.location_id, name: locationData.location_name }) }}>
 											<Text style={styles.text}>See Reviews for {locationData.location_name}</Text>
 										</TouchableOpacity>
 										<TouchableOpacity style={styles.signupButton} onPress={() => { navigation.navigate("CreateReviewPage", { id: locationData.location_id, name: locationData.location_name }) }}>

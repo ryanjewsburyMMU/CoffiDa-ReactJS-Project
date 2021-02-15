@@ -12,79 +12,83 @@ import StarRating from 'react-native-star-rating';
 
 
 
-export default class App extends Component {
-	constructor(props) {
-		super(props)
-		this.state = {
-			user_details: [],
+export default class FavouriteLocations extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            user_details: [],
 
-		}
-	}
+        }
+    }
 
-	componentDidMount() {
-		this.get_getInfo()
-	}
+    componentDidMount() {
+        this.get_getInfo()
+    }
 
 
-	async get_getInfo() {
-		console.log("Get Request Made For details")
-		return fetch("http://10.0.2.2:3333/api/1.0.0/user/" + await AsyncStorage.getItem('@user_id'),
+	async delete_removeFavourite(location_id) {
+		const navigation = this.props.navigation;
+
+		console.log("Post Request Made For Add Fave")
+		return fetch("http://10.0.2.2:3333/api/1.0.0/location/" + location_id + "/favourite",
 			{
-				method: 'get',
+				method: 'delete',
 				headers: { 'Content-Type': 'application/json', 'X-Authorization': await AsyncStorage.getItem('@session_token') },
 			})
-
-			.then((response) => response.json())
-			.then(async (responseJson) => {
-				this.setState({
-					user_details: responseJson,
-				})
-
+			.then((response)=> {
+				if (parseInt(response.status) == 200)
+				{
+					console.log("Login Success - Code: " + response.status)
+					this.get_getInfo()
+				}
+				if (parseInt(response.status) == 400)
+				{
+					console.log(" Unsucesful - Code: " + response.status)		
+				}
+				if (parseInt(response.status) == 403)
+				{
+					console.log(" Forbidden - Code: " + response.status)		
+				}
+				if (parseInt(response.status) == 404)
+				{
+					console.log(" Error updated - Code: " + response.status)		
+				}
+				if (parseInt(response.status) == 500)
+				{
+					console.log("Server Error, Please try again soon.  " + response.status)	
+				}
 			})
 			.catch((error) => {
-				console.log(error)
+				console.log(error);
 			})
 	}
-	async delete_review(review_id, location_id){
-		return fetch("http://10.0.2.2:3333/api/1.0.0/location/"+location_id + "/review/" +review_id,
-		{
-			method: 'delete',
-			headers: {'Content-Type': 'application/json', 'X-Authorization' : await AsyncStorage.getItem('@session_token')},
-		})
-		.then((response) =>{
-			// Add error catching here
-			if(response.status == "200"){
-				Alert.alert("Item has been deleted")
-				this.get_getInfo()
-			}
-			if(response.status == "400"){
-				Alert.alert("Bad Request 400")
-			}
-			if(response.status == "401"){
-				Alert.alert("Unauthorised (401)")
-			}
-			if(response.status == "403"){
-				Alert.alert("You cannot edit this review")
-			}
-			if(response.status == "404"){
-				Alert.alert("Review update not found, please try again(404)")
-			}
-			if(response.status == "500"){
-				Alert.alert("There was an erroe connecting, try again (500)")
-			}
-		})
-		.catch((error) => {
-			console.log(error)
-		})
 
-}
-	
-	press_delete(title, review_id, location_id){
-		Alert.alert("Are You Sure?", "Are you sure you want to delete your review for " + title + "?",
+    async get_getInfo() {
+        console.log("Get Request Made For details")
+        return fetch("http://10.0.2.2:3333/api/1.0.0/user/" + await AsyncStorage.getItem('@user_id'),
+            {
+                method: 'get',
+                headers: { 'Content-Type': 'application/json', 'X-Authorization': await AsyncStorage.getItem('@session_token') },
+            })
+
+            .then((response) => response.json())
+            .then(async (responseJson) => {
+                this.setState({
+                    user_details: responseJson,
+                })
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    	
+	press_delete(title, location_id){
+		Alert.alert("Are You Sure?", "Are you sure you want to remove " + title + " from your favourites?",
 		[
 			{
-			  text: 'Yes, Delete',
-			  onPress: () => this.delete_review(review_id, location_id)
+			  text: 'Yes, Remove',
+			  onPress: () => this.delete_removeFavourite(location_id)
 
 			},
 			{
@@ -95,13 +99,19 @@ export default class App extends Component {
 		)
 	}
 
-	
+
+
+
+
+
+
+
 	render() {
 		const user_data = this.state.user_details
 		const navigation = this.props.navigation;
 
 
-		if(this.state.user_details == [] && this.state.favourite_locations_id == []){
+		if(this.state.user_details == []){
 			return(
 				<View>
 					<Text>Loading</Text>
@@ -111,10 +121,10 @@ export default class App extends Component {
 		return (
 			<View style={styles.container}>
 				<View style={styles.header}>
-					<Text style={styles.title}>My Reviews</Text>
+					<Text style={styles.title}>Favourite Locations</Text>
 				</View>
 				<View style={styles.footer}>
-					<ScrollView>
+                    <ScrollView>
 					<Text style={styles.loginTitle}></Text>
 
 					<View>
@@ -123,31 +133,24 @@ export default class App extends Component {
 							<Text style={styles.text}>Go Back:</Text>
 						</TouchableOpacity>
 						<FlatList
-							data={this.state.user_details.reviews}
+							data={this.state.user_details.favourite_locations}
 							renderItem={({ item, index }) => (
 								<View style={styles.reviewContainer}>
-									<Text style={styles.reviewTitle}>{item.location.location_name}</Text>
-									<View style={styles.starContainer}>
-										<StarRating
-												disabled={false}
-												fullStarColor="#eaca97"
-												maxStars={5}
-												rating={item.location.avg_overall_rating}
-												starSize={20}
-												style={styles.star}
-											/>
-									</View>
-									<Text>Review ID: {item.review.review_id}</Text>
-									<Text>Comment: {item.review.review_body}</Text>
-									<TouchableOpacity
-									onPress={() => {navigation.navigate('EditReview', {review_id : item.review.review_id,location_id: item.location.location_id,clenliness_rating : item.review.clenliness_rating,price_rating : item.review.price_rating,overall_rating : item.review.overall_rating, quality_rating: item.review.quality_rating, review_body: item.review.review_body})}}
-									 style={styles.goBackButton}>
-									<Text style={styles.text}>Edit This Review</Text>
+									<Text style={styles.reviewTitle}>{item.location_name}</Text>
+                                    <Text>Overall Rating</Text>
+                                    <View style={styles.starContainer}>
+                                    <StarRating
+											disabled={false}
+											fullStarColor="#eaca97"
+											maxStars={5}
+											rating={item.avg_overall_rating}
+											starSize={20}
+										/>
+                                        </View>
+                                        <TouchableOpacity style={styles.deleteButton} onPress={()=>{this.press_delete(item.location_name, item.location_id)}}>
+									<Text style={styles.text}>Remove From Favourites</Text>
 								</TouchableOpacity>
-								<TouchableOpacity style={styles.deleteButton} onPress={()=>{this.press_delete(item.location.location_name, item.review.review_id, item.location.location_id)}}>
-									<Text style={styles.text}>Delete Review</Text>
-								</TouchableOpacity>
-								</View>
+                                </View>
 							)}
 							keyExtractor={(item, index) => index.toString()}
 						/>
@@ -159,7 +162,7 @@ export default class App extends Component {
 
 
 		)
-							}
+        }
 	}
 }
 
@@ -175,7 +178,8 @@ const styles = StyleSheet.create({
 		borderTopRightRadius: 30,
 		borderBottomLeftRadius: 30,
 		borderBottomRightRadius: 30,
-		elevation: 6
+		elevation: 6,
+
 	},
 	container: {
 		flex: 1,
@@ -195,7 +199,8 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		borderTopLeftRadius: 30,
 		borderTopRightRadius: 30,
-		paddingHorizontal: 30,
+        padding: 30,
+        
 	},
 	text: {
 		color: '#fff',
@@ -253,6 +258,7 @@ const styles = StyleSheet.create({
 		borderBottomLeftRadius: 10,
 		borderBottomRightRadius: 10,
 		borderWidth: 1,
+        marginTop: 20
 	},
 	textinput: {
 		marginBottom: 10,
@@ -264,8 +270,3 @@ const styles = StyleSheet.create({
 		borderBottomRightRadius: 10,
 	}
 })
-
-// location_id: item.location.location_id,
-// 									clenliness_rating : item.review.clenliness_rating,
-// 									price_rating : item.review.price_rating,
-// 									overall_rating : item.review.overall_rating,

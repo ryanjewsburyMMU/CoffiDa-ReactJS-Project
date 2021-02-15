@@ -12,6 +12,7 @@ import Login from './login'
 import Profile_Details from './profile_details'
 import App from './test_page'
 import EditReview from './editReviewPage'
+import FavouriteLocations from './favouriteLocations'
 
 const Stack = createStackNavigator()
 
@@ -28,6 +29,7 @@ export default class ProfileStack extends Component{
                 <Stack.Screen name="Profile_Details" component={Profile_Details}/> 
                 <Stack.Screen name="App" component={App}/> 
                 <Stack.Screen name="EditReview" component={EditReview}/> 
+                <Stack.Screen name="FavouriteLocations" component={FavouriteLocations}/> 
             </Stack.Navigator>
 
         )
