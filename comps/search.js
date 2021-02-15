@@ -29,7 +29,7 @@ export default class Search extends Component {
 
 			search_in: "java",
 
-			limit: 20,
+			limit: 2,
 			offset: 0,
 
 			searchResponse: []
@@ -284,6 +284,21 @@ export default class Search extends Component {
 		}
 	}
 
+	viewMore = () =>{
+		this.setState({
+			offset: this.state.offset + 2,
+		  }, () => {
+			  this.createCurl()
+			});
+	}
+	viewLess = () =>{
+		this.setState({
+			offset: this.state.offset - 2,
+		  }, () => {
+			  this.createCurl()
+			});
+	}
+
 
 	presentResults = () => {
 		if (this.state.searchResponse == "") {
@@ -307,8 +322,11 @@ export default class Search extends Component {
 						)}
 						keyExtractor={(item, index) => index.toString()}
 					/>
-					<TouchableOpacity>
+					<TouchableOpacity onPress={()=>{this.viewMore()}}>
 						<Text>View More?</Text>
+					</TouchableOpacity>
+					<TouchableOpacity onPress={()=>{this.viewMore()}}>
+						<Text>View Less?</Text>
 					</TouchableOpacity>
 				</View>
 			)
@@ -324,7 +342,7 @@ export default class Search extends Component {
 					<Text style={styles.title}>Search</Text>
 				</View>
 				<View style={styles.footer}>
-					<TextInput placeholder="Seach By Cafe Name" onChangeText={(text) => { this.setState({ cafe_name: text }) }} value={this.state.cafe_name} />
+					<TextInput placeholder="Seach By Cafe Name" onChangeText={(text) => { this.setState({ cafe_name: text }), this.setState({offset:0}) }} value={this.state.cafe_name} />
 					<Button title="search" onPress={() => { this.createCurl() }} />
 					<Button title="show/hide" onPress={() => { this.setState({ advancedFilter: !this.state.advancedFilter }) }} />
 					<this.emptyFunction />
