@@ -1,11 +1,14 @@
 import React, { Component, useEffect, useState } from 'react';
 
-import { Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions, TouchableOpacity, TouchableHighlightBase, } from 'react-native';
+import { Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions, TouchableOpacity, TouchableHighlightBase, Alert, } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import Slider from '@react-native-community/slider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Picker } from '@react-native-picker/picker';
+import StarRating from 'react-native-star-rating';
+import { ScrollView } from 'react-native-gesture-handler';
+
 
 
 export default class Search extends Component {
@@ -51,17 +54,34 @@ export default class Search extends Component {
 				headers: { 'Content-Type': 'application/json', 'X-Authorization': await AsyncStorage.getItem('@session_token') },
 			})
 
-			.then((response) => response.json())
+			.then((response) => {
+				if (parseInt(response.status) == 200) {
+					return response.json();
+				}
+				if (parseInt(response.status) == 400) {
+					Alert.alert("Incorrect Details (" + response.status + ")", "Please ensure your email and password are correct, if the problem persits please contact our team for more support.")
+
+				}
+				if (parseInt(response.status) == 500) {
+					console.log("Server Error, Please try again soon.  " + response.status)
+					Alert.alert("Connection Error", "We are struggling to connect with you! Please try again or contact our team for further support.")
+				}
+			})
 			.then(async (responseJson) => {
+				console.log("something here")
+				if (responseJson == "") {
+					Alert.alert("No Results Found", "Please refined your search criteria, no results have been found based on your input")
+				}
 				this.setState({
 					searchResponse: responseJson
 				})
-				console.log(responseJson)
 			})
 			.catch((error) => {
-				console.log(error)
+				console.log(error);
 			})
 	}
+
+
 
 	// This Method Creates a Curl string for giving to the fetch API on /find :) 
 	createCurl() {
@@ -284,19 +304,41 @@ export default class Search extends Component {
 		}
 	}
 
-	viewMore = () =>{
-		this.setState({
-			offset: this.state.offset + 2,
-		  }, () => {
-			  this.createCurl()
+	viewMore = (length) => {
+		if (length == 1) {
+			Alert.alert("No More Entries")
+		}
+		else {
+			this.setState({
+				offset: this.state.offset + 2,
+			}, () => {
+				this.createCurl()
 			});
+		}
 	}
-	viewLess = () =>{
+	viewLess = (length) => {
+		if (length >= 2) {
+			Alert.alert("Cannot go back")
+		}else{
 		this.setState({
 			offset: this.state.offset - 2,
-		  }, () => {
-			  this.createCurl()
-			});
+		}, () => {
+			this.createCurl()
+		});
+	}
+	}
+
+	displayStarRating(size, style, rating) {
+		return (
+			<StarRating
+				disabled={false}
+				fullStarColor="#eaca97"
+				maxStars={5} // 5
+				rating={rating}
+				starSize={size} //20
+				style={style}
+			/>
+		)
 	}
 
 
@@ -304,30 +346,60 @@ export default class Search extends Component {
 		if (this.state.searchResponse == "") {
 			return (
 				<View>
-					<Text>No Results have been found based on your search criteria....</Text>
+					<Text></Text>
 				</View>
 			)
 		} else {
+			console.log(this.state.searchResponse.length)
 			return (
-				<View>
+				<View style = {{marginTop: 10}}>
 					<FlatList
 						data={this.state.searchResponse}
 						renderItem={({ item, index }) => (
-							<View>
-								<Text>Results:</Text>
-								<Text>{item.location_name}</Text>
-								<Text>{item.location_town}</Text>
-								<Text>   </Text>
+							<TouchableOpacity onPress={()=>{{console.log("You clicked id " + item.location_id)}}}>
+							<View style={{flex: 1}}>
+							<View style={styles.resultContainer}>
+								<Text style={styles.title}>{item.location_name}</Text>
+								<Text style={styles.location_town}>{item.location_town}</Text>
+
+									<View style={styles.reviewRow}>
+										<View style={{ flex: 1 }}>
+											<Text>Overall Rating</Text>
+											<Text>{this.displayStarRating(20, styles.starContainer, item.avg_overall_rating)}</Text>
+										</View>
+										<View style={{ flex: 1, alignItems: 'flex-end' }}>
+											<Text>Cleanliness Rating</Text>
+											<Text>{this.displayStarRating(20, styles.starContainer, item.avg_clenliness_rating)}</Text>
+										</View>
+									</View>
+									<View style={styles.reviewRow}>
+										<View style={{ flex: 1 }}>
+											<Text>Price Rating</Text>
+											<Text>{this.displayStarRating(20, styles.starContainer, item.avg_price_rating)}</Text>
+										</View>
+										<View style={{ flex: 1, alignItems: 'flex-end' }}>
+											<Text>Quality Rating</Text>
+											<Text>{this.displayStarRating(20, styles.starContainer, item.avg_quality_rating)}</Text>
+										</View>
+									</View>
 							</View>
+							</View>
+							</TouchableOpacity>
 						)}
 						keyExtractor={(item, index) => index.toString()}
 					/>
-					<TouchableOpacity onPress={()=>{this.viewMore()}}>
-						<Text>View More?</Text>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={()=>{this.viewMore()}}>
-						<Text>View Less?</Text>
-					</TouchableOpacity>
+					<View style={{flexDirection : 'row'}}>
+					<View style={{flex:1}}>
+							<TouchableOpacity onPress={()=>{this.viewLess(this.state.searchResponse.length)}} >
+								<Text>Previous Page</Text>
+							</TouchableOpacity>
+						</View>
+						<View style={{alignContent:'flex-end'}}>
+							<TouchableOpacity onPress={()=>{this.viewMore(this.state.searchResponse.length)}}>
+								<Text>Next Page</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
 				</View>
 			)
 		}
@@ -336,17 +408,26 @@ export default class Search extends Component {
 
 	render() {
 		const navigation = this.props.navigation;
+		const searchIcon = <Icon name="search" size={20} color="#fff" />;
+
 		return (
 			<View style={styles.container}>
 				<View style={styles.header}>
-					<Text style={styles.title}>Search</Text>
+					<Text style={styles.mainTitle}>Search</Text>
 				</View>
 				<View style={styles.footer}>
-					<TextInput placeholder="Seach By Cafe Name" onChangeText={(text) => { this.setState({ cafe_name: text }), this.setState({offset:0}) }} value={this.state.cafe_name} />
-					<Button title="search" onPress={() => { this.createCurl() }} />
-					<Button title="show/hide" onPress={() => { this.setState({ advancedFilter: !this.state.advancedFilter }) }} />
+					<View style={{flexDirection:'row'}}>
+						<TextInput style={styles.textinput} placeholder="Seach By Cafe Name Or Location" onChangeText={(text) => { this.setState({ cafe_name: text }), this.setState({ offset: 0 }) }} value={this.state.cafe_name} />
+						<TouchableOpacity style={styles.loginButton} onPress={() => { this.createCurl() }}>
+							<Text style={styles.text}>{searchIcon}</Text>
+						</TouchableOpacity>
+					</View>
+					<TouchableOpacity onPress={() => { this.setState({ advancedFilter: !this.state.advancedFilter }) }} >
+							<Text style={{ textAlign: 'center', color: '#000' }}>Advanced Search</Text>
+						</TouchableOpacity>
 					<this.emptyFunction />
 					<this.presentResults />
+
 				</View>
 			</View>
 		)
@@ -354,6 +435,27 @@ export default class Search extends Component {
 }
 
 const styles = StyleSheet.create({
+	reviewRow:{
+        flexDirection: 'row'
+    },
+	starContainer: {
+		width: '20%'
+	},
+	location_town: {
+		marginBottom: 10,
+		color: 'grey'
+	},
+	resultContainer: {
+		backgroundColor: '#F2F2F2',
+		padding: 20,
+		marginBottom: 20,
+		borderTopLeftRadius: 30,
+		borderTopRightRadius: 30,
+		borderBottomLeftRadius: 30,
+		borderBottomRightRadius: 30,
+		elevation: 6,
+		width: '100%'
+	},
 	filterOptionsRow: {
 		flexDirection: 'row',
 		alignContent: 'flex-start'
@@ -380,14 +482,20 @@ const styles = StyleSheet.create({
 		paddingVertical: 50
 	},
 	text: {
+		textAlign: 'center',
 		color: '#fff',
 		marginBottom: 20
 	},
 	title: {
 		display: 'flex',
-
+		color: '#eaca97',
+		fontSize: 25,
+		fontWeight: "bold",
+	},
+	mainTitle: {
+		display: 'flex',
 		color: '#fff',
-		fontSize: 30,
+		fontSize: 40,
 		fontWeight: "bold",
 	},
 	loginTitle: {
@@ -400,32 +508,18 @@ const styles = StyleSheet.create({
 		marginBottom: 20
 	},
 	loginButton: {
-		alignItems: "center",
-		width: "100%",
+		flex: 1,
 		height: 40,
 		backgroundColor: "#eaca97",
 		padding: 10,
-		marginTop: 20,
 		borderTopLeftRadius: 10,
 		borderTopRightRadius: 10,
 		borderBottomLeftRadius: 10,
 		borderBottomRightRadius: 10,
-	},
-	signupButton: {
-		alignItems: "center",
-		width: "100%",
-		height: 40,
-		backgroundColor: "#fff",
-		padding: 10,
-		marginTop: 20,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-		borderColor: '#eaca97',
-		borderWidth: 1,
 	},
 	textinput: {
+		height: 40,
+		flex: 3,
 		marginBottom: 10,
 		borderColor: '#eaca97',
 		borderWidth: 1,
