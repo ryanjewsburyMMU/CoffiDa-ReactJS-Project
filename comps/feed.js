@@ -1,6 +1,6 @@
 import React, { Component, useEffect, useState } from 'react';
 
-import { Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions, TouchableOpacity, } from 'react-native';
+import { Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions, TouchableOpacity, ActivityIndicator} from 'react-native';
 
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -122,6 +122,7 @@ export default class Feed extends Component {
 				this.setState({ favourite_locations_id: new_list })
 				console.log("ID OF FAV LOCATIONS:")
 				console.log(this.state.favourite_locations_id)
+				this.setState({isLoading: false})
 
 			})
 			.catch((error) => {
@@ -212,6 +213,13 @@ export default class Feed extends Component {
 	render() {
 		const navigation = this.props.navigation;
 		const favourite_icon = <Icon name="heart-o" size={30} color="#900" />
+
+		if(this.state.isLoading == true){
+			return(<View>
+				<ActivityIndicator size="large" color="#0000ff" />
+			</View>)
+		}
+
 		return (
 			<View style={styles.container}>
 				<View style={styles.header}>
@@ -240,7 +248,7 @@ export default class Feed extends Component {
 										<Text>Favourite This Location?</Text>
 										<Text>{this.isFavourited(locationData.location_id)}</Text>
 
-										<TouchableOpacity style={styles.reviewButton} onPress={() => { navigation.navigate("ReviewPage", { id: locationData.location_id, name: locationData.location_name }) }}>
+										<TouchableOpacity style={styles.reviewButton} onPress={() => { navigation.navigate("ReviewPage", { id: locationData.location_id, name: locationData.location_name, photo_path: locationData.photo_path }) }}>
 											<Text style={styles.text}>See Reviews for {locationData.location_name}</Text>
 										</TouchableOpacity>
 										<TouchableOpacity style={styles.signupButton} onPress={() => { navigation.navigate("CreateReviewPage", { id: locationData.location_id, name: locationData.location_name }) }}>

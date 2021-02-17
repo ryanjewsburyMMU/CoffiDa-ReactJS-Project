@@ -1,6 +1,6 @@
 import React, { Component, useEffect, useState } from 'react';
 
-import { Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions, TouchableOpacity, Object, Alert } from 'react-native';
+import { Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions, TouchableOpacity, Object, Alert, ToastAndroid } from 'react-native';
 
 import StarRating from 'react-native-star-rating';
 
@@ -21,7 +21,8 @@ export default class CreateReviewPage extends Component {
             priceRating: 0,
             qualityRating: 0,
             clenlinessRating: 0,
-            reviewBody: ""
+            reviewBody: "",
+            imageUri: ""
 
         }
     }
@@ -47,6 +48,7 @@ export default class CreateReviewPage extends Component {
         this.setState({
             qualityRating: rating
         });
+
     }
     onStarPress_Clenliness(rating) {
         this.setState({
@@ -84,7 +86,16 @@ export default class CreateReviewPage extends Component {
 			.then((response)=> {
 				if (parseInt(response.status) == 201)
 				{
-					Alert.alert("Thank You!", "Thanks for your review! We've added this to our systems now.")			
+					Alert.alert("Thank You!", "Would You like to add a photo to your review?",[
+                        {
+                            text: "Yes",
+                            onPress: () => {navigation.navigate("CameraPage", {id: this.state.current_id})},
+                        },
+                        {
+                            text: "No",
+                            onPress: () => {navigation.goBack(),ToastAndroid.show("Review Submitted", ToastAndroid.SHORT)},
+                        },
+                      ],)			
 				}
 				if (parseInt(response.status) == 400)
 				{
@@ -109,6 +120,8 @@ export default class CreateReviewPage extends Component {
 	}
 
     render() {
+        const navigation = this.props.navigation;
+
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
@@ -172,6 +185,7 @@ export default class CreateReviewPage extends Component {
                     <TextInput placeholder="Provide More Details About Your Visit" multiline={true} onChangeText={(text) => {this.setState({reviewBody: text})}}
                     numberOfLines={4}>
                     </TextInput>
+                    <Button title="Add a Photo?" onPress={()=>{navigation.navigate("CameraPage", )}}/>
 
                     <TouchableOpacity style={styles.loginButton} onPress={()=>{this.post_review()}}>
                         <Text style={styles.text}>Submit Review</Text>

@@ -316,16 +316,17 @@ export default class Search extends Component {
 			});
 		}
 	}
-	viewLess = (length) => {
-		if (length >= 2) {
+	viewLess = (offset) => {
+		if (offset == 0) {
 			Alert.alert("Cannot go back")
-		}else{
-		this.setState({
-			offset: this.state.offset - 2,
-		}, () => {
-			this.createCurl()
-		});
-	}
+		}
+		else {
+			this.setState({
+				offset: this.state.offset - 2,
+			}, () => {
+				this.createCurl()
+			});
+		}
 	}
 
 	displayStarRating(size, style, rating) {
@@ -352,54 +353,54 @@ export default class Search extends Component {
 		} else {
 			console.log(this.state.searchResponse.length)
 			return (
-				<View style = {{marginTop: 10}}>
-					<FlatList
-						data={this.state.searchResponse}
-						renderItem={({ item, index }) => (
-							<TouchableOpacity onPress={()=>{{console.log("You clicked id " + item.location_id)}}}>
-							<View style={{flex: 1}}>
-							<View style={styles.resultContainer}>
-								<Text style={styles.title}>{item.location_name}</Text>
-								<Text style={styles.location_town}>{item.location_town}</Text>
-
-									<View style={styles.reviewRow}>
-										<View style={{ flex: 1 }}>
-											<Text>Overall Rating</Text>
-											<Text>{this.displayStarRating(20, styles.starContainer, item.avg_overall_rating)}</Text>
-										</View>
-										<View style={{ flex: 1, alignItems: 'flex-end' }}>
-											<Text>Cleanliness Rating</Text>
-											<Text>{this.displayStarRating(20, styles.starContainer, item.avg_clenliness_rating)}</Text>
-										</View>
-									</View>
-									<View style={styles.reviewRow}>
-										<View style={{ flex: 1 }}>
-											<Text>Price Rating</Text>
-											<Text>{this.displayStarRating(20, styles.starContainer, item.avg_price_rating)}</Text>
-										</View>
-										<View style={{ flex: 1, alignItems: 'flex-end' }}>
-											<Text>Quality Rating</Text>
-											<Text>{this.displayStarRating(20, styles.starContainer, item.avg_quality_rating)}</Text>
-										</View>
-									</View>
-							</View>
-							</View>
-							</TouchableOpacity>
-						)}
-						keyExtractor={(item, index) => index.toString()}
-					/>
-					<View style={{flexDirection : 'row'}}>
-					<View style={{flex:1}}>
-							<TouchableOpacity onPress={()=>{this.viewLess(this.state.searchResponse.length)}} >
+				<View style={{ marginTop: 10 }}>
+					<View style={{ flexDirection: 'row' }}>
+						<View style={{ flex: 1 }}>
+							<TouchableOpacity onPress={() => { this.viewLess(this.state.offset) }} >
 								<Text>Previous Page</Text>
 							</TouchableOpacity>
 						</View>
-						<View style={{alignContent:'flex-end'}}>
-							<TouchableOpacity onPress={()=>{this.viewMore(this.state.searchResponse.length)}}>
+						<View style={{ alignContent: 'flex-end' }}>
+							<TouchableOpacity onPress={() => { this.viewMore(this.state.searchResponse.length) }}>
 								<Text>Next Page</Text>
 							</TouchableOpacity>
 						</View>
 					</View>
+					<FlatList
+						data={this.state.searchResponse}
+						renderItem={({ item, index }) => (
+							<TouchableOpacity onPress={() => { { console.log("You clicked id " + item.location_id) } }}>
+								<View style={{ flex: 1 }}>
+									<View style={styles.resultContainer}>
+										<Text style={styles.title}>{item.location_name}</Text>
+										<Text style={styles.location_town}>{item.location_town}</Text>
+
+										<View style={styles.reviewRow}>
+											<View style={{ flex: 1 }}>
+												<Text>Overall Rating</Text>
+												<Text>{this.displayStarRating(20, styles.starContainer, item.avg_overall_rating)}</Text>
+											</View>
+											<View style={{ flex: 1, alignItems: 'flex-end' }}>
+												<Text>Cleanliness Rating</Text>
+												<Text>{this.displayStarRating(20, styles.starContainer, item.avg_clenliness_rating)}</Text>
+											</View>
+										</View>
+										<View style={styles.reviewRow}>
+											<View style={{ flex: 1 }}>
+												<Text>Price Rating</Text>
+												<Text>{this.displayStarRating(20, styles.starContainer, item.avg_price_rating)}</Text>
+											</View>
+											<View style={{ flex: 1, alignItems: 'flex-end' }}>
+												<Text>Quality Rating</Text>
+												<Text>{this.displayStarRating(20, styles.starContainer, item.avg_quality_rating)}</Text>
+											</View>
+										</View>
+									</View>
+								</View>
+							</TouchableOpacity>
+						)}
+						keyExtractor={(item, index) => index.toString()}
+					/>
 				</View>
 			)
 		}
@@ -409,6 +410,7 @@ export default class Search extends Component {
 	render() {
 		const navigation = this.props.navigation;
 		const searchIcon = <Icon name="search" size={20} color="#fff" />;
+		console.log("STARTING OFF SET = " + this.state.offset)
 
 		return (
 			<View style={styles.container}>
@@ -416,15 +418,15 @@ export default class Search extends Component {
 					<Text style={styles.mainTitle}>Search</Text>
 				</View>
 				<View style={styles.footer}>
-					<View style={{flexDirection:'row'}}>
+					<View style={{ flexDirection: 'row' }}>
 						<TextInput style={styles.textinput} placeholder="Seach By Cafe Name Or Location" onChangeText={(text) => { this.setState({ cafe_name: text }), this.setState({ offset: 0 }) }} value={this.state.cafe_name} />
 						<TouchableOpacity style={styles.loginButton} onPress={() => { this.createCurl() }}>
 							<Text style={styles.text}>{searchIcon}</Text>
 						</TouchableOpacity>
 					</View>
 					<TouchableOpacity onPress={() => { this.setState({ advancedFilter: !this.state.advancedFilter }) }} >
-							<Text style={{ textAlign: 'center', color: '#000' }}>Advanced Search</Text>
-						</TouchableOpacity>
+						<Text style={{ textAlign: 'center', color: '#000' }}>Advanced Search</Text>
+					</TouchableOpacity>
 					<this.emptyFunction />
 					<this.presentResults />
 
@@ -435,9 +437,9 @@ export default class Search extends Component {
 }
 
 const styles = StyleSheet.create({
-	reviewRow:{
-        flexDirection: 'row'
-    },
+	reviewRow: {
+		flexDirection: 'row'
+	},
 	starContainer: {
 		width: '20%'
 	},

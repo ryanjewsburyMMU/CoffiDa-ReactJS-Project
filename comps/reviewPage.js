@@ -1,6 +1,6 @@
 import React, { Component, useEffect, useState } from 'react';
 
-import { Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions, TouchableOpacity, Object, ActivityIndicator, Alert } from 'react-native';
+import { Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions, TouchableOpacity, Object, ActivityIndicator, Alert, Image } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -18,16 +18,17 @@ export default class ReviewPage extends Component {
             current_id: null,
             isLoading: true,
             liked_reviews: [],
-            current_name: ""
+            current_name: "",
+            photo_path: ""
         }
     }
 
     componentDidMount() {
         this.unsubscribe = this.props.navigation.addListener('focus', () => {
             const route = this.props.route
-            const { id, name } = route.params;
-            this.setState({ current_id: id })
-            this.setState({ current_name: name })
+            const { id, name, photoPath } = route.params;
+            this.setState({ current_id: id,  current_name: name, photoPath: photoPath })
+        
 
             this.get_locations(id)
             this.get_getInfo()
@@ -269,6 +270,9 @@ export default class ReviewPage extends Component {
                                 <TouchableOpacity>
                                     <Text style={styles.loginButton}>{this.isLiked(this.state.current_id, item.review_id, item.likes)}</Text>
                                 </TouchableOpacity>
+                                <TouchableOpacity style={styles.signupButton} onPress={()=>{navigation.navigate("ViewPhoto", {id: this.state.current_id, review_id : item.review_id})}}>
+                                    <Text >View Photos</Text>
+                                </TouchableOpacity>
                             </View>
                         )}
                         keyExtractor={(item, index) => index.toString()}
@@ -309,7 +313,7 @@ const styles = StyleSheet.create({
     header: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     footer: {
         flex: 5,
@@ -353,7 +357,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         width: "100%",
         height: 40,
-        backgroundColor: "#fff",
         padding: 10,
         marginTop: 20,
         borderTopLeftRadius: 10,
