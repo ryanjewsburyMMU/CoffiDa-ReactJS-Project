@@ -10,10 +10,12 @@ import {
 } from 'react-native';
 import DoubleClick from 'react-native-double-tap';
 
+
 import { RNCamera } from 'react-native-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import style from './stylesheet'
 
 
 
@@ -127,7 +129,7 @@ async get_getInfo() {
     const camera = <Icon name="camera" size={50} color="#fff" />;
 
     return (
-      <View style={{ flex: 1, width: '100%', height: '100%' }}>
+      <View style={style.displayCamera}>
         <RNCamera
           ref={ref => {
             this.camera = ref;
@@ -137,10 +139,10 @@ async get_getInfo() {
           style={{ flex: 1 }}
         />
           <TouchableOpacity  onPress={()=>{this.takePicture()}}>
-            <Text style={{backgroundColor: 'rgba(234,202,151,0.7)', width: '100%', textAlign: 'center', padding: 10, marginTop: 10}}>{camera}</Text>
+            <Text style={style.cameraBorder}>{camera}</Text>
           </TouchableOpacity>
-        <View style={styles.borderTest}>
-          <Text style={styles.cameraTitle}>Camera</Text>
+        <View style={style.cameraHeader}>
+          <Text style={style.cameraTitle}>Camera</Text>
         </View>
       </View>
 
@@ -149,32 +151,3 @@ async get_getInfo() {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  takePhotoStyle:{
-    position: 'absolute',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  borderTest:{
-    position: 'absolute',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    marginBottom: 10,
-    width: '100%',
-    backgroundColor: '#eaca97',
-    padding: 10,
-    borderBottomLeftRadius: 30,
-		borderBottomRightRadius: 30,
-  },
-  cameraTitle: {
-    textAlign: 'center',
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 30
-  },
-})

@@ -10,6 +10,7 @@ import SignUp from './signup'
 import StarRating from 'react-native-star-rating';
 
 
+import style from './stylesheet'
 
 
 export default class App extends Component {
@@ -109,43 +110,40 @@ export default class App extends Component {
 			)
 		}else{
 		return (
-			<View style={styles.container}>
-				<View style={styles.header}>
-					<Text style={styles.title}>My Reviews</Text>
+			<View style={style.mainContainer}>
+				<View style={style.mainHeader}>
+					<Text style={style.mainTitle}>My Reviews</Text>
 				</View>
-				<View style={styles.footer}>
+				<View style={style.mainFooter}>
 					<ScrollView>
-					<Text style={styles.loginTitle}></Text>
-
 					<View>
 						<TouchableOpacity
-							onPress={() => this.props.navigation.goBack()} style={styles.goBackButton}>
-							<Text style={styles.text}>Go Back:</Text>
+							onPress={() => this.props.navigation.goBack()} style={style.mainButton}>
+							<Text style={style.textCenterWhite}>Go Back:</Text>
 						</TouchableOpacity>
 						<FlatList
 							data={this.state.user_details.reviews}
 							renderItem={({ item, index }) => (
-								<View style={styles.reviewContainer}>
-									<Text style={styles.reviewTitle}>{item.location.location_name}</Text>
-									<View style={styles.starContainer}>
+								<View style={style.resultContainer}>
+									<Text style={style.containerTitle}>{item.location.location_name}</Text>
+									<View style={style.starContainer}>
 										<StarRating
 												disabled={false}
 												fullStarColor="#eaca97"
 												maxStars={5}
 												rating={item.location.avg_overall_rating}
 												starSize={20}
-												style={styles.star}
 											/>
 									</View>
 									<Text>Review ID: {item.review.review_id}</Text>
 									<Text>Comment: {item.review.review_body}</Text>
 									<TouchableOpacity
 									onPress={() => {navigation.navigate('EditReview', {review_id : item.review.review_id,location_id: item.location.location_id,clenliness_rating : item.review.clenliness_rating,price_rating : item.review.price_rating,overall_rating : item.review.overall_rating, quality_rating: item.review.quality_rating, review_body: item.review.review_body})}}
-									 style={styles.goBackButton}>
-									<Text style={styles.text}>Edit This Review</Text>
+									 style={style.mainButton}>
+									<Text style={style.textCenterWhite}>Edit This Review</Text>
 								</TouchableOpacity>
-								<TouchableOpacity style={styles.deleteButton} onPress={()=>{this.press_delete(item.location.location_name, item.review.review_id, item.location.location_id)}}>
-									<Text style={styles.text}>Delete Review</Text>
+								<TouchableOpacity style={style.deleteReview} onPress={()=>{this.press_delete(item.location.location_name, item.review.review_id, item.location.location_id)}}>
+									<Text style={style.textCenterWhite}>Delete Review</Text>
 								</TouchableOpacity>
 								</View>
 							)}
@@ -159,113 +157,7 @@ export default class App extends Component {
 
 
 		)
-							}
+		}
 	}
 }
 
-const styles = StyleSheet.create({
-	starContainer: {
-		width: '20%'
-	},
-	reviewContainer: {
-		backgroundColor: '#F2F2F2',
-		padding: 20,
-		marginBottom: 20,
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		borderBottomLeftRadius: 30,
-		borderBottomRightRadius: 30,
-		elevation: 6
-	},
-	container: {
-		flex: 1,
-		backgroundColor: '#eaca97',
-	},
-	guest: {
-		marginTop: 10,
-		textAlign: 'center'
-	},
-	header: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center'
-	},
-	footer: {
-		flex: 5,
-		backgroundColor: '#fff',
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		paddingHorizontal: 30,
-	},
-	text: {
-		color: '#fff',
-		marginBottom: 20
-	},
-	title: {
-		display: 'flex',
-
-		color: '#fff',
-		fontSize: 30,
-		fontWeight: "bold",
-	},
-	reviewTitle: {
-		color: '#eaca97',
-		fontSize: 20,
-		fontWeight: 'bold',
-	},
-	subtitle: {
-		marginBottom: 20
-	},
-	goBackButton: {
-		alignItems: "center",
-		width: "100%",
-		height: 40,
-		backgroundColor: "#eaca97",
-		padding: 10,
-		marginTop: 20,
-		marginBottom: 10,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-	},
-	signupButton: {
-		alignItems: "center",
-		width: "100%",
-		height: 40,
-		backgroundColor: "#fff",
-		padding: 10,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-		borderColor: '#eaca97',
-		borderWidth: 1,
-	},
-	deleteButton: {
-		alignItems: "center",
-		width: "100%",
-		height: 40,
-		backgroundColor: "#650D1B",
-		padding: 10,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-		borderWidth: 1,
-	},
-	textinput: {
-		marginBottom: 10,
-		borderColor: '#eaca97',
-		borderWidth: 1,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-	}
-})
-
-// location_id: item.location.location_id,
-// 									clenliness_rating : item.review.clenliness_rating,
-// 									price_rating : item.review.price_rating,
-// 									overall_rating : item.review.overall_rating,

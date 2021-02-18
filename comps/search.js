@@ -9,6 +9,8 @@ import { Picker } from '@react-native-picker/picker';
 import StarRating from 'react-native-star-rating';
 import { ScrollView } from 'react-native-gesture-handler';
 
+import style from './stylesheet'
+
 
 
 export default class Search extends Component {
@@ -145,16 +147,16 @@ export default class Search extends Component {
 		this.search_results(finalCurl)
 	}
 
-	emptyFunction = () => {
+	advancedSearch = () => {
 		if (this.state.advancedFilter == true) {
 			return (
 				<View>
-					<View style={{ flexDirection: 'row' }}>
-						<View style={{ flex: 1 }}>
-							<View style={{ alignContent: 'center', alignItems: 'center', marginTop: 10 }}>
+					<View style={style.flexRow}>
+						<View style={style.flexOne}>
+							<View style={style.filterRow}>
 								<View>
-									<Text style={{ textAlign: 'center' }}>Minimum Overall Rating?</Text>
-									<Text style={{ textAlign: 'center' }}>{this.state.value_overall}</Text>
+									<Text style={style.textCenterBlack}>Minimum Overall Rating?</Text>
+									<Text style={style.textCenterBlack}>{this.state.value_overall}</Text>
 								</View>
 								<View>
 									<CheckBox
@@ -182,11 +184,11 @@ export default class Search extends Component {
 
 						</View>
 
-						<View style={{ flex: 1 }}>
-							<View style={{ alignContent: 'center', alignItems: 'center', marginTop: 10 }}>
+						<View style={style.flexOne}>
+							<View style={style.filterRow}>
 								<View>
-									<Text style={{ textAlign: 'center' }}>Minimum Price Rating?</Text>
-									<Text style={{ textAlign: 'center' }}>{this.state.value_price}</Text>
+									<Text style={style.textCenterBlack}>Minimum Price Rating?</Text>
+									<Text style={style.textCenterBlack}>{this.state.value_price}</Text>
 								</View>
 								<View>
 									<CheckBox
@@ -213,12 +215,12 @@ export default class Search extends Component {
 							</View>
 						</View>
 					</View>
-					<View style={{ flexDirection: 'row' }}>
-						<View style={{ flex: 1 }}>
-							<View style={{ alignContent: 'center', alignItems: 'center', marginTop: 10 }}>
+					<View style={style.flexRow}>
+						<View style={style.flexOne}>
+							<View style={style.filterRow}>
 								<View>
-									<Text style={{ textAlign: 'center' }}>Min Cleanliness Rating?</Text>
-									<Text style={{ textAlign: 'center' }}>{this.state.value_clenliness}</Text>
+									<Text style={style.textCenterBlack}>Min Cleanliness Rating?</Text>
+									<Text style={style.textCenterBlack}>{this.state.value_clenliness}</Text>
 								</View>
 								<View>
 									<CheckBox
@@ -246,11 +248,11 @@ export default class Search extends Component {
 
 						</View>
 						{/* SECOND ROW */}
-						<View style={{ flex: 1 }}>
-							<View style={{ alignContent: 'center', alignItems: 'center', marginTop: 10 }}>
+						<View style={style.flexOne}>
+							<View style={style.filterRow}>
 								<View>
-									<Text style={{ textAlign: 'center' }}>Minimum Quality Rating?</Text>
-									<Text style={{ textAlign: 'center' }}>{this.state.value_quality}</Text>
+									<Text style={style.textCenterBlack}>Minimum Quality Rating?</Text>
+									<Text style={style.textCenterBlack}>{this.state.value_quality}</Text>
 								</View>
 								<View>
 									<CheckBox
@@ -277,11 +279,11 @@ export default class Search extends Component {
 							</View>
 						</View>
 					</View>
-					<View styles={{ flex: 1, alignContent: 'center', alignItems: 'center', justifyContent: 'center' }}>
+					<View >
 						<Text>Where Would You Like To Search?</Text>
 						<Picker
 							selectedValue={this.state.search_in}
-							style={{ height: 50, width: '100%', textAlign: 'center' }}
+							style={{ height: 50, width: '100%'}}
 							onValueChange={(itemValue, itemIndex) =>
 								this.setState({ search_in: itemValue })
 							}>
@@ -289,9 +291,6 @@ export default class Search extends Component {
 							<Picker.Item label="My Favourite Locations" value="favourite" />
 							<Picker.Item label="My Reviews" value="reviewed" />
 						</Picker>
-						<TouchableOpacity style={styles.loginButton} onPress={() => { this.setState({ advancedFilter: false }) }}>
-							<Text style={styles.text}>Updated Filter Settings</Text>
-						</TouchableOpacity>
 					</View>
 				</View>
 			)
@@ -353,14 +352,14 @@ export default class Search extends Component {
 		} else {
 			console.log(this.state.searchResponse.length)
 			return (
-				<View style={{ marginTop: 10 }}>
-					<View style={{ flexDirection: 'row' }}>
-						<View style={{ flex: 1 }}>
+				<View style={{ marginTop: 10 }}>{/* Leave here? */}
+					<View style={style.flexRow}>
+						<View style={style.flexOne}>
 							<TouchableOpacity onPress={() => { this.viewLess(this.state.offset) }} >
 								<Text>Previous Page</Text>
 							</TouchableOpacity>
 						</View>
-						<View style={{ alignContent: 'flex-end' }}>
+						<View style={style.flexEnd}>
 							<TouchableOpacity onPress={() => { this.viewMore(this.state.searchResponse.length) }}>
 								<Text>Next Page</Text>
 							</TouchableOpacity>
@@ -369,30 +368,30 @@ export default class Search extends Component {
 					<FlatList
 						data={this.state.searchResponse}
 						renderItem={({ item, index }) => (
-							<TouchableOpacity onPress={() => { { console.log("You clicked id " + item.location_id) } }}>
-								<View style={{ flex: 1 }}>
-									<View style={styles.resultContainer}>
-										<Text style={styles.title}>{item.location_name}</Text>
-										<Text style={styles.location_town}>{item.location_town}</Text>
+							<TouchableOpacity onPress={() => { { console.log("You clicked id " + item.location_id) } }}>{/*this needs to be implemented */}
+								<View style={style.flexEnd}>
+									<View style={style.resultContainer}>
+										<Text style={style.containerTitle}>{item.location_name}</Text>
+										<Text> {item.location_town}</Text>
 
-										<View style={styles.reviewRow}>
-											<View style={{ flex: 1 }}>
+										<View style={style.flexRow}>
+											<View style={style.flexOne}>
 												<Text>Overall Rating</Text>
-												<Text>{this.displayStarRating(20, styles.starContainer, item.avg_overall_rating)}</Text>
+												<Text>{this.displayStarRating(20, style.starContainer, item.avg_overall_rating)}</Text>
 											</View>
-											<View style={{ flex: 1, alignItems: 'flex-end' }}>
+											<View style={style.flexEnd}>
 												<Text>Cleanliness Rating</Text>
-												<Text>{this.displayStarRating(20, styles.starContainer, item.avg_clenliness_rating)}</Text>
+												<Text>{this.displayStarRating(20, style.starContainer, item.avg_clenliness_rating)}</Text>
 											</View>
 										</View>
-										<View style={styles.reviewRow}>
+										<View style={style.flexRow}>
 											<View style={{ flex: 1 }}>
 												<Text>Price Rating</Text>
-												<Text>{this.displayStarRating(20, styles.starContainer, item.avg_price_rating)}</Text>
+												<Text>{this.displayStarRating(20, style.starContainer, item.avg_price_rating)}</Text>
 											</View>
-											<View style={{ flex: 1, alignItems: 'flex-end' }}>
+											<View style={style.flexEnd}>
 												<Text>Quality Rating</Text>
-												<Text>{this.displayStarRating(20, styles.starContainer, item.avg_quality_rating)}</Text>
+												<Text>{this.displayStarRating(20, style.starContainer, item.avg_quality_rating)}</Text>
 											</View>
 										</View>
 									</View>
@@ -413,21 +412,21 @@ export default class Search extends Component {
 		console.log("STARTING OFF SET = " + this.state.offset)
 
 		return (
-			<View style={styles.container}>
-				<View style={styles.header}>
-					<Text style={styles.mainTitle}>Search</Text>
+			<View style={style.mainContainer}>
+				<View style={style.mainHeader}>
+					<Text style={style.mainTitle}>Search</Text>
 				</View>
-				<View style={styles.footer}>
-					<View style={{ flexDirection: 'row' }}>
-						<TextInput style={styles.textinput} placeholder="Seach By Cafe Name Or Location" onChangeText={(text) => { this.setState({ cafe_name: text }), this.setState({ offset: 0 }) }} value={this.state.cafe_name} />
-						<TouchableOpacity style={styles.loginButton} onPress={() => { this.createCurl() }}>
-							<Text style={styles.text}>{searchIcon}</Text>
+				<View style={style.mainFooter}>
+					<View style={style.flexRow}>
+						<TextInput style={style.searchBar} placeholder="Seach By Cafe Name Or Location" onChangeText={(text) => { this.setState({ cafe_name: text }), this.setState({ offset: 0 }) }} value={this.state.cafe_name} />
+						<TouchableOpacity style={style.searchButton} onPress={() => { this.createCurl() }}>
+							<Text style={style.searchIcon}>{searchIcon}</Text>
 						</TouchableOpacity>
 					</View>
 					<TouchableOpacity onPress={() => { this.setState({ advancedFilter: !this.state.advancedFilter }) }} >
-						<Text style={{ textAlign: 'center', color: '#000' }}>Advanced Search</Text>
+						<Text style={style.textCenterBlack}>Advanced Search</Text>
 					</TouchableOpacity>
-					<this.emptyFunction />
+					<this.advancedSearch />
 					<this.presentResults />
 
 				</View>
@@ -435,99 +434,3 @@ export default class Search extends Component {
 		)
 	}
 }
-
-const styles = StyleSheet.create({
-	reviewRow: {
-		flexDirection: 'row'
-	},
-	starContainer: {
-		width: '20%'
-	},
-	location_town: {
-		marginBottom: 10,
-		color: 'grey'
-	},
-	resultContainer: {
-		backgroundColor: '#F2F2F2',
-		padding: 20,
-		marginBottom: 20,
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		borderBottomLeftRadius: 30,
-		borderBottomRightRadius: 30,
-		elevation: 6,
-		width: '100%'
-	},
-	filterOptionsRow: {
-		flexDirection: 'row',
-		alignContent: 'flex-start'
-	},
-	container: {
-		flex: 1,
-		backgroundColor: '#eaca97',
-	},
-	guest: {
-		marginTop: 10,
-		textAlign: 'center'
-	},
-	header: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center'
-	},
-	footer: {
-		flex: 5,
-		backgroundColor: '#fff',
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		paddingHorizontal: 30,
-		paddingVertical: 50
-	},
-	text: {
-		textAlign: 'center',
-		color: '#fff',
-		marginBottom: 20
-	},
-	title: {
-		display: 'flex',
-		color: '#eaca97',
-		fontSize: 25,
-		fontWeight: "bold",
-	},
-	mainTitle: {
-		display: 'flex',
-		color: '#fff',
-		fontSize: 40,
-		fontWeight: "bold",
-	},
-	loginTitle: {
-		color: '#502b10',
-		fontSize: 20,
-		fontWeight: 'bold',
-		marginBottom: 10
-	},
-	subtitle: {
-		marginBottom: 20
-	},
-	loginButton: {
-		flex: 1,
-		height: 40,
-		backgroundColor: "#eaca97",
-		padding: 10,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-	},
-	textinput: {
-		height: 40,
-		flex: 3,
-		marginBottom: 10,
-		borderColor: '#eaca97',
-		borderWidth: 1,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-	}
-})

@@ -8,6 +8,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import DoubleClick from 'react-native-double-tap';
 import Reviews from './reviews'
 import StarRating from 'react-native-star-rating';
+import style from './stylesheet'
 
 
 
@@ -200,7 +201,7 @@ export default class ReviewPage extends Component {
                         }}
                         delay={200}
                     >
-                       <Text style={{marginTop: 10, color: '#fff'}}>{like_icon} {likes} likes</Text>
+                       <Text style={style.likeButtonText} >{like_icon} {likes} likes</Text>
                     </DoubleClick>
                 </View>)
         } else {
@@ -221,7 +222,7 @@ export default class ReviewPage extends Component {
                         }}
                         delay={200}
                     >
-                        <Text style={{marginTop: 10, color: '#fff'}}>{unlike_icon} {likes} likes</Text>
+                        <Text style={style.likeButtonText} >{unlike_icon} {likes} likes</Text>
                     </DoubleClick>
                 </View>)
         }
@@ -235,43 +236,43 @@ export default class ReviewPage extends Component {
             </View>
         }
         return (
-            <View style={styles.container}>
-                <View style={styles.header}>
-                    <Text style={styles.title}>Reviews</Text>
+            <View style={style.mainContainer}>
+                <View style={style.mainHeader}>
+                    <Text style={style.mainTitle}>Reviews</Text>
                 </View>
-                <View style={styles.footer}>
+                <View style={style.mainFooter}>
                     <FlatList
                         data={this.state.review_data.location_reviews}
                         renderItem={({ item, index }) => (
-                            <View style={styles.reviewContainer}>
-                                <Text style={styles.title}>{this.state.current_name}</Text>
-                                <Text style={styles.review_id}>Review ID: {item.review_id}</Text>
-                                <View style={styles.reviewRow}>
-                                    <View style={{flex: 1}}>
+                            <View style={style.resultContainer}>
+                                <Text style={style.containerTitle}>{this.state.current_name}</Text>
+                                <Text>Review ID: {item.review_id}</Text>
+                                <View style={style.flexRow}>
+                                    <View style={style.flexOne}>
                                         <Text>Overall Rating</Text>
-                                        <Text>{this.displayStarRating(20, styles.starContainer, item.overall_rating)}</Text>
+                                        <Text>{this.displayStarRating(20, style.starContainer, item.overall_rating)}</Text>
                                     </View>
-                                    <View style={{flex: 1, alignItems: 'flex-end'}}>
+                                    <View style={style.flexEnd}>
                                         <Text>Cleanliness Rating</Text>
-                                        <Text>{this.displayStarRating(20, styles.starContainer, item.clenliness_rating)}</Text>
+                                        <Text>{this.displayStarRating(20, style.starContainer, item.clenliness_rating)}</Text>
                                     </View>
                                 </View>
-                                <View style={styles.reviewRow}>
-                                    <View style={{flex: 1}}>
+                                <View style={style.flexRow}>
+                                <View style={style.flexOne}>
                                         <Text>Price Rating</Text>
-                                        <Text>{this.displayStarRating(20, styles.starContainer, item.price_rating)}</Text>
+                                        <Text>{this.displayStarRating(20, style.starContainer, item.price_rating)}</Text>
                                     </View>
-                                    <View style={{flex: 1, alignItems: 'flex-end'}}>
+                                    <View style={style.flexEnd}>
                                         <Text>Quality Rating</Text>
-                                        <Text>{this.displayStarRating(20, styles.starContainer, item.quality_rating)}</Text>
+                                        <Text>{this.displayStarRating(20, style.starContainer, item.quality_rating)}</Text>
                                     </View>
                                 </View>
                                 <Text>User Comment: </Text>
                                 <Text>{item.review_body}</Text>
-                                <TouchableOpacity>
-                                    <Text style={styles.loginButton}>{this.isLiked(this.state.current_id, item.review_id, item.likes)}</Text>
+                                <TouchableOpacity style={style.mainButton}>
+                                    <Text style={style.textCenterWhite}>{this.isLiked(this.state.current_id, item.review_id, item.likes)}</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.signupButton} onPress={()=>{navigation.navigate("ViewPhoto", {id: this.state.current_id, review_id : item.review_id})}}>
+                                <TouchableOpacity style={style.mainButtonWhite} onPress={()=>{navigation.navigate("ViewPhoto", {id: this.state.current_id, review_id : item.review_id})}}>
                                     <Text >View Photos</Text>
                                 </TouchableOpacity>
                             </View>
@@ -284,96 +285,3 @@ export default class ReviewPage extends Component {
 
     }
 }
-
-const styles = StyleSheet.create({
-    reviewRow:{
-        flexDirection: 'row'
-    },
-    review_id:{
-        marginBottom: 10,
-        color: 'grey'
-    },
-    starContainer: {
-		width: '20%'
-	},
-    reviewContainer: {
-        backgroundColor: '#F2F2F2',
-        padding: 20,
-        marginBottom: 20,
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        borderBottomLeftRadius: 30,
-        borderBottomRightRadius: 30,
-        elevation: 6,
-        width: '100%'
-    },
-    container: {
-        flex: 1,
-        backgroundColor: '#eaca97',
-    },
-    header: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    footer: {
-        flex: 5,
-        backgroundColor: '#fff',
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        paddingHorizontal: 30,
-        paddingVertical: 50
-    },
-    text: {
-        color: '#fff',
-        marginBottom: 20
-    },
-    title: {
-        display: 'flex',
-        color: '#eaca97',
-        fontSize: 25,
-        fontWeight: "bold",
-    },
-    loginTitle: {
-        color: '#502b10',
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 10
-    },
-    subtitle: {
-        marginBottom: 20
-    },
-    loginButton: {
-        textAlign: 'center',
-        alignItems: 'center',
-        height: 40,
-        marginTop: 10,
-        backgroundColor: '#eaca97',
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
-    },
-    signupButton: {
-        alignItems: "center",
-        width: "100%",
-        height: 40,
-        padding: 10,
-        marginTop: 20,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
-        borderColor: '#eaca97',
-        borderWidth: 1,
-    },
-    textinput: {
-        marginBottom: 10,
-        borderColor: '#eaca97',
-        borderWidth: 1,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
-    }
-})

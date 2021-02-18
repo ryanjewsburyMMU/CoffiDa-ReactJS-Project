@@ -6,6 +6,7 @@ import StarRating from 'react-native-star-rating';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import style from './stylesheet'
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -123,13 +124,13 @@ export default class CreateReviewPage extends Component {
         const navigation = this.props.navigation;
 
         return (
-            <View style={styles.container}>
-                <View style={styles.header}>
-                    <Text style={styles.mainTitle}>Write a Review For {this.state.current_name}</Text>
+            <View style={style.mainContainer}>
+                <View style={style.mainHeader}>
+                    <Text style={style.mainTitle}>Write a Review For {this.state.current_name}</Text>
                 </View>
-                <View style={styles.footer}>
+                <View style={style.mainFooter}>
                     <ScrollView>
-                    <Text style={styles.title}>How Would You Rate Your Overall Experience?</Text>
+                    <Text style={style.subTitle}>How Would You Rate Your Overall Experience?</Text>
                     <StarRating
                         disabled={false}
                         emptyStar={'star-o'}
@@ -142,7 +143,7 @@ export default class CreateReviewPage extends Component {
                         selectedStar={(rating) => this.onStarPress_OverallRating(rating)}
                         fullStarColor={'#eaca97'}
                     />
-                    <Text style={styles.title}>How Would You Rate The Price?</Text>
+                    <Text style={style.subTitle}>How Would You Rate The Price?</Text>
                     <StarRating
                         disabled={false}
                         emptyStar={'star-o'}
@@ -155,7 +156,7 @@ export default class CreateReviewPage extends Component {
                         selectedStar={(rating) => this.onStarPress_Price(rating)}
                         fullStarColor={'#eaca97'}
                     />
-                     <Text style={styles.title}>How Would You Rate The Quality?</Text>
+                     <Text style={style.subTitle}>How Would You Rate The Quality?</Text>
                     <StarRating
                         disabled={false}
                         emptyStar={'star-o'}
@@ -168,7 +169,7 @@ export default class CreateReviewPage extends Component {
                         selectedStar={(rating) => this.onStarPress_Quality(rating)}
                         fullStarColor={'#eaca97'}
                     />
-                     <Text style={styles.title}>How Would You Rate The Clenliness?</Text>
+                     <Text style={style.subTitle}>How Would You Rate The Clenliness?</Text>
                     <StarRating
                         disabled={false}
                         emptyStar={'star-o'}
@@ -185,94 +186,16 @@ export default class CreateReviewPage extends Component {
                     <TextInput placeholder="Provide More Details About Your Visit" multiline={true} onChangeText={(text) => {this.setState({reviewBody: text})}}
                     numberOfLines={4}>
                     </TextInput>
-                    <Button title="Add a Photo?" onPress={()=>{navigation.navigate("CameraPage", )}}/>
 
-                    <TouchableOpacity style={styles.loginButton} onPress={()=>{this.post_review()}}>
-                        <Text style={styles.text}>Submit Review</Text>
+                    <TouchableOpacity style={style.mainButton} onPress={()=>{this.post_review()}}>
+                        <Text style={style.textCenterWhite}>Submit Review</Text>
                     </TouchableOpacity>
                     </ScrollView>
 
-                   
-
+            
                 </View>
             </View>
         )
 
     }
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#eaca97',
-    },
-    header: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    footer: {
-        flex: 5,
-        backgroundColor: '#fff',
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        padding: 50
-    },
-    title: {
-        display: 'flex',
-        color: '#eaca97',
-        fontSize: 18,
-        fontWeight: "bold",
-        textAlign: 'center',
-        marginTop: 20,
-        marginBottom: 20
-    },
-    mainTitle: {
-        display: 'flex',
-        color: '#fff',
-        fontSize: 25,
-        fontWeight: "bold",
-        textAlign: 'center',
-    },
-    text: {
-        color: '#fff',
-        fontSize: 15,
-        marginBottom: 10
-    },
-    locationTitle: {
-        display: 'flex',
-        color: '#eaca97',
-        fontSize: 20,
-        fontWeight: "bold",
-        marginBottom: 10
-    },
-    loginButton: {
-		alignItems: "center",
-		width: "100%",
-		height:40,
-		backgroundColor: "#eaca97",
-		padding: 10,
-		marginTop: 20,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-	},
-    favourite: {
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    reviewButton: {
-        alignItems: "center",
-        width: "100%",
-        backgroundColor: '#eaca97',
-        height: 40,
-        padding: 10,
-        marginTop: 20,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
-    },
-
-})

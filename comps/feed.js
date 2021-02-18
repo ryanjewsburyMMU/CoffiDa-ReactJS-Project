@@ -6,6 +6,7 @@ import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScrollView } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import style from './stylesheet'
 
 import DoubleClick from 'react-native-double-tap';
 
@@ -221,19 +222,17 @@ export default class Feed extends Component {
 		}
 
 		return (
-			<View style={styles.container}>
-				<View style={styles.header}>
-					<Text style={styles.title}>Your Feed</Text>
+			<View style={style.mainContainer}>
+				<View style={style.mainHeader}>
+					<Text style={style.mainTitle}>Your Feed</Text>
 				</View>
-				<View style={styles.footer}>
+				<View style={style.mainFooter}>
 					<ScrollView>
-
-						<Text style={styles.loginTitle}></Text>
 						<View>
 							{this.state.location_data.map((locationData, index) => (
 								<View key={index}>
-									<View style={styles.loginButton}>
-										<Text style={styles.locationTitle}>{locationData.location_name}</Text>
+									<View style={style.feedContainer}>
+										<Text style={style.locationTitle}>{locationData.location_name}</Text>
 										<Text>Overall Rating</Text>
 										<StarRating
 											disabled={false}
@@ -244,14 +243,14 @@ export default class Feed extends Component {
 											selectedStar={(rating) => this.onStarRatingPress(rating)}
 										/>
 									</View>
-									<View style={styles.favourite}>
+									<View style={style.alignCenter}>
 										<Text>Favourite This Location?</Text>
 										<Text>{this.isFavourited(locationData.location_id)}</Text>
 
-										<TouchableOpacity style={styles.reviewButton} onPress={() => { navigation.navigate("ReviewPage", { id: locationData.location_id, name: locationData.location_name, photo_path: locationData.photo_path }) }}>
-											<Text style={styles.text}>See Reviews for {locationData.location_name}</Text>
+										<TouchableOpacity style={style.mainButton} onPress={() => { navigation.navigate("ReviewPage", { id: locationData.location_id, name: locationData.location_name, photo_path: locationData.photo_path }) }}>
+											<Text style={style.textCenterWhite}>See Reviews for {locationData.location_name}</Text>
 										</TouchableOpacity>
-										<TouchableOpacity style={styles.signupButton} onPress={() => { navigation.navigate("CreateReviewPage", { id: locationData.location_id, name: locationData.location_name }) }}>
+										<TouchableOpacity style={style.mainButtonWhite} onPress={() => { navigation.navigate("CreateReviewPage", { id: locationData.location_id, name: locationData.location_name }) }}>
 											<Text>Write a Review For {locationData.location_name}</Text>
 										</TouchableOpacity>
 									</View>
@@ -267,82 +266,3 @@ export default class Feed extends Component {
 	}
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: '#eaca97',
-	},
-	header: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center'
-	},
-	footer: {
-		flex: 5,
-		backgroundColor: '#fff',
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		padding: 10
-	},
-	title: {
-		display: 'flex',
-		color: '#fff',
-		fontSize: 30,
-		fontWeight: "bold",
-	},
-	text: {
-		color: '#fff',
-		fontSize: 15,
-		marginBottom: 10
-	},
-	locationTitle: {
-		display: 'flex',
-		color: '#eaca97',
-		fontSize: 20,
-		fontWeight: "bold",
-		marginBottom: 10
-	},
-	loginButton: {
-		alignItems: "center",
-		width: "100%",
-		height: 40,
-		padding: 10,
-		marginTop: 20,
-		marginBottom: 70,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-	},
-	favourite: {
-		justifyContent: 'center',
-		alignItems: 'center'
-	},
-	reviewButton: {
-		alignItems: "center",
-		width: "100%",
-		backgroundColor: '#eaca97',
-		height: 40,
-		padding: 10,
-		marginTop: 20,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-	},
-	signupButton: {
-		alignItems: "center",
-		width: "100%",
-		height: 40,
-		backgroundColor: "#fff",
-		padding: 10,
-		marginTop: 20,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-		borderColor: '#eaca97',
-		borderWidth: 1,
-	},
-
-})

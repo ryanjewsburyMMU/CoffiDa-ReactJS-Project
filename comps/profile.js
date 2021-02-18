@@ -8,6 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Login from './login'
 import SignUp from './signup'
 
+import style from './stylesheet.js'
+
 
 
 export default class Profile extends Component{
@@ -114,28 +116,28 @@ export default class Profile extends Component{
 
 
 	 		return(
-	 			<View style={styles.container}>
-	 				<View style={styles.header}>
-						<Text style={styles.title}>Hello, {this.state.user_details.first_name}</Text>
+	 			<View style={style.mainContainer}>
+	 				<View style={style.mainHeader}>
+						<Text style={style.mainTitle}>Hello, {this.state.user_details.first_name}</Text>
 					</View>
-					<View style={styles.footer}>
-						<Text style={styles.loginTitle}>Your Details:</Text>
-						<Text style={styles.text}>Full Name: {this.state.user_details.first_name} {this.state.user_details.last_name}</Text>
-						<Text style={styles.text}>E-Mail: {this.state.user_details.email}</Text>
-						<Text style={styles.text}>Your Unique ID: {this.state.user_details.user_id}</Text>
-						<TouchableOpacity style={styles.signupButton} onPress={() => navigation.navigate("Profile_Details")}>
+					<View style={style.mainFooter}>
+						<Text style={style.detailsTitle}>Your Details:</Text>
+						<Text style={style.textCenterBlack}>Full Name: {this.state.user_details.first_name} {this.state.user_details.last_name}</Text>
+						<Text style={style.textCenterBlack}>E-Mail: {this.state.user_details.email}</Text>
+						<Text style={style.textCenterBlack}>Your Unique ID: {this.state.user_details.user_id}</Text>
+						<TouchableOpacity style={style.mainButtonWhite} onPress={() => navigation.navigate("Profile_Details")}>
 							<Text>Edit Profile</Text>
 						</TouchableOpacity> 
-						<TouchableOpacity style={styles.signupButton} onPress={() => navigation.navigate("FavouriteLocations")}>
+						<TouchableOpacity style={style.mainButtonWhite} onPress={() => navigation.navigate("FavouriteLocations")}>
 							<Text>Favourite Locations</Text>
 						</TouchableOpacity> 
-						<TouchableOpacity style={styles.signupButton} onPress={() => navigation.navigate("App")}>
+						<TouchableOpacity style={style.mainButtonWhite} onPress={() => navigation.navigate("App")}>
 							<Text>My Reviews</Text>
 						</TouchableOpacity> 
-						<TouchableOpacity style={styles.signupButton} onPress={() => console.log("Take to stack page")}>
+						<TouchableOpacity style={style.mainButtonWhite} onPress={() => console.log('Liked Reviews Possible...')}>
 							<Text>Liked Reviews</Text>
 						</TouchableOpacity> 
-						<TouchableOpacity style={styles.loginButton} onPress={() => {this.post_logout()}}>
+						<TouchableOpacity style={style.mainButton} onPress={() => {this.post_logout()}}>
 							<Text>Sign Out</Text>
 						</TouchableOpacity> 
 			
@@ -144,84 +146,3 @@ export default class Profile extends Component{
 	)}
 }
 
-const styles = StyleSheet.create({
-	test: {
-		textAlign: 'right'
-	},
-	container: {
-		flex: 1,
-		backgroundColor: '#eaca97',
-	},
-	guest:{
-		marginTop: 10,
-		textAlign: 'center'
-	},
-	header:{
-		flex: 1,
-		justifyContent: 'flex-end',
-		marginLeft: 20,
-		marginBottom: 10
-	},
-	footer:{
-		flex: 5,
-		backgroundColor: '#fff',
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		paddingHorizontal: 30,
-		paddingVertical: 50
-	},
-	text:{
-		textAlign: 'center',
-		marginBottom: 10,
-	},
-	title:{
-		color: '#fff',
-		fontSize: 30,
-		fontWeight: "bold",
-	},
-	loginTitle:{
-		color: '#502b10',
-		fontSize: 20,
-		fontWeight: 'bold',
-		marginBottom: 10,
-		textAlign: 'center'
-	},
-	subtitle:{
-		marginBottom: 20
-	},
-	loginButton: {
-		alignItems: "center",
-		width: "100%",
-		height:40,
-		backgroundColor: "#eaca97",
-		padding: 10,
-		marginTop: 20,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-	},
-	signupButton: {
-		alignItems: "center",
-		width: "100%",
-		height:40,
-		backgroundColor: "#fff",
-		padding: 10,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-		borderColor:'#eaca97',
-		borderWidth: 1,
-		marginBottom: 30
-	},
-	textinput:{
-		marginBottom:10,
-		borderColor:'#eaca97',
-		borderWidth: 1,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-	}
-})

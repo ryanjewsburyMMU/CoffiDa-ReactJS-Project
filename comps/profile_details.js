@@ -8,6 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Login from './login'
 import SignUp from './signup'
 
+import style from './stylesheet'
+
 
 
 export default class Profile_Details extends Component{
@@ -101,35 +103,35 @@ export default class Profile_Details extends Component{
 
 
 	 		return(
-	 			<View style={styles.container}>
-	 				<View style={styles.header}>
-						<Text style={styles.title}>Edit Details</Text>
+	 			<View style={style.mainContainer}>
+	 				<View style={style.mainHeader}>
+						<Text style={style.mainTitle}>Edit Details</Text>
 					</View>
-					<View style={styles.footer}>
+					<View style={style.mainFooter}>
 						<ScrollView>
-							<Text style={styles.loginTitle}>Your Details:</Text>
+							<Text style={style.detailsTitle}>Your Details:</Text>
 							<TouchableOpacity	
-								style={styles.loginButton}					
+								style={style.mainButton}					
 								onPress={() => navigation.goBack()}>
-								<Text style={styles.text}>Go Back</Text>
+								<Text style={style.textCenterWhite}>Go Back</Text>
 							</TouchableOpacity>
 
 							<Text>First Name: </Text>
-							<TextInput style={styles.textinput}
+							<TextInput style={style.inputDetails}
 								placeholder={this.state.orig_first_name}
 								onChangeText={(updated_first_name) => this.setState({updated_first_name})}
 								value={this.state.updated_first_name}
 							/>
 
 							<Text>Last Name: </Text>
-							<TextInput style={styles.textinput}
+							<TextInput style={style.inputDetails}
 								placeholder={this.state.orig_last_name}
 								onChangeText={(updated_last_name) => this.setState({updated_last_name})}
 								value={this.state.updated_last_name}
 							/>
 							
 							<Text>E-Mail: </Text>
-							<TextInput style={styles.textinput}
+							<TextInput style={style.inputDetails}
 								placeholder={this.state.orig_email}
 								onChangeText={(updated_email) => this.setState({updated_email})}
 								value={this.state.updated_email}
@@ -137,108 +139,24 @@ export default class Profile_Details extends Component{
 							/>
 
 							<Text>Password: </Text>
-							<TextInput style={styles.textinput}
+							<TextInput style={style.inputDetails}
 								placeholder="Password"
 								onChangeText={(password) => this.setState({password})}
 								value={this.state.password}
 							/>
 
 							<Text>Confirm Passsword: </Text>
-							<TextInput style={styles.textinput}
+							<TextInput style={style.inputDetails}
 								placeholder="Password"
 								onChangeText={(confirm_password) => this.setState({confirm_password})}
 								value={this.state.confirm_password}
 							/>
 
-							<TouchableOpacity style={styles.loginButton} onPress={() => {this.patch_updateInformation()}}>
-								<Text style={styles.text}>Submit Changes</Text>
+							<TouchableOpacity style={style.mainButton} onPress={() => {this.patch_updateInformation()}}>
+								<Text style={style.textCenterWhite}>Submit Changes</Text>
 							</TouchableOpacity>
 						</ScrollView>
 					</View>
 	 			</View>
 	)}
 }
-
-const styles = StyleSheet.create({
-	test: {
-		textAlign: 'right'
-	},
-	container: {
-		flex: 1,
-		backgroundColor: '#eaca97',
-	},
-	guest:{
-		marginTop: 10,
-		textAlign: 'center'
-	},
-	header:{
-		flex: 1,
-		justifyContent: 'flex-end',
-		marginLeft: 20,
-		marginBottom: 10
-	},
-	footer:{
-		flex: 5,
-		backgroundColor: '#fff',
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		paddingHorizontal: 30,
-		paddingVertical: 50
-	},
-	text:{
-		color: '#fff',
-		textAlign: 'center',
-		marginBottom: 10,
-	},
-	title:{
-		color: '#fff',
-		fontSize: 30,
-		fontWeight: "bold",
-	},
-	loginTitle:{
-		color: '#502b10',
-		fontSize: 20,
-		fontWeight: 'bold',
-		marginBottom: 10,
-		textAlign: 'center'
-	},
-	subtitle:{
-		marginBottom: 20
-	},
-	loginButton: {
-		alignItems: "center",
-		width: "100%",
-		height:40,
-		backgroundColor: "#eaca97",
-		padding: 10,
-		marginTop: 20,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-		marginBottom: 20
-	},
-	signupButton: {
-		alignItems: "center",
-		width: "100%",
-		height:40,
-		backgroundColor: "#fff",
-		padding: 10,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-		borderColor:'#eaca97',
-		borderWidth: 1,
-		marginBottom: 30
-	},
-	textinput:{
-		marginBottom:10,
-		borderColor:'#eaca97',
-		borderWidth: 1,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-	}
-})

@@ -2,6 +2,8 @@ import React, {Component, useEffect, useState} from 'react';
 
 import {Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions,TouchableOpacity, Alert,} from 'react-native';
 
+import style from './stylesheet'
+
 export default class SignUp extends Component{
 
 	constructor(props){
@@ -83,23 +85,23 @@ export default class SignUp extends Component{
 
 
 	 		return(
-				<View style={styles.container}>
-					<View style={styles.header}>
-						<Text style={styles.title}>Sign Up</Text>
+				<View style={style.mainContainer}>
+					<View style={style.mainHeader}>
+						<Text style={style.mainTitle}>Sign Up</Text>
 					</View>
-					<View style={styles.footer}>
-							<Text style={styles.signUpTitle}>Create An Account:</Text>
-							<TextInput style={styles.textinput} placeholder="First Name" onChangeText={(text) => {this.setState({first_name: text})}}/>
-							<TextInput style={styles.textinput} placeholder="Last Name" onChangeText={(text) => {this.setState({last_name: text})}}/>
-							<TextInput style={styles.textinput} placeholder="Email" onChangeText={(text) => {this.setState({email: text})}}/>
-							<TextInput style={styles.textinput} placeholder="Password" onChangeText={(text) => {this.setState({password: text})}}/>
-							<TextInput style={styles.textinput} placeholder="Confirm Password" onChangeText={(text) => {this.setState({password_confirm: text})}}/>
+					<View style={style.mainFooter}>
+							<Text style={style.signupTitle}>Create An Account:</Text>
+							<TextInput style={style.signupInput} placeholder="First Name" onChangeText={(text) => {this.setState({first_name: text})}}/>
+							<TextInput style={style.signupInput} placeholder="Last Name" onChangeText={(text) => {this.setState({last_name: text})}}/>
+							<TextInput style={style.signupInput} placeholder="Email" onChangeText={(text) => {this.setState({email: text})}}/>
+							<TextInput style={style.signupInput} placeholder="Password" onChangeText={(text) => {this.setState({password: text})}}/>
+							<TextInput style={style.signupInput} placeholder="Confirm Password" onChangeText={(text) => {this.setState({password_confirm: text})}}/>
 							<TouchableOpacity
-								onPress={()=> this.post_signup()} style={styles.loginButton}>							
-								<Text>Sign Up:</Text>
+								onPress={()=> this.post_signup()} style={style.mainButton}>							
+								<Text style={style.textCenterWhite}>Sign Up:</Text>
 							</TouchableOpacity>
 							<TouchableOpacity
-								onPress={()=> this.props.navigation.goBack()} style={styles.signupButton}>							
+								onPress={()=> this.props.navigation.goBack()} style={style.mainButtonWhite}>							
 								<Text>Go Back:</Text>
 							</TouchableOpacity>
 
@@ -107,74 +109,3 @@ export default class SignUp extends Component{
 				</View>
 			)}
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: '#eaca97',
-	},
-	header:{
-		flex: 1,
-		justifyContent: 'flex-end',
-		marginLeft: 20,
-		marginBottom: 10
-	},
-	footer:{
-		flex: 3,
-		backgroundColor: '#fff',
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		paddingHorizontal: 30,
-		paddingVertical: 50
-	},
-	text:{
-		color: '#fff',
-		marginBottom: 20
-	},
-	title:{
-		color: '#fff',
-		fontSize: 30,
-		fontWeight: "bold"
-	},
-	signUpTitle:{
-		color: '#502b10',
-		fontSize: 20,
-		fontWeight: 'bold',
-		marginBottom: 10
-	},
-	loginButton: {
-		alignItems: "center",
-		width: "100%",
-		height:40,
-		backgroundColor: "#eaca97",
-		padding: 10,
-		marginTop: 20,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-	},
-	signupButton: {
-		alignItems: "center",
-		width: "100%",
-		height:40,
-		backgroundColor: "#fff",
-		padding: 10,
-		marginTop: 20,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-		borderColor:'#eaca97',
-		borderWidth: 1,
-	},
-	textinput:{
-		marginBottom:10,
-		borderColor:'#eaca97',
-		borderWidth: 1,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-	}
-})

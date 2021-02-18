@@ -4,6 +4,7 @@ import {View, Text, Image, ActivityIndicator, Alert, StyleSheet} from 'react-nat
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
+import style from './stylesheet'
 
 
 export default class ViewPhoto extends Component{
@@ -74,13 +75,13 @@ export default class ViewPhoto extends Component{
             </View>
         }
         return(
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.mainTitle}>Photos</Text>
+        <View style={style.mainContainer}>
+            <View style={style.mainHeader}>
+                <Text style={style.mainTitle}>Photos</Text>
             </View>
-            <View style={styles.footer}>
-                <TouchableOpacity style={styles.loginButton} onPress={()=>{navigation.goBack()}}>
-                    <Text style={styles.text}>Go Back</Text>
+            <View style={style.mainFooter}>
+                <TouchableOpacity style={style.mainButton} onPress={()=>{navigation.goBack()}}>
+                    <Text style={style.textCenterWhite}>Go Back</Text>
                     </TouchableOpacity>
             <Image
                 style={{width: '100%', height:'90%', marginTop: 20}}
@@ -94,99 +95,4 @@ export default class ViewPhoto extends Component{
         </View>
         )
     }
-}const styles = StyleSheet.create({
-	reviewRow: {
-		flexDirection: 'row'
-	},
-	starContainer: {
-		width: '20%'
-	},
-	location_town: {
-		marginBottom: 10,
-		color: 'grey'
-	},
-	resultContainer: {
-		backgroundColor: '#F2F2F2', 
-		padding: 20,
-		marginBottom: 20,
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		borderBottomLeftRadius: 30,
-		borderBottomRightRadius: 30,
-		elevation: 6,
-		width: '100%'
-	},
-	filterOptionsRow: {
-		flexDirection: 'row',
-		alignContent: 'flex-start'
-	},
-	container: {
-		flex: 1,
-		backgroundColor: '#eaca97',
-	},
-	guest: {
-		marginTop: 10,
-		textAlign: 'center'
-	},
-	header: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center'
-	},
-	footer: {
-		flex: 5,
-		backgroundColor: '#fff',
-		borderTopLeftRadius: 30,
-		borderTopRightRadius: 30,
-		paddingHorizontal: 30,
-		paddingVertical: 50
-	},
-	text: {
-		textAlign: 'center',
-		color: '#fff',
-        padding: 10
-	},
-	title: {
-		display: 'flex',
-		color: '#eaca97',
-		fontSize: 25,
-		fontWeight: "bold",
-	},
-	mainTitle: {
-		display: 'flex',
-		color: '#fff',
-		fontSize: 40,
-		fontWeight: "bold",
-	},
-	loginTitle: {
-		color: '#502b10',
-		fontSize: 20,
-		fontWeight: 'bold',
-		marginBottom: 10
-	},
-	subtitle: {
-		marginBottom: 20
-	},
-	loginButton: {
-		textAlign: 'center',
-        alignItems: 'center',
-        height: 40,
-        marginTop: 10,
-        backgroundColor: '#eaca97',
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
-	},
-	textinput: {
-		height: 40,
-		flex: 3,
-		marginBottom: 10,
-		borderColor: '#eaca97',
-		borderWidth: 1,
-		borderTopLeftRadius: 10,
-		borderTopRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		borderBottomRightRadius: 10,
-	}
-})
+}

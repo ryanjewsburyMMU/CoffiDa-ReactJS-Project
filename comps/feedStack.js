@@ -14,7 +14,7 @@ export default class FeedStack extends Component{
     render(){
         return(
             <Stack.Navigator>
-                <Stack.Screen name="Feed" component={Feed}/> 
+                <Stack.Screen name="Feed" component={Feed}/>
                 <Stack.Screen name="ReviewPage" component={ReviewPage}/> 
                 <Stack.Screen name="CreateReviewPage" component={CreateReviewPage}/> 
                 <Stack.Screen name="CameraPage" component={CameraPage}/> 
