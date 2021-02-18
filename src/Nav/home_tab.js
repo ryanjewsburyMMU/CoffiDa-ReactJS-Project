@@ -10,8 +10,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 const Tab = createBottomTabNavigator()
 
 import FeedStack from './feedStack'
-import Search from './search'
-import CreatePost from './createPost'
+import Search from '../Comps/Screens/Main/search'
 
 
 export default class Home_Tab extends Component{

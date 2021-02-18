@@ -2,7 +2,7 @@ import React, {Component, useEffect, useState} from 'react';
 
 import {Text, View, TextInput,  StyleSheet,TouchableOpacity, Button, Alert} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import style from './stylesheet'
+import style from '../../../Styles/stylesheet'
 
 
 export default class Login extends Component{

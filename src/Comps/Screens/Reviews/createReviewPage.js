@@ -6,7 +6,7 @@ import StarRating from 'react-native-star-rating';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-import style from './stylesheet'
+import style from '../../../Styles/stylesheet'
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScrollView } from 'react-native-gesture-handler';

@@ -10,7 +10,7 @@ import SignUp from './signup'
 import StarRating from 'react-native-star-rating';
 
 
-import style from './stylesheet'
+import style from '../../../Styles/stylesheet'
 
 
 export default class App extends Component {

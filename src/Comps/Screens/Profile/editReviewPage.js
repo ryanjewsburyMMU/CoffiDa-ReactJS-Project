@@ -7,7 +7,7 @@ import StarRating from 'react-native-star-rating';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import style from './stylesheet'
+import style from '../../../Styles/stylesheet'
 
 
 export default class EditReview extends Component {

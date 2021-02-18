@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Login from './login'
 import SignUp from './signup'
 
-import style from './stylesheet'
+import style from '../../../Styles/stylesheet'
 
 
 

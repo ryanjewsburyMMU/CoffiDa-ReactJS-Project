@@ -9,7 +9,7 @@ import { Picker } from '@react-native-picker/picker';
 import StarRating from 'react-native-star-rating';
 import { ScrollView } from 'react-native-gesture-handler';
 
-import style from './stylesheet'
+import style from '../../../Styles/stylesheet'
 
 
 

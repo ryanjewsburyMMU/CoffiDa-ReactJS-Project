@@ -6,13 +6,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import {Text, View, Button,TouchableOpacity} from 'react-native';
 
-import Profile from './profile'
-import SignUp from './signup'
-import Login from './login'
-import Profile_Details from './profile_details'
-import App from './test_page'
-import EditReview from './editReviewPage'
-import FavouriteLocations from './favouriteLocations'
+import Profile from '../Comps/Screens/Profile/profile'
+import SignUp from '../Comps/Screens/Profile/signup'
+import Login from '../Comps/Screens/Profile/login'
+import Profile_Details from '../Comps/Screens/Profile/profile_details'
+import App from '../Comps/Screens/Profile/test_page'
+import EditReview from '../Comps/Screens/Profile/editReviewPage'
+import FavouriteLocations from '../Comps/Screens/Profile/favouriteLocations'
 
 const Stack = createStackNavigator()
 

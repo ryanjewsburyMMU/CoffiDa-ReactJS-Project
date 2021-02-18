@@ -4,11 +4,12 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 const Stack = createStackNavigator()
 
-import Feed from './feed'
-import ReviewPage from './reviewPage'
-import CreateReviewPage from './createReviewPage'
-import CameraPage from './cameraPage'
-import ViewPhoto from './viewPhoto'
+import Feed from '../Comps/Screens/Main/feed'
+import ReviewPage from '../Comps/Screens/Reviews/reviewPage'
+import CreateReviewPage from '../Comps/Screens/Reviews/createReviewPage'
+import CameraPage from '../Comps/Screens/Reviews/cameraPage'
+import ViewPhoto from '../Comps/Screens/Reviews/viewPhoto'
+
 
 export default class FeedStack extends Component{
     render(){

@@ -2,7 +2,7 @@ import React, {Component, useEffect, useState} from 'react';
 
 import {Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions,TouchableOpacity, Alert,} from 'react-native';
 
-import style from './stylesheet'
+import style from '../../../Styles/stylesheet'
 
 export default class SignUp extends Component{
 

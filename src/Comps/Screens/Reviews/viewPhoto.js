@@ -4,7 +4,7 @@ import {View, Text, Image, ActivityIndicator, Alert, StyleSheet} from 'react-nat
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-import style from './stylesheet'
+import style from '../../../Styles/stylesheet'
 
 
 export default class ViewPhoto extends Component{

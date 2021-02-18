@@ -8,7 +8,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import DoubleClick from 'react-native-double-tap';
 import Reviews from './reviews'
 import StarRating from 'react-native-star-rating';
-import style from './stylesheet'
+import style from '../../../Styles/stylesheet'
 
 
 

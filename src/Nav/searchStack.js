@@ -5,7 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 const Stack = createStackNavigator()
 
-import Search from './search'
+import Search from '../Comps/Screens/Main/search'
 
 export default class SearchStack extends Component{
     render(){

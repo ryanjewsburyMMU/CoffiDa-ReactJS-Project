@@ -15,7 +15,7 @@ import { RNCamera } from 'react-native-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-import style from './stylesheet'
+import style from '../../../Styles/stylesheet'
 
 
 
