@@ -86,12 +86,11 @@ export default class App extends React.Component {
 
     testfunction(){
       console.log("Your ")
-      console.log("You are " +
-      getDistance({latitude: this.state.lat, longitude: this.state.long}, {
+      const a = getDistance({latitude: this.state.lat, longitude: this.state.long}, {
         latitude: 53,
         longitude: -2,
         }
-      ))
+      )
     }
 
 
