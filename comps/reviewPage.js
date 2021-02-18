@@ -10,6 +10,7 @@ import Reviews from './reviews'
 import StarRating from 'react-native-star-rating';
 
 
+
 export default class ReviewPage extends Component {
     constructor(props) {
         super(props);
