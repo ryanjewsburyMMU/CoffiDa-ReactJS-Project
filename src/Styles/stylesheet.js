@@ -61,6 +61,10 @@ export default StyleSheet.create({
         textAlign: 'center',
         color: '#fff'
     },
+    textCenterGrey: {
+        textAlign: 'center',
+        color: 'gray'
+    },
     flexRow: {
         flexDirection: 'row'
     },
@@ -216,7 +220,6 @@ export default StyleSheet.create({
         color: '#eaca97',
         fontSize: 20,
         fontWeight: "bold",
-        marginBottom: 10
     },
 
     //Review Page

@@ -9,6 +9,33 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import style from '../../../Styles/stylesheet'
 
 import DoubleClick from 'react-native-double-tap';
+import Geolocation from 'react-native-geolocation-service'
+import { getDistance } from 'geolib';
+
+
+async function requestLocationPermission(){
+	try{
+	  const granted = await PermissionsAndroid.request(
+		PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+		{
+		  title: "Location Permission",
+		  message: "Please allow location we won't hack u we promnise xx",
+		  buttonNeutral: "Nah son, maybe in time ya get me?",
+		  buttonNegative: "Mate get out of here",
+		  buttonPositive: "Yeah lard go on then",
+		},
+	  );
+	  if(granted === PermissionsAndroid.RESULTS.GRANTED){
+		console.log("Location can be accessed")
+		return true
+	  }else{
+		console.log("Location access denied")
+		return false
+	  }
+	}catch(error){
+	  console.log("error")
+	}
+  }
 
 export default class Feed extends Component {
 	constructor(props) {
@@ -18,15 +45,45 @@ export default class Feed extends Component {
 				location_data: [],
 				favourite_locations: [],
 				favourite_locations_id: [],
-				current_state_icon: "Yes"
-
+				current_state_icon: "Yes",
+				location: null,
+				locationPermission: false,
+				long: "",
+				lat: ""
 			}
 	}
 
 	componentDidMount() {
+		this.findLocation()
 		this.get_locations();
 		this.get_getInfo();
 	}
+
+	findLocation = () =>{
+		if(!this.state.locationPermission){
+		  console.log(this.state.locationPermission)
+		  this.state.locationPermission = requestLocationPermission();
+		}
+		Geolocation.getCurrentPosition(
+		  (position) => {
+			const location = position
+			this.setState(
+			  {
+				long : location.coords.longitude,
+				lat : location.coords.latitude,
+				location: location
+			  })
+		  },
+		  (error) =>{
+			Alert.alert(error.message)
+		  },
+		  {
+			enableHighAccuracy: true,
+			timeout: 20000,
+			maximumAge: 1000
+		  }
+		  )
+	  }
 
 
 	async post_addFavourite(location_id) {
@@ -131,7 +188,6 @@ export default class Feed extends Component {
 			})
 	}
 
-
 	async get_locations() {
 		console.log("Finding Locations")
 		return fetch("http://10.0.2.2:3333/api/1.0.0/find",
@@ -163,10 +219,6 @@ export default class Feed extends Component {
 				console.log("errrr = " + error)
 			})
 	}
-
-
-
-
 
 	isFavourited(currentID) {
 		var favourite_icon = <Icon name="heart" size={30} color="#900" />
@@ -211,6 +263,31 @@ export default class Feed extends Component {
 				</View>)
 		}
 	}
+
+	findDistance(lat, long){
+		if(this.state.long == ""){
+			return(
+				<View>
+					<Text>Calculating Distance...</Text>
+				</View>
+			)
+		}
+		else{
+		let distance = getDistance({latitude: this.state.lat, longitude: this.state.long}, {
+				latitude: lat,
+				longitude: long,
+				}
+			)
+		let miles = Math.round((parseInt(distance) * 0.00062137))
+			return(
+			<View>
+				<Text>{miles} Miles Away</Text>
+			</View>
+			)
+		}
+	}
+
+
 	render() {
 		const navigation = this.props.navigation;
 		const favourite_icon = <Icon name="heart-o" size={30} color="#900" />
@@ -225,6 +302,7 @@ export default class Feed extends Component {
 			<View style={style.mainContainer}>
 				<View style={style.mainHeader}>
 					<Text style={style.mainTitle}>Your Feed</Text>
+					<Text>{this.state.lat}</Text>
 				</View>
 				<View style={style.mainFooter}>
 					<ScrollView>
@@ -233,6 +311,7 @@ export default class Feed extends Component {
 								<View key={index}>
 									<View style={style.feedContainer}>
 										<Text style={style.locationTitle}>{locationData.location_name}</Text>
+										<Text style={style.textCenterGrey}>{locationData.location_town}</Text>
 										<Text>Overall Rating</Text>
 										<StarRating
 											disabled={false}
@@ -246,7 +325,7 @@ export default class Feed extends Component {
 									<View style={style.alignCenter}>
 										<Text>Favourite This Location?</Text>
 										<Text>{this.isFavourited(locationData.location_id)}</Text>
-
+										<Text> {this.findDistance(locationData.latitude, locationData.longitude)}</Text>
 										<TouchableOpacity style={style.mainButton} onPress={() => { navigation.navigate("ReviewPage", { id: locationData.location_id, name: locationData.location_name, photo_path: locationData.photo_path }) }}>
 											<Text style={style.textCenterWhite}>See Reviews for {locationData.location_name}</Text>
 										</TouchableOpacity>

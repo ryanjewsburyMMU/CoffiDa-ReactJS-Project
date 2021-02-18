@@ -67,6 +67,18 @@ export default class CreateReviewPage extends Component {
     }
 
 
+    profanityFilter(){
+        // Restrict users from using certain words in review. 
+        if(this.state.reviewBody.includes("tea")
+        || this.state.reviewBody.includes("cakes")
+        || this.state.reviewBody.includes("pastries")){
+            Alert.alert("Please Follow Guidlines", "Coffida does not accept any reviews that are not directly related aspects their cafe experience, please ammend your comment.")
+        }else{
+            this.post_review()
+        }
+    }
+
+
     async post_review () {
 		const navigation = this.props.navigation;
 
@@ -187,7 +199,7 @@ export default class CreateReviewPage extends Component {
                     numberOfLines={4}>
                     </TextInput>
 
-                    <TouchableOpacity style={style.mainButton} onPress={()=>{this.post_review()}}>
+                    <TouchableOpacity style={style.mainButton} onPress={()=>{this.profanityFilter()}}>
                         <Text style={style.textCenterWhite}>Submit Review</Text>
                     </TouchableOpacity>
                     </ScrollView>
