@@ -72,7 +72,9 @@ export default class Search extends Component {
 			.then(async (responseJson) => {
 				console.log("something here")
 				if (responseJson == "") {
-					Alert.alert("No Results Found", "Please refined your search criteria, no results have been found based on your input")
+					this.setState({offset : offset-2}) 
+					Alert.alert("No results found")
+					this.createCurl()
 				}
 				this.setState({
 					searchResponse: responseJson
@@ -86,65 +88,71 @@ export default class Search extends Component {
 
 
 	// This Method Creates a Curl string for giving to the fetch API on /find :) 
-	createCurl() {
-		let finalCurl = "http://10.0.2.2:3333/api/1.0.0/find?"
-		console.log(finalCurl)
-		// Searching By Cafe Name 
-		if (this.state.cafe_name != "") {
-			let search_name = this.state.cafe_name.replace(/\s/g, '%20')
-			finalCurl = finalCurl + "q=" + search_name
-		}
-		else {
-			console.log("Please Enter A Cafe Name to Search")
-		}
+	async createCurl() {
 
-		// Searching By Overall Rating
-		if (this.state.overall_rating_active == true) {
-			finalCurl = finalCurl + "&overall_rating=" + this.state.value_overall
-			console.log("Overall Rating is true")
+		if(await AsyncStorage.getItem("@session_token") == null){
+			Alert.alert("Please Login To Access This Feature")
 		}
-		else {
-			console.log("No Overall Rating Selected")
-		}
+		else{
+			let finalCurl = "http://10.0.2.2:3333/api/1.0.0/find?"
+			console.log(finalCurl)
+			// Searching By Cafe Name 
+			if (this.state.cafe_name != "") {
+				let search_name = this.state.cafe_name.replace(/\s/g, '%20')
+				finalCurl = finalCurl + "q=" + search_name
+			}
+			else {
+				console.log("Please Enter A Cafe Name to Search")
+			}
 
-		// Searching By Price Rating
-		if (this.state.price_rating_active == true) {
-			finalCurl = finalCurl + "&price_rating=" + this.state.value_price
-			console.log("Price Rating is true")
-		}
-		else {
-			console.log("No Price Rating Selected")
-		}
+			// Searching By Overall Rating
+			if (this.state.overall_rating_active == true) {
+				finalCurl = finalCurl + "&overall_rating=" + this.state.value_overall
+				console.log("Overall Rating is true")
+			}
+			else {
+				console.log("No Overall Rating Selected")
+			}
 
-		// Searching By Quality Rating
-		if (this.state.quality_rating_active == true) {
-			finalCurl = finalCurl + "&quality_rating=" + this.state.value_quality
-			console.log("Quality Rating is true")
-		}
-		else {
-			console.log("No Quality Rating Selected")
-		}
-		// Searching By Cleanliness Rating
-		if (this.state.clenliness_rating_active == true) {
-			finalCurl = finalCurl + "&clenliness_rating=" + this.state.value_clenliness
-			console.log("Cleaniness Rating is true")
-		}
-		else {
-			console.log("No Cleanliness Rating Selected")
-		}
-		// Search In
-		if (this.state.search_in == "favourite") {
-			finalCurl = finalCurl + "&search_in=" + this.state.search_in
-		}
-		else if (this.state.search_in == "reviewed") {
-			finalCurl = finalCurl + "&search_in=" + this.state.search_in
-		} else {
-			console.log("NO SERAHC IN PARAM SELECTED")
-		}
-		finalCurl = finalCurl + "&limit=" + this.state.limit + "&offset=" + this.state.offset
-		console.log(finalCurl)
+			// Searching By Price Rating
+			if (this.state.price_rating_active == true) {
+				finalCurl = finalCurl + "&price_rating=" + this.state.value_price
+				console.log("Price Rating is true")
+			}
+			else {
+				console.log("No Price Rating Selected")
+			}
+
+			// Searching By Quality Rating
+			if (this.state.quality_rating_active == true) {
+				finalCurl = finalCurl + "&quality_rating=" + this.state.value_quality
+				console.log("Quality Rating is true")
+			}
+			else {
+				console.log("No Quality Rating Selected")
+			}
+			// Searching By Cleanliness Rating
+			if (this.state.clenliness_rating_active == true) {
+				finalCurl = finalCurl + "&clenliness_rating=" + this.state.value_clenliness
+				console.log("Cleaniness Rating is true")
+			}
+			else {
+				console.log("No Cleanliness Rating Selected")
+			}
+			// Search In
+			if (this.state.search_in == "favourite") {
+				finalCurl = finalCurl + "&search_in=" + this.state.search_in
+			}
+			else if (this.state.search_in == "reviewed") {
+				finalCurl = finalCurl + "&search_in=" + this.state.search_in
+			} else {
+				console.log("NO SERAHC IN PARAM SELECTED")
+			}
+			finalCurl = finalCurl + "&limit=" + this.state.limit + "&offset=" + this.state.offset
+			console.log(finalCurl)
 
 		this.search_results(finalCurl)
+	}
 	}
 
 	advancedSearch = () => {
@@ -303,19 +311,30 @@ export default class Search extends Component {
 		}
 	}
 
+	// viewMore = (length) => {
+	// 	if (length == 1){
+	// 		Alert.alert("No More Entries")
+	// 	}
+	// 	else {
+	// 		this.setState({
+	// 			offset: this.state.offset + 2,
+	// 		}, () => {
+	// 			this.createCurl()
+	// 		});
+	// 	}
+	// }
+
 	viewMore = (length) => {
-		if (length == 1) {
-			Alert.alert("No More Entries")
-		}
-		else {
-			this.setState({
-				offset: this.state.offset + 2,
-			}, () => {
-				this.createCurl()
-			});
-		}
+	console.log("OFFSET = "+this.state.offset)
+		this.setState({
+			offset: this.state.offset + 2,
+		}, () => {
+			this.createCurl()
+		});
 	}
+	
 	viewLess = (offset) => {
+		console.log("OFFSET = " + this.state.offset)
 		if (offset == 0) {
 			Alert.alert("Cannot go back")
 		}
@@ -333,9 +352,9 @@ export default class Search extends Component {
 			<StarRating
 				disabled={false}
 				fullStarColor="#eaca97"
-				maxStars={5} // 5
+				maxStars={5}
 				rating={rating}
-				starSize={size} //20
+				starSize={size}
 				style={style}
 			/>
 		)

@@ -11,6 +11,7 @@ import style from '../../../Styles/stylesheet'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScrollView } from 'react-native-gesture-handler';
 
+import profFilter from '../../../Data/ProfanityFilter.json';
 
 export default class CreateReviewPage extends Component {
     constructor(props) {
@@ -34,7 +35,6 @@ export default class CreateReviewPage extends Component {
         this.setState({ current_id: id })
         this.setState({ current_name: name })
     }
-
     onStarPress_OverallRating(rating) {
         this.setState({
             overallRating: rating
@@ -56,7 +56,6 @@ export default class CreateReviewPage extends Component {
             clenlinessRating: rating
         });
     }
-
     test(){
         console.log(this.state.priceRating)
         console.log(this.state.qualityRating)
@@ -65,20 +64,16 @@ export default class CreateReviewPage extends Component {
 
         console.log(this.state.reviewBody)
     }
-
-
     profanityFilter(){
-        // Restrict users from using certain words in review. 
-        if(this.state.reviewBody.includes("tea")
-        || this.state.reviewBody.includes("cakes")
-        || this.state.reviewBody.includes("pastries")){
-            Alert.alert("Please Follow Guidlines", "Coffida does not accept any reviews that are not directly related aspects their cafe experience, please ammend your comment.")
-        }else{
-            this.post_review()
-        }
+        let verify = true
+        profFilter.profanityKeywords.forEach((item) => {
+            if(this.state.reviewBody.includes(item)){
+                verify = false;
+            }
+        });
+        if(verify){this.post_review()}
+        else{Alert.alert("Please Follow Guidlines", "Coffida does not accept any reviews that are not directly related aspects their cafe experience, please ammend your comment.")}
     }
-
-
     async post_review () {
 		const navigation = this.props.navigation;
 

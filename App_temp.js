@@ -18,12 +18,6 @@ import Home_Tab from './src/Nav/home_tab'
 
 import ProfileStack from './src/Nav/profileStack'
 
-const Stack = createStackNavigator()
-
-const OpenAppStack = createStackNavigator()
-
-const Tab = createBottomTabNavigator()
-
 const Drawer = createDrawerNavigator()
 
 

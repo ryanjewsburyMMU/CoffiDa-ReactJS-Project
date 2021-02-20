@@ -1,6 +1,6 @@
 import React, { Component, useEffect, useState } from 'react';
 
-import { Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions, TouchableOpacity, ActivityIndicator} from 'react-native';
+import { Text, View, TouchableOpacity, ActivityIndicator, Alert, PermissionsAndroid, Linking} from 'react-native';
 
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,6 +11,7 @@ import style from '../../../Styles/stylesheet'
 import DoubleClick from 'react-native-double-tap';
 import Geolocation from 'react-native-geolocation-service'
 import { getDistance } from 'geolib';
+import { CheckBox } from 'native-base';
 
 
 async function requestLocationPermission(){
@@ -52,11 +53,34 @@ export default class Feed extends Component {
 				lat: ""
 			}
 	}
+	componentDidMount (){
+		this.unsubscribe = this.props.navigation.addListener('focus', () => {
+			this.checkLoggedIn()
+			console.log("Screen Aciviated")
 
-	componentDidMount() {
+	})
+	}
+	componentWillUnmount(){
+		this.unsubscribe()
+		}
+
+	checkLoggedIn = async () => {
+		const navigation = this.props.navigation;
+
+		const token = await AsyncStorage.getItem('@session_token')
+		console.log("token is === " + token)
+
+		if (token === null) {
+			Alert.alert("Please Login To Access This Page", "We ask that you create an account in order to access these features!")
+			navigation.navigate('Profile')
+
+		} else {
+			
+		this.get_getInfo()
 		this.findLocation()
 		this.get_locations();
 		this.get_getInfo();
+		}
 	}
 
 	findLocation = () =>{
@@ -84,7 +108,6 @@ export default class Feed extends Component {
 		  }
 		  )
 	  }
-
 
 	async post_addFavourite(location_id) {
 		const navigation = this.props.navigation;
@@ -230,11 +253,9 @@ export default class Feed extends Component {
 				<View>
 					<DoubleClick
 						singleTap={() => {
-							console.log("You have unfavourited " + currentID);
 							this.delete_removeFavourite(currentID)
 						}}
 						doubleTap={() => {
-							console.log("You have favourited " + currentID);
 							this.post_addFavourite(currentID)
 						}}
 						delay={200}
@@ -287,10 +308,21 @@ export default class Feed extends Component {
 		}
 	}
 
+	async generateMapDirections(destLat, destLong){
+		if(this.state.longitude == ""){
+			Alert.alert("No Directions Found", "Please ensure you have locations enabled.")
+		}else{
+			let address = "https://www.google.com/maps/dir/?api=1&origin="+this.state.lat+","+this.state.long+"&destination="+destLat+","+destLong
+			await Linking.openURL(address);
+		}
+	}
+
 
 	render() {
 		const navigation = this.props.navigation;
 		const favourite_icon = <Icon name="heart-o" size={30} color="#900" />
+		const opencloseDrawer = <Icon name="circle" size={30} color="#900" />
+
 
 		if(this.state.isLoading == true){
 			return(<View>
@@ -301,8 +333,9 @@ export default class Feed extends Component {
 		return (
 			<View style={style.mainContainer}>
 				<View style={style.mainHeader}>
-					<Text style={style.mainTitle}>Your Feed</Text>
-					<Text>{this.state.lat}</Text>
+					<View style={style.flexRow}> 
+							<Text style={style.mainTitle}>Your Feed</Text>
+					</View>
 				</View>
 				<View style={style.mainFooter}>
 					<ScrollView>
@@ -325,7 +358,9 @@ export default class Feed extends Component {
 									<View style={style.alignCenter}>
 										<Text>Favourite This Location?</Text>
 										<Text>{this.isFavourited(locationData.location_id)}</Text>
-										<Text> {this.findDistance(locationData.latitude, locationData.longitude)}</Text>
+										<TouchableOpacity onPress={()=>{this.generateMapDirections(locationData.latitude, locationData.longitude)}}>
+											<Text> {this.findDistance(locationData.latitude, locationData.longitude)}</Text>
+										</TouchableOpacity>
 										<TouchableOpacity style={style.mainButton} onPress={() => { navigation.navigate("ReviewPage", { id: locationData.location_id, name: locationData.location_name, photo_path: locationData.photo_path }) }}>
 											<Text style={style.textCenterWhite}>See Reviews for {locationData.location_name}</Text>
 										</TouchableOpacity>

@@ -27,8 +27,6 @@ export default class ViewPhoto extends Component{
 			});
         }
 
-
-
 	async search_results() {
         const navigation = this.props.navigation
 		console.log("Searching the database for your search queires")

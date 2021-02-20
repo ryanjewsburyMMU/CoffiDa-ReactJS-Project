@@ -36,8 +36,8 @@ export default class Home_Tab extends Component{
                 inactiveTintColor : 'gray'
             }}
             >
-                <Tab.Screen name="Search" component={Search}/>
                 <Tab.Screen name="FeedStack" component={FeedStack}/>
+                <Tab.Screen name="Search" component={Search}/>
 
             </Tab.Navigator>
     )

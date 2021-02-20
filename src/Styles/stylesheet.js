@@ -1,6 +1,5 @@
 import { StyleSheet } from 'react-native';
 
-
 export default StyleSheet.create({
     // Global Styles 
     mainContainer: {
@@ -18,11 +17,10 @@ export default StyleSheet.create({
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
         paddingHorizontal: 30,
-        paddingVertical: 50
+        paddingVertical: 30 //THIOS CAN BE CHANGED TO ANY VALUE IF THERE ARE ANY MISTAKES ORIG 50 
     },
     mainTitle: {
         textAlign: 'center',
-        display: 'flex',
         color: '#fff',
         fontSize: 30,
         fontWeight: "bold",
@@ -314,5 +312,13 @@ export default StyleSheet.create({
 		borderWidth: 1,
         marginTop: 20
     },
+
+    // Image
+    imageDidLoad:{
+        width: 192*1.5, height: 108*1.5, marginTop: 20, marginBottom: 20
+    },
+    imageDidNotLoad:{
+        marginTop: 20, marginBottom: 20
+    }
 
 })

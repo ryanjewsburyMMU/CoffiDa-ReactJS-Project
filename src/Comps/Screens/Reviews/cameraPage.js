@@ -9,15 +9,11 @@ import {
   TouchableOpacity
 } from 'react-native';
 import DoubleClick from 'react-native-double-tap';
-
-
 import { RNCamera } from 'react-native-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import style from '../../../Styles/stylesheet'
-
-
 
 export default class CameraPage extends React.Component {
   constructor(props){
@@ -57,7 +53,6 @@ async get_getInfo() {
             let highest_value = Math.max.apply(Math, new_list)
             this.setState({review_id: highest_value})
             console.log(this.state.review_id)
-
         })
         .catch((error) => {
             console.log(error)

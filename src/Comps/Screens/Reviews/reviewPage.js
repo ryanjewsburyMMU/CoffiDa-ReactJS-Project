@@ -10,18 +10,21 @@ import Reviews from './reviews'
 import StarRating from 'react-native-star-rating';
 import style from '../../../Styles/stylesheet'
 
+import { ScrollView } from 'react-native-gesture-handler';
+
 
 
 export default class ReviewPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            review_data: [],
+            location_data: [],
             current_id: null,
             isLoading: true,
             liked_reviews: [],
             current_name: "",
-            photo_path: ""
+            photo_path: "",
+            imageLoad : true
         }
     }
 
@@ -83,7 +86,7 @@ export default class ReviewPage extends Component {
             .then((response) => {
                 if (parseInt(response.status) == 200) {
                     console.log("Login Success - Code: " + response.status)
-                    Alert.alert("Added Like")
+                    Alert.alert("rEMOVED Like")
                     this.get_getInfo(location_id)
                     this.get_locations(location_id)
                 }
@@ -104,7 +107,6 @@ export default class ReviewPage extends Component {
                 console.log(error);
             })
     }
-
 
     async get_getInfo() {
         console.log("Get Request Made For details")
@@ -156,7 +158,7 @@ export default class ReviewPage extends Component {
             .then(async (responseJson) => {
                 console.log("Result is")
                 console.log(responseJson)
-                this.setState({ review_data: responseJson })
+                this.setState({ location_data: responseJson })
 
             })
 
@@ -164,9 +166,6 @@ export default class ReviewPage extends Component {
                 console.log("error = " + error)
             })
     }
-
-    //thumbs-o-up
-
 
     displayStarRating(size, style, rating) {
         return (
@@ -180,8 +179,6 @@ export default class ReviewPage extends Component {
             />
         )
     }
-
-
 
     isLiked(location_id, review_id, likes) {
         var like_icon = <Icon name="thumbs-up" size={20} color="#fff" />
@@ -199,7 +196,7 @@ export default class ReviewPage extends Component {
                             this.post_addLike(location_id, review_id)
 
                         }}
-                        delay={200}
+                        delay={100}
                     >
                        <Text style={style.likeButtonText} >{like_icon} {likes} likes</Text>
                     </DoubleClick>
@@ -229,56 +226,75 @@ export default class ReviewPage extends Component {
 
     }
 
+    locationInformation(){
+        // The header of the flat list, contains info about coffee shop. 
+        return(
+            <View style={{justifyContent: 'center', alignItems: 'center', marginBottom: 20}}>
+                <Text style={style.containerTitle}>Average Ratings</Text>
+                <Image style={this.state.imageLoad ? style.imageDidLoad : style.imageDidNotLoad}
+                    source={{uri:'https://i.picsum.photos/id/0/5616/3744.jpg?hmac=3GAAioiQziMGEtLbfrdbcoenXoWAW-zlyEAMkfEdBzQ'}}
+                    onError={()=>{this.setState({imageLoad : false})}}
+                />
+                <Text>Overall Rating</Text>
+                {this.displayStarRating(30, style.starContainer, this.state.location_data.avg_overall_rating)}
+                <Text>Price Rating</Text>
+                {this.displayStarRating(30, style.starContainer, this.state.location_data.avg_price_rating)}
+                <Text>Cleanliness Rating</Text>
+                {this.displayStarRating(30, style.starContainer, this.state.location_data.avg_clenliness_rating)}
+                <Text>Quality Rating</Text>
+                {this.displayStarRating(30, style.starContainer, this.state.location_data.avg_quality_rating)}
+            </View>
+        )
+    }
+    
     render() {
         const navigation = this.props.navigation;
-        if (this.state.review_data == "") {
+        if (this.state.location_data == "") {
             return <View><ActivityIndicator size="large" />
             </View>
         }
         return (
             <View style={style.mainContainer}>
                 <View style={style.mainHeader}>
-                    <Text style={style.mainTitle}>Reviews</Text>
+                    <Text style={style.mainTitle}>{this.state.current_name}</Text>
                 </View>
                 <View style={style.mainFooter}>
-                    <FlatList
-                        data={this.state.review_data.location_reviews}
-                        renderItem={({ item, index }) => (
-                            <View style={style.resultContainer}>
-                                <Text style={style.containerTitle}>{this.state.current_name}</Text>
-                                <Text>Review ID: {item.review_id}</Text>
-                                <View style={style.flexRow}>
-                                    <View style={style.flexOne}>
-                                        <Text>Overall Rating</Text>
-                                        <Text>{this.displayStarRating(20, style.starContainer, item.overall_rating)}</Text>
+                            <FlatList
+                                data={this.state.location_data.location_reviews}
+                                ListHeaderComponent={this.locationInformation()}
+                                renderItem={({ item, index }) => (
+                                    <View style={style.resultContainer}>
+                                        <Text style={style.containerTitle}>{this.state.current_name}</Text>
+                                        <Text>Review ID: {item.review_id}</Text>
+                                        <View style={style.flexRow}>
+                                            <View style={style.flexOne}>
+                                                <Text>Overall Rating</Text>
+                                                <Text>{this.displayStarRating(20, style.starContainer, item.overall_rating)}</Text>
+                                            </View>
+                                            <View style={style.flexEnd}>
+                                                <Text>Cleanliness Rating</Text>
+                                                <Text>{this.displayStarRating(20, style.starContainer, item.clenliness_rating)}</Text>
+                                            </View>
+                                        </View>
+                                        <View style={style.flexRow}>
+                                        <View style={style.flexOne}>
+                                                <Text>Price Rating</Text>
+                                                <Text>{this.displayStarRating(20, style.starContainer, item.price_rating)}</Text>
+                                            </View>
+                                            <View style={style.flexEnd}>
+                                                <Text>Quality Rating</Text>
+                                                <Text>{this.displayStarRating(20, style.starContainer, item.quality_rating)}</Text>
+                                            </View>
+                                        </View>
+                                        <Text>User Comment: </Text>
+                                        <Text>{item.review_body}</Text>
+                                        <TouchableOpacity style={style.mainButton}>
+                                            <Text style={style.textCenterWhite}>{this.isLiked(this.state.current_id, item.review_id, item.likes)}</Text>
+                                        </TouchableOpacity>
                                     </View>
-                                    <View style={style.flexEnd}>
-                                        <Text>Cleanliness Rating</Text>
-                                        <Text>{this.displayStarRating(20, style.starContainer, item.clenliness_rating)}</Text>
-                                    </View>
-                                </View>
-                                <View style={style.flexRow}>
-                                <View style={style.flexOne}>
-                                        <Text>Price Rating</Text>
-                                        <Text>{this.displayStarRating(20, style.starContainer, item.price_rating)}</Text>
-                                    </View>
-                                    <View style={style.flexEnd}>
-                                        <Text>Quality Rating</Text>
-                                        <Text>{this.displayStarRating(20, style.starContainer, item.quality_rating)}</Text>
-                                    </View>
-                                </View>
-                                <Text>User Comment: </Text>
-                                <Text>{item.review_body}</Text>
-                                <TouchableOpacity style={style.mainButton}>
-                                    <Text style={style.textCenterWhite}>{this.isLiked(this.state.current_id, item.review_id, item.likes)}</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={style.mainButtonWhite} onPress={()=>{navigation.navigate("ViewPhoto", {id: this.state.current_id, review_id : item.review_id})}}>
-                                    <Text >View Photos</Text>
-                                </TouchableOpacity>
-                            </View>
-                        )}
-                        keyExtractor={(item, index) => index.toString()}
-                    />
+                                )}
+                                keyExtractor={(item, index) => index.toString()}
+                            />
                 </View>
             </View>
         )
