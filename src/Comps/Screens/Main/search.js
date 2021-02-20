@@ -32,7 +32,7 @@ export default class Search extends Component {
 			value_quality: 0,
 			quality_rating_active: false,
 
-			search_in: "java",
+			search_in: "",
 
 			limit: 2,
 			offset: 0,
@@ -72,9 +72,20 @@ export default class Search extends Component {
 			.then(async (responseJson) => {
 				console.log("something here")
 				if (responseJson == "") {
-					this.setState({offset : offset-2}) 
-					Alert.alert("No results found")
-					this.createCurl()
+					// Handles No Search Results
+					if(this.state.offset - 2 < 0){
+						Alert.alert("No results found")
+					}
+					else{
+					// Handles Next Page 
+					this.setState({
+						offset: this.state.offset - 2,
+					}, () => {
+						Alert.alert("No More Results found")
+						this.createCurl()
+					});
+				}
+
 				}
 				this.setState({
 					searchResponse: responseJson
@@ -334,7 +345,6 @@ export default class Search extends Component {
 	}
 	
 	viewLess = (offset) => {
-		console.log("OFFSET = " + this.state.offset)
 		if (offset == 0) {
 			Alert.alert("Cannot go back")
 		}
