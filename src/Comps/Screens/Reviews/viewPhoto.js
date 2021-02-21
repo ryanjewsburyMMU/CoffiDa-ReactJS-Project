@@ -40,7 +40,7 @@ export default class ViewPhoto extends Component{
 				if (parseInt(response.status) == 200) {
 					return response
 				}
-				if (parseInt(response.status) == 400) {
+				if (parseInt(response.status) == 404) {
 					Alert.alert("Incorrect Details (" + response.status + ")", "Please ensure your email and password are correct, if the problem persits please contact our team for more support.")
 
 				}

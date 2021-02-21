@@ -11,6 +11,7 @@ const Tab = createBottomTabNavigator()
 
 import FeedStack from './feedStack'
 import Search from '../Comps/Screens/Main/search'
+import NearMe from '../Comps/Screens/Main/nearMe'
 
 
 export default class Home_Tab extends Component{
@@ -21,13 +22,16 @@ export default class Home_Tab extends Component{
                 tabBarIcon: ({focused, color, size}) => {
                     let iconName;
 
-                    if (route.name == 'FeedStack'){
+                    if (route.name == 'Feed'){
                         iconName = focused ? 'home' : 'home-outline'
                     }else if (route.name == 'Search'){
                         iconName = focused ? 'search' : 'search-outline'
+                    }else if (route.name == 'Near Me'){
+                        iconName = focused ? 'radio' : 'radio-outline'
                     }
                     return <Ionicons name={iconName} size={size} color={color}/>
                 },
+                navigationOptions: { safeAreaInsets: { top: 0 } }
 
 
             })}
@@ -36,8 +40,10 @@ export default class Home_Tab extends Component{
                 inactiveTintColor : 'gray'
             }}
             >
-                <Tab.Screen name="FeedStack" component={FeedStack}/>
+                <Tab.Screen name="Feed" component={FeedStack}/>
                 <Tab.Screen name="Search" component={Search}/>
+                <Tab.Screen name="Near Me" component={NearMe}/>
+
 
             </Tab.Navigator>
     )

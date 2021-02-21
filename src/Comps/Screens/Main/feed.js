@@ -361,7 +361,7 @@ export default class Feed extends Component {
 										<TouchableOpacity onPress={()=>{this.generateMapDirections(locationData.latitude, locationData.longitude)}}>
 											<Text> {this.findDistance(locationData.latitude, locationData.longitude)}</Text>
 										</TouchableOpacity>
-										<TouchableOpacity style={style.mainButton} onPress={() => { navigation.navigate("ReviewPage", { id: locationData.location_id, name: locationData.location_name, photo_path: locationData.photo_path }) }}>
+										<TouchableOpacity style={style.mainButton} onPress={() => {navigation.navigate("ReviewPage", { id: locationData.location_id, name: locationData.location_name, photo_path: locationData.photo_path })}}>
 											<Text style={style.textCenterWhite}>See Reviews for {locationData.location_name}</Text>
 										</TouchableOpacity>
 										<TouchableOpacity style={style.mainButtonWhite} onPress={() => { navigation.navigate("CreateReviewPage", { id: locationData.location_id, name: locationData.location_name }) }}>

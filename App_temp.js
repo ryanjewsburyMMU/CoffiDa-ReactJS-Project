@@ -24,14 +24,14 @@ const Drawer = createDrawerNavigator()
 export default class DB extends Component{
 	render(){
 		return(
-            <NavigationContainer>
-                <Drawer.Navigator>
-                    <Drawer.Screen name="Home" component={Home_Tab}/>
-                    <Drawer.Screen name="Profile" component={ProfileStack}/>
-                    <Drawer.Screen name="Settings" component={Settings}/>
-                    <Drawer.Screen name="Login" component={login_temp}/>
-                </Drawer.Navigator>
-                </NavigationContainer>
+      <NavigationContainer >
+        <Drawer.Navigator>
+          <Drawer.Screen name="Home" component={Home_Tab}/>
+          <Drawer.Screen name="Profile" component={ProfileStack}/>
+          <Drawer.Screen name="Settings" component={Settings}/>
+          <Drawer.Screen name="Login" component={login_temp}/>
+      </Drawer.Navigator>
+      </NavigationContainer>
 	)}
 }
 

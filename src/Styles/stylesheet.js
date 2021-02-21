@@ -101,8 +101,12 @@ export default StyleSheet.create({
     starContainer: {
         width: '20%'
     },
-    gap:{
+
+    gapTop:{
         marginTop:20
+    },
+    gapBottom:{
+        marginBottom:20
     },
 
 

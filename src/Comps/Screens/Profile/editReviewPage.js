@@ -1,6 +1,6 @@
 import React, { Component, useEffect, useState } from 'react';
 
-import { Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions, TouchableOpacity, forceUpdate, Alert } from 'react-native';
+import { Text, View, Button, TextInput, FlatList, ListItem, StyleSheet, Dimensions, TouchableOpacity, Image, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import StarRating from 'react-native-star-rating';
 
@@ -14,6 +14,7 @@ export default class EditReview extends Component {
 	constructor(props) {
 		super(props)
 		this.state = {
+			photo: [],
 			review_id: "",
 			location_id: "",
 			clenliness_rating: "",
@@ -34,23 +35,82 @@ export default class EditReview extends Component {
 	componentDidMount() {
 		const route = this.props.route
 		const { review_id, location_id, clenliness_rating, price_rating, overall_rating, quality_rating, review_body } = route.params;
-		this.setState({ review_id: review_id })
-		this.setState({ location_id: location_id })
-		this.setState({ clenliness_rating: clenliness_rating })
-		this.setState({ price_rating: price_rating })
-		this.setState({ overall_rating: overall_rating })
-		this.setState({ quality_rating: quality_rating })
-		this.setState({ review_body: review_body })
-
-
-		this.setState({ new_clenliness_rating: clenliness_rating })
-		this.setState({ new_price_rating: price_rating })
-		this.setState({ new_overall_rating: overall_rating })
-		this.setState({ new_quality_rating: quality_rating })
-		this.setState({ new_review_body: review_body })
-
-
+		this.setState({
+		review_id: review_id,
+		location_id: location_id,
+		clenliness_rating: clenliness_rating,
+		price_rating: price_rating,
+		overall_rating: overall_rating,
+		quality_rating: quality_rating,
+		review_body: review_body,
+		// Updated Variables
+		new_clenliness_rating: clenliness_rating,
+		new_price_rating: price_rating,
+		new_overall_rating: overall_rating,
+		new_quality_rating: quality_rating,
+		new_review_body: review_body},()=>{
+			console.log("Information here: "+ this.state.review_id, this.state.location_id)
+			this.displayPhoto()
+		})
 	}
+
+	async displayPhoto() {
+		const navigation = this.props.navigation
+		console.log("Searching the database for your search queires")
+		return fetch("http://10.0.2.2:3333/api/1.0.0/location/" + this.state.location_id + "/review/" + this.state.review_id + "/photo",
+			{
+				method: 'get',
+				headers: { 'Content-Type': 'image/jpeg', 'X-Authorization': await AsyncStorage.getItem('@session_token') },
+			})
+
+			.then((response) => {
+				if (parseInt(response.status) == 200) {
+					console.log("success?")
+					return response
+				}
+				if (parseInt(response.status) == 404) {
+				}
+				if (parseInt(response.status) == 500) {
+				}
+			})
+			.then((responseJson) => {
+				console.log("RESPONSE JSON IS AS FOLLOWS BBAY")
+				console.log(responseJson)
+				this.setState({ photo: responseJson })
+			})
+			.catch((error) => {
+				console.log(error);
+			})
+	}
+
+	async deletePhoto() {
+		const navigation = this.props.navigation
+		console.log("Searching the database for your search queires")
+		return fetch("http://10.0.2.2:3333/api/1.0.0/location/" + this.state.location_id + "/review/" + this.state.review_id + "/photo",
+			{
+				method: 'delete',
+				headers: { 'Content-Type': 'image/jpeg', 'X-Authorization': await AsyncStorage.getItem('@session_token') },
+			})
+
+			.then((response) => {
+				if (parseInt(response.status) == 200) {
+					Alert.alert("success, photo deleted")
+					this.displayPhoto()
+				}
+				if (parseInt(response.status) == 404) {
+				}
+				if (parseInt(response.status) == 500) {
+				}
+				else{
+					console.log("Undefined error code: "+ response.status)
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+			})
+	}
+
+
 
 	onStarPress_OverallRating(rating) {
 		this.setState({
@@ -130,6 +190,33 @@ export default class EditReview extends Component {
 	}
 
 
+	loadImage() {
+		// If image is null
+		if (this.state.photo == undefined) {
+			return (
+				<View>
+					<Text style={style.textCenterBlack}>You did not submit a photo with this review.</Text>
+				</View>
+			)
+		} else {
+			console.log(this.state.photo)
+			return (
+				<View>
+					<Image
+						style={{ width: 100, height: 90, marginTop: 20 }}
+						source={{
+							uri:this.state.photo.url
+						}}
+					/>
+					<TouchableOpacity onPress={()=>{this.deletePhoto()}}>
+						<Text>Delete Photo?</Text>
+					</TouchableOpacity>
+				</View>
+			)
+		}
+	}
+
+
 
 
 	render() {
@@ -203,9 +290,14 @@ export default class EditReview extends Component {
 							</TextInput>
 						</View>
 
+						{this.loadImage()}
+
 						<TouchableOpacity style={style.mainButton} onPress={() => { this.patch_review() }}>
 							<Text style={style.textCenterWhite}>Submit Review</Text>
 						</TouchableOpacity>
+
+
+
 
 					</ScrollView>
 
