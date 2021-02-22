@@ -259,6 +259,7 @@ export default class ReviewPage extends Component {
         else{
         return (
             <View style={style.mainContainer}>
+                {/* <Text>Hello world</Text> */}
                 <View style={style.mainHeader}>
                     <Text style={style.mainTitle}>{this.state.current_name}</Text>
                 </View>
