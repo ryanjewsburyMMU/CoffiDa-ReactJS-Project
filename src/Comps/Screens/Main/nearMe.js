@@ -22,7 +22,7 @@ async function RequestLocationPermission() {
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
       {
         title: 'Location Permission',
-        message: "Please allow location we won't hack u we promnise xx",
+        message: 'Something Here',
         buttonNeutral: 'Nah son, maybe in time ya get me?',
         buttonNegative: 'Mate get out of here',
         buttonPositive: 'Yeah lard go on then',
@@ -212,8 +212,7 @@ export default class NearMe extends Component {
 
   render() {
     const { navigation } = this.props;
-    const searchIcon = <Icon name="search" size={20} color="#fff" />;
-    if (this.state.long == '') {
+    if (this.state.long === '') {
       return (
         <View style={style.mainContainer}>
           <View style={style.mainHeader}>
