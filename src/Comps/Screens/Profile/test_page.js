@@ -12,17 +12,20 @@ import {
 import { ScrollView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StarRating from 'react-native-star-rating';
-import style from '../../../Styles/stylesheet';
+import stylesLight from '../../../Styles/stylesheet';
+import stylesDark from '../../../Styles/stylesheetDark';
 
 export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       user_details: [],
+      darkMode: null,
     };
   }
 
   componentDidMount() {
+    this.chooseStyle();
     this.getInfo();
   }
 
@@ -126,7 +129,16 @@ export default class App extends Component {
     );
   }
 
+  async chooseStyle() {
+    if (await AsyncStorage.getItem('darkMode') === 'true'){
+      this.setState({darkMode: true})
+    }else{
+      this.setState({darkMode: false})
+    }
+  }
+
   render() {
+    const style = this.state.darkMode ? stylesDark : stylesLight;
     const { navigation } = this.props;
 
     if (
@@ -194,7 +206,7 @@ export default class App extends Component {
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={style.deleteReview}
+                    style={style.deleteFavourite}
                     onPress={() => {
                       this.pressDelete(
                         item.location.location_name,

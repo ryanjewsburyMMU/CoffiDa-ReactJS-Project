@@ -14,7 +14,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Picker } from '@react-native-picker/picker';
 import StarRating from 'react-native-star-rating';
-import style from '../../../Styles/stylesheet';
+import stylesLight from '../../../Styles/stylesheet';
+import stylesDark from '../../../Styles/stylesheetDark';
 
 export default class Search extends Component {
   constructor(props) {
@@ -41,12 +42,154 @@ export default class Search extends Component {
       offset: 0,
 
       searchResponse: [],
+
+      darkMode: null,
     };
   }
 
-  advancedSearch = () => {
-    if (this.state.advancedFilter == true) {
+  componentDidMount() {
+    this.unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.chooseStyle();
+    });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
+    this.setState({ darkMode: null })
+  }
+
+  viewMore = () => {
+    console.log(`OFFSET = ${this.state.offset}`);
+    this.setState(
+      {
+        offset: this.state.offset + 2,
+      },
+      () => {
+        this.createCurl();
+      },
+    );
+  };
+
+  viewLess = (offset) => {
+    if (offset === 0) {
+      Alert.alert(
+        'No Previous Results',
+        'There are no results prior to the current ones on screen. Try "Next Page" to see more.',
+      );
+    } else {
+      this.setState(
+        {
+          offset: this.state.offset - 2,
+        },
+        () => {
+          this.createCurl();
+        },
+      );
+    }
+  };
+
+  presentResults(style) {
+    if (this.state.searchResponse == '') {
       return (
+        <View>
+          <Text />
+        </View>
+      );
+    }
+    return (
+      <View style={style.gapTop}>
+        {/* Leave here? */}
+        <View style={style.flexRow}>
+          <View style={style.flexOne}>
+            <TouchableOpacity
+              onPress={() => {
+                this.viewLess(this.state.offset);
+              }}
+            >
+              <Text style={style.regularTextBlack}>Previous Page</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={style.flexEnd}>
+            <TouchableOpacity
+              onPress={() => {
+                this.viewMore(this.state.searchResponse.length);
+              }}
+            >
+              <Text style={style.regularTextBlack}>Next Page</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <FlatList
+          data={this.state.searchResponse}
+          renderItem={({ item, index }) => (
+            <TouchableOpacity
+              onPress={() => {
+                { console.log(`You clicked id ${item.location_id}`);}
+              }}
+            >
+              <View style={style.flexEnd}>
+                <View style={style.resultContainer}>
+                  <Text style={style.containerTitle}>{item.location_name}</Text>
+                  <Text style={style.regularTextBlack}>{item.location_town} </Text>
+
+                  <View style={style.flexRow}>
+                    <View style={style.flexOne}>
+                      <Text style={style.regularTextBlack}>Overall Rating</Text>
+                      <Text>
+                        {this.displayStarRating(
+                          20,
+                          style.starContainer,
+                          item.avg_overall_rating,
+                        )}
+                      </Text>
+                    </View>
+                    <View style={style.flexEnd}>
+                      <Text style={style.regularTextBlack}>Cleanliness Rating</Text>
+                      <Text>
+                        {this.displayStarRating(
+                          20,
+                          style.starContainer,
+                          item.avg_clenliness_rating,
+                        )}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={style.flexRow}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={style.regularTextBlack}>Price Rating</Text>
+                      <Text>
+                        {this.displayStarRating(
+                          20,
+                          style.starContainer,
+                          item.avg_price_rating,
+                        )}
+                      </Text>
+                    </View>
+                    <View style={style.flexEnd}>
+                      <Text style={style.regularTextBlack}>Quality Rating</Text>
+                      <Text>
+                        {this.displayStarRating(
+                          20,
+                          style.starContainer,
+                          item.avg_quality_rating,
+                        )}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      </View>
+    );
+  }
+
+  advancedSearch(style) {
+    if (this.state.advancedFilter === true) {
+      return (
+        // eslint-disable-next-line react/jsx-filename-extension
         <View>
           <View style={style.flexRow}>
             <View style={style.flexOne}>
@@ -64,8 +207,7 @@ export default class Search extends Component {
                     value={this.state.overall_rating_active}
                     onValueChange={() => {
                       this.setState({
-                        overall_rating_active: !this.state
-                          .overall_rating_active,
+                        overall_rating_active: !this.state.overall_rating_active,
                       });
                     }}
                     tintColors={{ true: '#eaca97' }}
@@ -81,6 +223,7 @@ export default class Search extends Component {
                       minimumTrackTintColor="#eaca97"
                       thumbTintColor="#eaca97"
                       maximumTrackTintColor="#eaca97"
+                      value={this.state.value_overall}
                       onValueChange={(value) => this.setState({ value_overall: value })}
                       disabled={!this.state.overall_rating_active}
                     />
@@ -120,6 +263,7 @@ export default class Search extends Component {
                       minimumTrackTintColor="#eaca97"
                       thumbTintColor="#eaca97"
                       maximumTrackTintColor="#eaca97"
+                      value={this.state.value_price}
                       onValueChange={(value) => this.setState({ value_price: value })}
                       disabled={!this.state.price_rating_active}
                     />
@@ -161,6 +305,7 @@ export default class Search extends Component {
                       minimumTrackTintColor="#eaca97"
                       thumbTintColor="#eaca97"
                       maximumTrackTintColor="#eaca97"
+                      value={this.state.value_clenliness}
                       onValueChange={(value) => this.setState({ value_clenliness: value })}
                       disabled={!this.state.clenliness_rating_active}
                     />
@@ -183,10 +328,7 @@ export default class Search extends Component {
                   <CheckBox
                     value={this.state.quality_rating_active}
                     onValueChange={() => {
-                      this.setState({
-                        quality_rating_active: !this.state
-                          .quality_rating_active,
-                      });
+                      this.setState({ quality_rating_active: !this.state.quality_rating_active });
                     }}
                     tintColors={{ true: '#eaca97' }}
                   />
@@ -201,6 +343,7 @@ export default class Search extends Component {
                       minimumTrackTintColor="#eaca97"
                       thumbTintColor="#eaca97"
                       maximumTrackTintColor="#eaca97"
+                      value={this.state.value_quality}
                       onValueChange={(value) => this.setState({ value_quality: value })}
                       disabled={!this.state.quality_rating_active}
                     />
@@ -210,10 +353,10 @@ export default class Search extends Component {
             </View>
           </View>
           <View>
-            <Text>Where Would You Like To Search?</Text>
+            <Text style={style.textCenterBlack}>Where Would You Like To Search?</Text>
             <Picker
               selectedValue={this.state.search_in}
-              style={{ height: 50, width: '100%' }}
+              style={{ height: 50, width: '100%', color: '#fff' }}
               onValueChange={(itemValue, itemIndex) => this.setState({ search_in: itemValue })}
             >
               <Picker.Item label="Everywhere" value="everywhere" />
@@ -227,142 +370,18 @@ export default class Search extends Component {
     return <View />;
   };
 
-  viewMore = () => {
-    console.log(`OFFSET = ${this.state.offset}`);
-    this.setState(
-      {
-        offset: this.state.offset + 2,
-      },
-      () => {
-        this.createCurl();
-      },
-    );
-  };
-
-  viewLess = (offset) => {
-    if (offset === 0) {
-      Alert.alert(
-        'No Previous Results',
-        'There are no results prior to the current ones on screen. Try "Next Page" to see more.',
-      );
-    } else {
-      this.setState(
-        {
-          offset: this.state.offset - 2,
-        },
-        () => {
-          this.createCurl();
-        },
-      );
+  async chooseStyle() {
+    // Choose a stylesheet
+    if (await AsyncStorage.getItem('darkMode') === 'true'){
+      this.setState({darkMode: true})
+    }else{
+      this.setState({darkMode: false})
     }
-  };
-
-  presentResults = () => {
-    if (this.state.searchResponse == '') {
-      return (
-        <View>
-          <Text />
-        </View>
-      );
-    }
-    return (
-      <View style={style.gapTop}>
-        {/* Leave here? */}
-        <View style={style.flexRow}>
-          <View style={style.flexOne}>
-            <TouchableOpacity
-              onPress={() => {
-                this.viewLess(this.state.offset);
-              }}
-            >
-              <Text>Previous Page</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={style.flexEnd}>
-            <TouchableOpacity
-              onPress={() => {
-                this.viewMore(this.state.searchResponse.length);
-              }}
-            >
-              <Text>Next Page</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <FlatList
-          data={this.state.searchResponse}
-          renderItem={({ item, index }) => (
-            <TouchableOpacity
-              onPress={() => {
-                {
-                  console.log(`You clicked id ${item.location_id}`);
-                }
-              }}
-            >
-              <View style={style.flexEnd}>
-                <View style={style.resultContainer}>
-                  <Text style={style.containerTitle}>{item.location_name}</Text>
-                  <Text>
-                    {' '}
-                    {item.location_town}
-                  </Text>
-
-                  <View style={style.flexRow}>
-                    <View style={style.flexOne}>
-                      <Text>Overall Rating</Text>
-                      <Text>
-                        {this.displayStarRating(
-                          20,
-                          style.starContainer,
-                          item.avg_overall_rating,
-                        )}
-                      </Text>
-                    </View>
-                    <View style={style.flexEnd}>
-                      <Text>Cleanliness Rating</Text>
-                      <Text>
-                        {this.displayStarRating(
-                          20,
-                          style.starContainer,
-                          item.avg_clenliness_rating,
-                        )}
-                      </Text>
-                    </View>
-                  </View>
-                  <View style={style.flexRow}>
-                    <View style={{ flex: 1 }}>
-                      <Text>Price Rating</Text>
-                      <Text>
-                        {this.displayStarRating(
-                          20,
-                          style.starContainer,
-                          item.avg_price_rating,
-                        )}
-                      </Text>
-                    </View>
-                    <View style={style.flexEnd}>
-                      <Text>Quality Rating</Text>
-                      <Text>
-                        {this.displayStarRating(
-                          20,
-                          style.starContainer,
-                          item.avg_quality_rating,
-                        )}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item, index) => index.toString()}
-        />
-      </View>
-    );
-  };
+  }
 
   // Consider Moving this somehow / fixing error
   // eslint-disable-next-line class-methods-use-this
-  displayStarRating(size, styles, rating) {
+  displayStarRating(size, styles, rating, style) {
     return (
       // eslint-disable-next-line react/jsx-filename-extension
       <StarRating
@@ -488,10 +507,14 @@ export default class Search extends Component {
   }
 
   render() {
+    const style = this.state.darkMode ? stylesDark : stylesLight;
     const { navigation } = this.props;
     const searchIcon = <Icon name="search" size={20} color="#fff" />;
-
-    return (
+    if (this.state.darkMode === null){
+      return(
+        <View><Text>Loading</Text></View>
+      )
+    }return (
       <View style={style.mainContainer}>
         <View style={style.mainHeader}>
           <Text style={style.mainTitle}>Search</Text>
@@ -522,8 +545,8 @@ export default class Search extends Component {
           >
             <Text style={style.textCenterBlack}>Advanced Search</Text>
           </TouchableOpacity>
-          <this.advancedSearch />
-          <this.presentResults />
+          {this.advancedSearch(style)}
+          {this.presentResults(style)}
         </View>
       </View>
     );

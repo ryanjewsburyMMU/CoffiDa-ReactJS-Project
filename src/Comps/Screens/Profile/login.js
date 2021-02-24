@@ -3,7 +3,8 @@ import React, {Component} from 'react';
 import {Text, View, TouchableOpacity, TextInput, Alert} from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import style from '../../../Styles/stylesheet';
+import stylesLight from '../../../Styles/stylesheet';
+import stylesDark from '../../../Styles/stylesheetDark';
 
 export default class Login extends Component {
   constructor(props) {
@@ -11,11 +12,13 @@ export default class Login extends Component {
     this.state = {
       email: '',
       password: '',
+      darkMode: null,
     };
   }
 
   componentDidMount() {
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.chooseStyle();
       this.checkLoggedIn();
     });
   }
@@ -79,7 +82,16 @@ export default class Login extends Component {
       });
   }
 
+  async chooseStyle() {
+    if (await AsyncStorage.getItem('darkMode') === 'true') {
+      this.setState({ darkMode: true })
+    }else{
+      this.setState({ darkMode: false })
+    }
+  }
+
   render() {
+    const style = this.state.darkMode ? stylesDark : stylesLight;
     const navigation = this.props.navigation;
 
     return (

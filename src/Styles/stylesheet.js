@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
@@ -100,6 +102,18 @@ export default StyleSheet.create({
     },
     starContainer: {
         width: '20%'
+    },
+    starColour: {
+        color: "#eaca97"
+      },
+    faveColour:{
+        color: "#eaca97" 
+      },
+    regularTextBlack:{
+        color:'#000'
+    },
+    regularTextWhite:{
+        color:'#fff'
     },
 
     gapTop:{
@@ -317,12 +331,25 @@ export default StyleSheet.create({
         marginTop: 20
     },
 
+    profileTitle:{
+        color: '#000',
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        textAlign: 'center',
+      },
+
     // Image
     imageDidLoad:{
         width: 192*1.5, height: 108*1.5, marginTop: 20, marginBottom: 20
     },
     imageDidNotLoad:{
         marginTop: 20, marginBottom: 20
+    },
+
+    // Tab Bar
+    tabBar:{
+        color: '#fff'
     }
 
 })

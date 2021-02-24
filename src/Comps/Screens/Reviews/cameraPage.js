@@ -8,8 +8,8 @@ import {
 import { RNCamera } from 'react-native-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
-import style from '../../../Styles/stylesheet';
+import stylesLight from '../../../Styles/stylesheet';
+import stylesDark from '../../../Styles/stylesheetDark';
 
 export default class CameraPage extends Component {
   constructor(props) {
@@ -17,10 +17,12 @@ export default class CameraPage extends Component {
     this.state = {
       current_id: 0,
       review_id: 0,
+      darkMode: null,
     };
   }
 
   componentDidMount() {
+    this.chooseStyle();
     const { route } = this.props;
     const { id } = route.params;
     this.setState(
@@ -134,8 +136,17 @@ export default class CameraPage extends Component {
       });
   }
 
+  async chooseStyle() {
+    if (await AsyncStorage.getItem('darkMode') === 'true'){
+      this.setState({darkMode: true})
+    }else{
+      this.setState({darkMode: false})
+    }
+  }
+
   render() {
     const camera = <Icon name="camera" size={50} color="#fff" />;
+    const style = this.state.darkMode ? stylesDark : stylesLight;
 
     return (
       <View style={style.displayCamera}>

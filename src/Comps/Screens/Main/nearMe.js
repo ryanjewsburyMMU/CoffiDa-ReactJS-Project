@@ -7,6 +7,7 @@ import {
   Linking,
   Alert,
   PermissionsAndroid,
+  Button
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -14,7 +15,8 @@ import StarRating from 'react-native-star-rating';
 
 import Geolocation from 'react-native-geolocation-service';
 import { getDistance } from 'geolib';
-import style from '../../../Styles/stylesheet';
+import stylesLight from '../../../Styles/stylesheet';
+import stylesDark from '../../../Styles/stylesheetDark';
 
 async function RequestLocationPermission() {
   try {
@@ -30,8 +32,9 @@ async function RequestLocationPermission() {
     );
     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
       return true;
-    }
+    }else{
     return false;
+    }
   } catch (error) {
     Alert.alert(error);
   }
@@ -50,12 +53,22 @@ export default class NearMe extends Component {
       closest_distance: '',
       closest_lat: 0,
       closest_long: 0,
+      darkMode: false,
+
     };
   }
 
+
   componentDidMount() {
-    this.findLocation();
-    this.getLocations();
+    this.unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.chooseStyle();
+      this.findLocation();
+      this.getLocations();
+    });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
   }
 
   handleNearestLocations() {
@@ -159,7 +172,6 @@ export default class NearMe extends Component {
 
   findLocation = () => {
     if (!this.state.locationPermission) {
-      console.log(this.state.locationPermission);
       this.state.locationPermission = RequestLocationPermission();
     }
     Geolocation.getCurrentPosition(
@@ -172,7 +184,7 @@ export default class NearMe extends Component {
         });
       },
       (error) => {
-        Alert.alert(error.message);
+        Alert.alert("Please Enable Location Services",""+ error.message);
       },
       {
         enableHighAccuracy: true,
@@ -210,7 +222,17 @@ export default class NearMe extends Component {
     }
   }
 
+  async chooseStyle() {
+    // Choose a stylesheet
+    if (await AsyncStorage.getItem('darkMode') === 'true'){
+      this.setState({darkMode: true})
+    }else{
+      this.setState({darkMode: false})
+    }
+  }
+ 
   render() {
+    const style = this.state.darkMode ? stylesDark : stylesLight;
     const { navigation } = this.props;
     if (this.state.long === '') {
       return (
@@ -220,6 +242,7 @@ export default class NearMe extends Component {
           </View>
           <View style={style.mainFooter}>
             <Text>Please Wait while we load this page...</Text>
+            {this.findLocation()}
           </View>
         </View>
       );

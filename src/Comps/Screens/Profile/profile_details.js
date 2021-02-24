@@ -5,6 +5,8 @@ import {ScrollView} from 'react-native-gesture-handler';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import style from '../../../Styles/stylesheet';
+import stylesLight from '../../../Styles/stylesheet';
+import stylesDark from '../../../Styles/stylesheetDark';
 
 export default class EditProfile extends Component {
   constructor(props) {
@@ -20,11 +22,14 @@ export default class EditProfile extends Component {
 
       password: '',
       confirm_password: '',
+      darkMode: null,
+
     };
   }
 
   componentDidMount() {
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.chooseStyle();
       this.getDetails();
     });
   }
@@ -85,7 +90,17 @@ export default class EditProfile extends Component {
       });
   }
 
+  async chooseStyle() {
+    if (await AsyncStorage.getItem('darkMode') === 'true'){
+      this.setState({darkMode: true})
+    }else{
+      this.setState({darkMode: false})
+    }
+  }
+
+
   render() {
+    const style = this.state.darkMode ? stylesDark : stylesLight;
     const navigation = this.props.navigation;
 
     return (// eslint-disable-next-line react/jsx-filename-extension
@@ -95,16 +110,16 @@ export default class EditProfile extends Component {
         </View>
         <View style={style.mainFooter}>
           <ScrollView>
-            <Text style={style.detailsTitle}>Your Details:</Text>
+            <Text style={style.profileTitle}>Your Details:</Text>
             <TouchableOpacity
               style={style.mainButton}
               onPress={() => navigation.goBack()}>
               <Text style={style.textCenterWhite}>Go Back</Text>
             </TouchableOpacity>
 
-            <Text>First Name: </Text>
+            <Text style={style.regularTextBlack}>First Name: </Text>
             <TextInput
-              style={style.inputDetails}
+              style={style.inputBody}
               placeholder={this.state.orig_first_name}
               onChangeText={(updated_first_name) =>
                 this.setState({updated_first_name})
@@ -112,9 +127,9 @@ export default class EditProfile extends Component {
               value={this.state.updated_first_name}
             />
 
-            <Text>Last Name: </Text>
+            <Text style={style.regularTextBlack}>Last Name: </Text>
             <TextInput
-              style={style.inputDetails}
+              style={style.inputBody}
               placeholder={this.state.orig_last_name}
               onChangeText={(updated_last_name) =>
                 this.setState({ updated_last_name })
@@ -122,25 +137,25 @@ export default class EditProfile extends Component {
               value={this.state.updated_last_name}
             />
 
-            <Text>E-Mail: </Text>
+            <Text style={style.regularTextBlack}>E-Mail: </Text>
             <TextInput
-              style={style.inputDetails}
+              style={style.inputBody}
               placeholder={this.state.orig_email}
               onChangeText={(updated_email) => this.setState({updated_email})}
               value={this.state.updated_email}
             />
 
-            <Text>Password: </Text>
+            <Text style={style.regularTextBlack}>Password: </Text>
             <TextInput
-              style={style.inputDetails}
+              style={style.inputBody}
               placeholder="Password"
               onChangeText={(password) => this.setState({password})}
               value={this.state.password}
             />
 
-            <Text>Confirm Passsword: </Text>
+            <Text style={style.regularTextBlack}>Confirm Passsword: </Text>
             <TextInput
-              style={style.inputDetails}
+              style={style.inputBody}
               placeholder="Password"
               onChangeText={(confirm_password) =>
                 this.setState({ confirm_password })

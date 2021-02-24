@@ -4,8 +4,8 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-
-import style from '../../../Styles/stylesheet';
+import stylesLight from '../../../Styles/stylesheet';
+import stylesDark from '../../../Styles/stylesheetDark';
 
 export default class ViewPhoto extends Component {
   constructor(props) {
@@ -14,10 +14,12 @@ export default class ViewPhoto extends Component {
       review_id: 0,
       location_id: 0,
       photo: [],
+      darkMode: null,
     };
   }
 
   componentDidMount() {
+    this.chooseStyle();
     const { route } = this.props;
     const { id, review_id } = route.params;
     this.setState(
@@ -70,13 +72,25 @@ export default class ViewPhoto extends Component {
       });
   }
 
+  async chooseStyle() {
+    if (await AsyncStorage.getItem('darkMode') === 'true'){
+      this.setState({darkMode: true})
+    }else{
+      this.setState({darkMode: false})
+    }
+  }
+
   render() {
+    const style = this.state.darkMode ? stylesDark : stylesLight;
     const { navigation } = this.props;
     console.log(this.state.photo);
-    if (this.state.photo == '') {
-      <View>
-        <ActivityIndicator />
-      </View>;
+
+    if (this.state.photo === '') {
+      return (
+        <View>
+          <ActivityIndicator />
+        </View>
+      );
     }
     return (
       <View style={style.mainContainer}>

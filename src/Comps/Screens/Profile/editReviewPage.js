@@ -12,6 +12,8 @@ import {ScrollView} from 'react-native-gesture-handler';
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import style from '../../../Styles/stylesheet';
+import stylesLight from '../../../Styles/stylesheet';
+import stylesDark from '../../../Styles/stylesheetDark';
 
 export default class EditReview extends Component {
   constructor(props) {
@@ -31,10 +33,12 @@ export default class EditReview extends Component {
       new_overall_rating: '',
       new_quality_rating: '',
       new_review_body: '',
+      darkMode: null,
     };
   }
 
   componentDidMount() {
+    this.chooseStyle();
     const {route} = this.props;
     const {
       review_id,
@@ -219,7 +223,7 @@ export default class EditReview extends Component {
       });
   }
 
-  loadImage() {
+  loadImage(style) {
     // If image is null
     if (this.state.photo === undefined) {
       return (
@@ -249,7 +253,17 @@ export default class EditReview extends Component {
     );
   }
 
+  async chooseStyle() {
+    if (await AsyncStorage.getItem('darkMode') === 'true'){
+      this.setState({darkMode: true})
+    }else{
+      this.setState({darkMode: false})
+    }
+  }
+
   render() {
+    const style = this.state.darkMode ? stylesDark : stylesLight;
+
     const {navigation} = this.props;
     return (
       <View style={style.mainContainer}>
@@ -335,7 +349,7 @@ export default class EditReview extends Component {
               />
             </View>
 
-            {this.loadImage()}
+            {this.loadImage(style)}
 
             <TouchableOpacity
               style={style.mainButton}

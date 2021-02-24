@@ -13,7 +13,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 import DoubleClick from 'react-native-double-tap';
 import StarRating from 'react-native-star-rating';
-import style from '../../../Styles/stylesheet';
+import stylesLight from '../../../Styles/stylesheet';
+import stylesDark from '../../../Styles/stylesheetDark';
 
 export default class ReviewPage extends Component {
   constructor(props) {
@@ -30,6 +31,7 @@ export default class ReviewPage extends Component {
 
   componentDidMount() {
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.chooseStyle();
       const { route } = this.props;
       const { id, name, photoPath } = route.params;
       this.setState({ current_id: id, current_name: name, photoPath });
@@ -39,6 +41,13 @@ export default class ReviewPage extends Component {
       this.getInfo();
     });
   }
+
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+
+
+
 
   async getInfo() {
     console.log('Get Request Made For details');
@@ -195,7 +204,7 @@ export default class ReviewPage extends Component {
     );
   }
 
-  isLiked(locationID, reviewID, likes) {
+  isLiked(locationID, reviewID, likes, style) {
     const likeIcon = <Icon name="thumbs-up" size={20} color="#fff" />;
     const unlikeIcon = <Icon name="thumbs-o-up" size={20} color="#fff" />;
     if (this.state.liked_reviews.includes(reviewID)) {
@@ -235,7 +244,7 @@ export default class ReviewPage extends Component {
     }
   }
 
-  locationInformation() {
+  locationInformation(style) {
     // The header of the flat list, contains info about coffee shop.
     return (
       <View
@@ -259,25 +268,25 @@ export default class ReviewPage extends Component {
           <View />
         )}
 
-        <Text>Overall Rating</Text>
+        <Text style={style.textCenterBlack}>Overall Rating</Text>
         {this.displayStarRating(
           30,
           style.starContainer,
           this.state.location_data.avg_overall_rating,
         )}
-        <Text>Price Rating</Text>
+        <Text style={style.textCenterBlack}>Price Rating</Text>
         {this.displayStarRating(
           30,
           style.starContainer,
           this.state.location_data.avg_price_rating,
         )}
-        <Text>Cleanliness Rating</Text>
+        <Text style={style.textCenterBlack}>Cleanliness Rating</Text>
         {this.displayStarRating(
           30,
           style.starContainer,
           this.state.location_data.avg_clenliness_rating,
         )}
-        <Text>Quality Rating</Text>
+        <Text style={style.textCenterBlack}>Quality Rating</Text>
         {this.displayStarRating(
           30,
           style.starContainer,
@@ -287,7 +296,17 @@ export default class ReviewPage extends Component {
     );
   }
 
+  async chooseStyle() {
+    if (await AsyncStorage.getItem('darkMode') === 'true'){
+      this.setState({darkMode: true})
+    }else{
+      this.setState({darkMode: false})
+    }
+  }
+
   render() {
+    const style = this.state.darkMode ? stylesDark : stylesLight;
+
     const { navigation } = this.props;
     if (this.state.isLoading == true) {
       return (
@@ -304,19 +323,19 @@ export default class ReviewPage extends Component {
         <View style={style.mainFooter}>
           <FlatList
             data={this.state.location_data.location_reviews}
-            ListHeaderComponent={this.locationInformation()}
+            ListHeaderComponent={this.locationInformation(style)}
             renderItem={({ item, index }) => (
               <View style={style.resultContainer}>
                 <Text style={style.containerTitle}>
                   {this.state.current_name}
                 </Text>
-                <Text>
+                <Text style={style.regularTextBlack}>
                   Review ID:
                   {item.review_id}
                 </Text>
                 <View style={style.flexRow}>
                   <View style={style.flexOne}>
-                    <Text>Overall Rating</Text>
+                    <Text style={style.regularTextBlack}>Overall Rating</Text>
                     <Text>
                       {this.displayStarRating(
                         20,
@@ -326,7 +345,7 @@ export default class ReviewPage extends Component {
                     </Text>
                   </View>
                   <View style={style.flexEnd}>
-                    <Text>Cleanliness Rating</Text>
+                    <Text style={style.regularTextBlack}>Cleanliness Rating</Text>
                     <Text>
                       {this.displayStarRating(
                         20,
@@ -338,7 +357,7 @@ export default class ReviewPage extends Component {
                 </View>
                 <View style={style.flexRow}>
                   <View style={style.flexOne}>
-                    <Text>Price Rating</Text>
+                    <Text style={style.regularTextBlack}>Price Rating</Text>
                     <Text>
                       {this.displayStarRating(
                         20,
@@ -348,7 +367,7 @@ export default class ReviewPage extends Component {
                     </Text>
                   </View>
                   <View style={style.flexEnd}>
-                    <Text>Quality Rating</Text>
+                    <Text style={style.regularTextBlack}>Quality Rating</Text>
                     <Text>
                       {this.displayStarRating(
                         20,
@@ -358,14 +377,15 @@ export default class ReviewPage extends Component {
                     </Text>
                   </View>
                 </View>
-                <Text>User Comment: </Text>
-                <Text>{item.review_body}</Text>
+                <Text style={style.regularTextBlack}>User Comment: </Text>
+                <Text style={style.regularTextBlack}>{item.review_body}</Text>
                 <TouchableOpacity style={style.mainButton}>
                   <Text style={style.textCenterWhite}>
                     {this.isLiked(
                       this.state.current_id,
                       item.review_id,
                       item.likes,
+                      style,
                     )}
                   </Text>
                 </TouchableOpacity>

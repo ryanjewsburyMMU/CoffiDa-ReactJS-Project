@@ -9,18 +9,20 @@ import {
 import { ScrollView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StarRating from 'react-native-star-rating';
-
-import style from '../../../Styles/stylesheet';
+import stylesLight from '../../../Styles/stylesheet';
+import stylesDark from '../../../Styles/stylesheetDark';
 
 export default class FavouriteLocations extends Component {
   constructor(props) {
     super(props);
     this.state = {
       user_details: [],
+      darkMode: null,
     };
   }
 
   componentDidMount() {
+    this.chooseStyle();
     this.getInfo();
   }
 
@@ -113,7 +115,16 @@ export default class FavouriteLocations extends Component {
     );
   }
 
+  async chooseStyle() {
+    if (await AsyncStorage.getItem('darkMode') === 'true'){
+      this.setState({darkMode: true})
+    }else{
+      this.setState({darkMode: false})
+    }
+  }
+
   render() {
+    const style = this.state.darkMode ? stylesDark : stylesLight;
     const user_data = this.state.user_details;
     const navigation = this.props.navigation;
 
@@ -128,7 +139,6 @@ export default class FavouriteLocations extends Component {
           <Text style={style.mainTitle}>Favourite Locations</Text>
         </View>
         <View style={style.mainFooter}>
-          <ScrollView>
             <Text style={style.containerTitle}></Text>
 
             <View>
@@ -137,6 +147,7 @@ export default class FavouriteLocations extends Component {
                 style={style.mainButton}>
                 <Text style={style.textCenterWhite}>Go Back:</Text>
               </TouchableOpacity>
+              <View style={style.gapTop}></View>
               <FlatList
                 data={this.state.user_details.favourite_locations}
                 renderItem={({item, index}) => (
@@ -144,7 +155,7 @@ export default class FavouriteLocations extends Component {
                     <Text style={style.containerTitle}>
                       {item.location_name}
                     </Text>
-                    <Text>Overall Rating</Text>
+                    <Text style={style.regularTextBlack}>Overall Rating</Text>
                     <View style={style.starContainer}>
                       <StarRating
                         disabled={false}
@@ -159,7 +170,7 @@ export default class FavouriteLocations extends Component {
                       onPress={() => {
                         this.pressDelete(item.location_name, item.location_id);
                       }}>
-                      <Text style={style.textCenterWhite}>
+                      <Text style={style.textCenterBlack}>
                         Remove From Favourites
                       </Text>
                     </TouchableOpacity>
@@ -168,7 +179,6 @@ export default class FavouriteLocations extends Component {
                 keyExtractor={(item, index) => index.toString()}
               />
             </View>
-          </ScrollView>
         </View>
       </View>
     );

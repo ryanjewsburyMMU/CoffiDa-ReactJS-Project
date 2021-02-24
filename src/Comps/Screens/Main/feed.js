@@ -9,6 +9,9 @@ import {
   Alert,
   PermissionsAndroid,
   Linking,
+  ToastAndroid,
+  Surface,
+  Button
 } from 'react-native';
 
 import StarRating from 'react-native-star-rating';
@@ -19,7 +22,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import DoubleClick from 'react-native-double-tap';
 import Geolocation from 'react-native-geolocation-service';
 import { getDistance } from 'geolib';
-import style from '../../../Styles/stylesheet';
+import stylesLight from '../../../Styles/stylesheet';
+import stylesDark from '../../../Styles/stylesheetDark';
 
 async function RequestLocationPermission() {
   try {
@@ -53,13 +57,15 @@ export default class Feed extends Component {
       locationPermission: false,
       long: '',
       lat: '',
+      darkMode: null,
     };
   }
 
   componentDidMount() {
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.chooseStyle();
       this.checkLoggedIn();
-      console.log('Screen Aciviated');
+      this.findLocation();
     });
   }
 
@@ -132,9 +138,9 @@ export default class Feed extends Component {
   }
 
   findLocation = () => {
-    if (!this.state.locationPermission) {
-      console.log(this.state.locationPermission);
+    if (this.state.locationPermission = false) {
       this.state.locationPermission = RequestLocationPermission();
+      console.log(this.state.locationPermission);
     }
     Geolocation.getCurrentPosition(
       (position) => {
@@ -163,13 +169,11 @@ export default class Feed extends Component {
 
     if (token === null) {
       Alert.alert(
-        'Please Login To Access This Page',
-        'We ask that you create an account in order to access these features!',
-      );
+        'Welcome To Coffida',
+        'Please login or create an account to get started!')
       navigation.navigate('Profile');
     } else {
       this.getInfo();
-      this.findLocation();
       this.getLocations();
     }
   }
@@ -189,6 +193,7 @@ export default class Feed extends Component {
     )
       .then((response) => {
         if (response.status === 200) {
+          ToastAndroid.show('Added to Favourites', ToastAndroid.SHORT);
           this.getInfo();
         }
         if (response.status === 400) {
@@ -234,6 +239,7 @@ export default class Feed extends Component {
     )
       .then((response) => {
         if (response.status === 200) {
+          ToastAndroid.show('Removed From Favourites', ToastAndroid.SHORT);
           this.getInfo();
         }
         if (response.status === 401) {
@@ -266,9 +272,9 @@ export default class Feed extends Component {
       });
   }
 
-  isFavourited(currentID) {
-    const faveIcon = <Icon name="heart" size={30} color="#900" />;
-    const notFaveIcon = <Icon name="heart-o" size={30} color="#900" />;
+  isFavourited(currentID, style) {
+    const faveIcon = <Icon name="heart" size={30} color={style.faveColour.color} />;
+    const notFaveIcon = <Icon name="heart-o" size={30} color={style.faveColour.color} />;
 
     if (this.state.favourite_locations_id.includes(currentID) === true) {
       return (
@@ -302,11 +308,11 @@ export default class Feed extends Component {
     );
   }
 
-  findDistance(lat, long) {
+  findDistance(lat, long, style) {
     if (this.state.long === '') {
       return (
         <View>
-          <Text>Calculating Distance...</Text>
+          <Text style={style.textCenterBlack}>Calculating Distance...</Text>
         </View>
       );
     }
@@ -320,13 +326,13 @@ export default class Feed extends Component {
     const miles = Math.round(parseInt(distance) * 0.00062137);
     return (
       <View>
-        <Text>{miles} Miles Away</Text>
+        <Text style={style.textCenterBlack}>{miles} Miles Away</Text>
       </View>
     );
   }
 
-  async generateMapDirections(destLat, destLong) {
-    if (this.state.longitude === '') {
+  async generateMapDirections(destLat, destLong, style) {
+    if (this.state.long === '') {
       Alert.alert(
         'No Directions Found',
         'Please ensure you have locations enabled.',
@@ -337,10 +343,22 @@ export default class Feed extends Component {
     }
   }
 
-  render() {
-    const {navigation} = this.props;
+  /* eslint-disable */
 
-    if (this.state.isLoading == true) {
+
+  async chooseStyle() {
+    if (await AsyncStorage.getItem('darkMode') === 'true'){
+      this.setState({darkMode: true})
+    }else{
+      this.setState({darkMode: false})
+    }
+  }
+
+  render() {
+    const style = this.state.darkMode ? stylesDark : stylesLight;
+
+    const {navigation} = this.props;
+    if (this.state.isLoading === true) {
       return (
         <View>
           <ActivityIndicator size="large" color="#0000ff" />
@@ -353,6 +371,8 @@ export default class Feed extends Component {
         <View style={style.mainHeader}>
           <View style={style.flexRow}>
             <Text style={style.mainTitle}>Your Feed</Text>
+            {/* <Button title="change style drk" onPress={()=>{this.changeStyleDark()}}/>
+            <Button title="change style lght" onPress={()=>{this.changeStyleLight()}}/> */}
           </View>
         </View>
         <View style={style.mainFooter}>
@@ -367,31 +387,32 @@ export default class Feed extends Component {
                     <Text style={style.textCenterGrey}>
                       {locationData.location_town}
                     </Text>
-                    <Text>Overall Rating</Text>
+                    <Text style={style.textCenterBlack}>Overall Rating</Text>
                     <StarRating
                       disabled={false}
-                      fullStarColor="#eaca97"
+                      fullStarColor={style.starColour.color}
                       maxStars={5}
                       rating={locationData.avg_overall_rating}
                       starSize={25}
-                      selectedStar={(rating) => this.onStarRatingPress(rating)}
                     />
                   </View>
                   <View style={style.alignCenter}>
-                    <Text>Favourite This Location?</Text>
-                    <Text>{this.isFavourited(locationData.location_id)}</Text>
+                    <Text style={style.textCenterBlack}>Favourite This Location?</Text>
+                    <Text>{this.isFavourited(locationData.location_id, style)}</Text>
                     <TouchableOpacity
                       onPress={() => {
                         this.generateMapDirections(
                           locationData.latitude,
                           locationData.longitude,
+                          style,
                         );
                       }}>
-                      <Text>
+                      <Text style={style.textCenterBlack}>
                         {' '}
                         {this.findDistance(
                           locationData.latitude,
                           locationData.longitude,
+                          style,
                         )}
                       </Text>
                     </TouchableOpacity>
@@ -405,7 +426,7 @@ export default class Feed extends Component {
                         });
                       }}>
                       <Text style={style.textCenterWhite}>
-                        See Reviews for {locationData.location_name}
+                        See More Information About {locationData.location_name}
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity

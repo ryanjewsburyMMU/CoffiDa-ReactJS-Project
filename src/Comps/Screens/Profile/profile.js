@@ -8,18 +8,21 @@ import {
 } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import style from '../../../Styles/stylesheet';
+import stylesLight from '../../../Styles/stylesheet';
+import stylesDark from '../../../Styles/stylesheetDark';
 
 export default class Profile extends Component {
   constructor(props) {
     super(props);
     this.state = {
       user_details: [],
+      darkMode: null,
     };
   }
 
   componentDidMount() {
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.chooseStyle();
       this.checkLoggedIn();
     });
   }
@@ -101,7 +104,18 @@ export default class Profile extends Component {
       });
   }
 
+  async chooseStyle() {
+    if (await AsyncStorage.getItem('darkMode') === 'true'){
+      this.setState({darkMode: true})
+    }else{
+      this.setState({darkMode: false})
+    }
+  }
+
+
   render() {
+    const style = this.state.darkMode ? stylesDark : stylesLight;
+
     const navigation = this.props.navigation;
 
     return (// eslint-disable-next-line react/jsx-filename-extension
@@ -112,7 +126,7 @@ export default class Profile extends Component {
           </Text>
         </View>
         <View style={style.mainFooter}>
-          <Text style={style.detailsTitle}>Your Details:</Text>
+          <Text style={style.profileTitle}>Your Details:</Text>
           <Text style={style.textCenterBlack}>
             Full Name: {this.state.user_details.first_name}{' '}
             {this.state.user_details.last_name}

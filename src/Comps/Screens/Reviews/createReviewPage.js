@@ -11,7 +11,8 @@ import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScrollView } from 'react-native-gesture-handler';
 import profFilter from '../../../Data/ProfanityFilter.json';
-import style from '../../../Styles/stylesheet';
+import stylesLight from '../../../Styles/stylesheet';
+import stylesDark from '../../../Styles/stylesheetDark';
 
 export default class CreateReviewPage extends Component {
   constructor(props) {
@@ -28,10 +29,17 @@ export default class CreateReviewPage extends Component {
   }
 
   componentDidMount() {
-    const { route } = this.props;
-    const { id, name } = route.params;
-    this.setState({ current_id: id });
-    this.setState({ current_name: name });
+    this.unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.chooseStyle();
+      const { route } = this.props;
+      const { id, name } = route.params;
+      this.setState({ current_id: id });
+      this.setState({ current_name: name });
+    });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
   }
 
   onStarPressOverallRating(rating) {
@@ -148,7 +156,17 @@ export default class CreateReviewPage extends Component {
       });
   }
 
+  async chooseStyle() {
+    if (await AsyncStorage.getItem('darkMode') === 'true'){
+      this.setState({darkMode: true})
+    }else{
+      this.setState({darkMode: false})
+    }
+  }
+
   render() {
+    const style = this.state.darkMode ? stylesDark : stylesLight;
+
     const { navigation } = this.props;
 
     return (// eslint-disable-next-line react/jsx-filename-extension
@@ -218,8 +236,9 @@ export default class CreateReviewPage extends Component {
               selectedStar={(rating) => this.onStarPressClenliness(rating)}
               fullStarColor="#eaca97"
             />
-            <Text style={{ marginTop: 30 }}>Please Leave a Comment: </Text>
+            <Text style={style.textCenterBlack}>Please Leave a Comment: </Text>
             <TextInput
+              style={style.inputBody}
               placeholder="Provide More Details About Your Visit"
               multiline
               onChangeText={(text) => {
