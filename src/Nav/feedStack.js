@@ -14,7 +14,11 @@ import ViewPhoto from '../Comps/Screens/Reviews/viewPhoto'
 export default class FeedStack extends Component{
     render(){
         return(
-            <Stack.Navigator>
+            <Stack.Navigator
+            screenOptions={{
+                headerShown: false,
+              }
+              }>
                 <Stack.Screen name="Feed" component={Feed}/>
                 <Stack.Screen name="ReviewPage" component={ReviewPage}/> 
                 <Stack.Screen name="CreateReviewPage" component={CreateReviewPage}/> 

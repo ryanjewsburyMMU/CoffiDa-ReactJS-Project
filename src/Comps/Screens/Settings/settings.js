@@ -8,13 +8,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import stylesLight from '../../../Styles/stylesheet';
 import stylesDark from '../../../Styles/stylesheetDark';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-
+import Geolocation from 'react-native-geolocation-service';
 export default class Settings extends Component {
   constructor(props) {
     super(props);
     this.state = {
       darkMode: null,
-      buttonText: ""
+      buttonText: "",
+      locationPermission: false
     };
   }
 

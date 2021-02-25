@@ -345,10 +345,34 @@ export default StyleSheet.create({
   imageDidNotLoad: {
     marginTop: 20, marginBottom: 20,
   },
+  imageCenter:{
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center' 
+},
+imageSize:{
+    width: 200,
+    height: 180,
+    marginTop: 20
+},
 
   // Tab Bar
   tabBar:{
     color: '#424242'
+},
+//Slider 
+sliderStyle:{
+  width: 150,
+   height: 40 
+},
+
+pickerStyle:{
+    height: 50,
+    width: '100%',
+    color: '#fff'
+},
+textWhite:{
+  color: '#fff'
 }
 
 });

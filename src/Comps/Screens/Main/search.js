@@ -14,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Picker } from '@react-native-picker/picker';
 import StarRating from 'react-native-star-rating';
+import PropTypes from 'prop-types';
 import stylesLight from '../../../Styles/stylesheet';
 import stylesDark from '../../../Styles/stylesheetDark';
 
@@ -21,22 +22,22 @@ export default class Search extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      cafe_name: '',
+      cafeName: '',
 
       advancedFilter: false,
-      value_overall: 0,
-      overall_rating_active: false,
+      valueOverall: 0,
+      overallRatingActive: false,
 
-      value_price: 0,
-      price_rating_active: false,
+      valuePrice: 0,
+      priceRatingOverall: false,
 
-      value_clenliness: 0,
-      clenliness_rating_active: false,
+      valueClenliness: 0,
+      clenlinessRatingActive: false,
 
-      value_quality: 0,
-      quality_rating_active: false,
+      valueQuality: 0,
+      qualityRatingActive: false,
 
-      search_in: '',
+      searchIn: '',
 
       limit: 2,
       offset: 0,
@@ -48,21 +49,35 @@ export default class Search extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = this.props.navigation.addListener('focus', () => {
+    const { navigation } = this.props;
+    this.unsubscribe = navigation.addListener('focus', () => {
       this.chooseStyle();
     });
   }
 
   componentWillUnmount() {
     this.unsubscribe();
-    this.setState({ darkMode: null })
+    this.setState({ darkMode: null });
+  }
+
+  handleReviewPress(id, name) {
+    const { navigation } = this.props;
+    Alert.alert(`Would You Like To View${name}`, 'This will transfer you to the feed page, where you will be able to see reviews and more details.', [
+      {
+        text: 'Yes!',
+        onPress: () => { navigation.navigate('ReviewPage', { id, name }); },
+      },
+      {
+        text: 'No Thanks',
+      },
+    ]);
   }
 
   viewMore = () => {
-    console.log(`OFFSET = ${this.state.offset}`);
+    const { offset } = this.state;
     this.setState(
       {
-        offset: this.state.offset + 2,
+        offset: offset + 2,
       },
       () => {
         this.createCurl();
@@ -70,8 +85,9 @@ export default class Search extends Component {
     );
   };
 
-  viewLess = (offset) => {
-    if (offset === 0) {
+  viewLess = (offset_) => {
+    const { offset } = this.state;
+    if (offset_ === 0) {
       Alert.alert(
         'No Previous Results',
         'There are no results prior to the current ones on screen. Try "Next Page" to see more.',
@@ -79,7 +95,7 @@ export default class Search extends Component {
     } else {
       this.setState(
         {
-          offset: this.state.offset - 2,
+          offset: offset - 2,
         },
         () => {
           this.createCurl();
@@ -89,11 +105,11 @@ export default class Search extends Component {
   };
 
   presentResults(style) {
-    if (this.state.searchResponse == '') {
+    const { searchResponse, offset } = this.state;
+
+    if (searchResponse === '') {
       return (
-        <View>
-          <Text />
-        </View>
+        <View />
       );
     }
     return (
@@ -103,7 +119,7 @@ export default class Search extends Component {
           <View style={style.flexOne}>
             <TouchableOpacity
               onPress={() => {
-                this.viewLess(this.state.offset);
+                this.viewLess(offset);
               }}
             >
               <Text style={style.regularTextBlack}>Previous Page</Text>
@@ -112,7 +128,7 @@ export default class Search extends Component {
           <View style={style.flexEnd}>
             <TouchableOpacity
               onPress={() => {
-                this.viewMore(this.state.searchResponse.length);
+                this.viewMore(searchResponse.length);
               }}
             >
               <Text style={style.regularTextBlack}>Next Page</Text>
@@ -120,17 +136,18 @@ export default class Search extends Component {
           </View>
         </View>
         <FlatList
-          data={this.state.searchResponse}
+          data={searchResponse}
           renderItem={({ item, index }) => (
             <TouchableOpacity
-              onPress={() => {
-                { console.log(`You clicked id ${item.location_id}`);}
-              }}
+              onPress={() => { this.handleReviewPress(item.location_id, item.location_name); }}
             >
               <View style={style.flexEnd}>
                 <View style={style.resultContainer}>
                   <Text style={style.containerTitle}>{item.location_name}</Text>
-                  <Text style={style.regularTextBlack}>{item.location_town} </Text>
+                  <Text style={style.regularTextBlack}>
+                    {item.location_town}
+                    {' '}
+                  </Text>
 
                   <View style={style.flexRow}>
                     <View style={style.flexOne}>
@@ -155,7 +172,7 @@ export default class Search extends Component {
                     </View>
                   </View>
                   <View style={style.flexRow}>
-                    <View style={{ flex: 1 }}>
+                    <View style={style.flexOne}>
                       <Text style={style.regularTextBlack}>Price Rating</Text>
                       <Text>
                         {this.displayStarRating(
@@ -187,7 +204,12 @@ export default class Search extends Component {
   }
 
   advancedSearch(style) {
-    if (this.state.advancedFilter === true) {
+    const {
+      advancedFilter, valueOverall, overallRatingActive, valuePrice, priceRatingOverall,
+      valueClenliness, clenlinessRatingActive, valueQuality, qualityRatingActive, searchIn,
+
+    } = this.state;
+    if (advancedFilter === true) {
       return (
         // eslint-disable-next-line react/jsx-filename-extension
         <View>
@@ -199,15 +221,15 @@ export default class Search extends Component {
                     Minimum Overall Rating?
                   </Text>
                   <Text style={style.textCenterBlack}>
-                    {this.state.value_overall}
+                    {valueOverall}
                   </Text>
                 </View>
                 <View>
                   <CheckBox
-                    value={this.state.overall_rating_active}
+                    value={overallRatingActive}
                     onValueChange={() => {
                       this.setState({
-                        overall_rating_active: !this.state.overall_rating_active,
+                        overallRatingActive: !overallRatingActive,
                       });
                     }}
                     tintColors={{ true: '#eaca97' }}
@@ -216,16 +238,16 @@ export default class Search extends Component {
                 <View>
                   <View>
                     <Slider
-                      style={{ width: 150, height: 40 }}
+                      style={style.sliderStyle}
                       step={1}
                       minimumValue={0}
                       maximumValue={5}
                       minimumTrackTintColor="#eaca97"
                       thumbTintColor="#eaca97"
                       maximumTrackTintColor="#eaca97"
-                      value={this.state.value_overall}
-                      onValueChange={(value) => this.setState({ value_overall: value })}
-                      disabled={!this.state.overall_rating_active}
+                      value={valueOverall}
+                      onValueChange={(value) => this.setState({ valueOverall: value })}
+                      disabled={!overallRatingActive}
                     />
                   </View>
                 </View>
@@ -239,15 +261,15 @@ export default class Search extends Component {
                     Minimum Price Rating?
                   </Text>
                   <Text style={style.textCenterBlack}>
-                    {this.state.value_price}
+                    {valuePrice}
                   </Text>
                 </View>
                 <View>
                   <CheckBox
-                    value={this.state.price_rating_active}
+                    value={priceRatingOverall}
                     onValueChange={() => {
                       this.setState({
-                        price_rating_active: !this.state.price_rating_active,
+                        priceRatingOverall: !priceRatingOverall,
                       });
                     }}
                     tintColors={{ true: '#eaca97' }}
@@ -256,16 +278,16 @@ export default class Search extends Component {
                 <View>
                   <View>
                     <Slider
-                      style={{ width: 150, height: 40 }}
+                      style={style.sliderStyle}
                       step={1}
                       minimumValue={0}
                       maximumValue={5}
                       minimumTrackTintColor="#eaca97"
                       thumbTintColor="#eaca97"
                       maximumTrackTintColor="#eaca97"
-                      value={this.state.value_price}
-                      onValueChange={(value) => this.setState({ value_price: value })}
-                      disabled={!this.state.price_rating_active}
+                      value={valuePrice}
+                      onValueChange={(value) => this.setState({ valuePrice: value })}
+                      disabled={!priceRatingOverall}
                     />
                   </View>
                 </View>
@@ -280,16 +302,15 @@ export default class Search extends Component {
                     Min Cleanliness Rating?
                   </Text>
                   <Text style={style.textCenterBlack}>
-                    {this.state.value_clenliness}
+                    {valueClenliness}
                   </Text>
                 </View>
                 <View>
                   <CheckBox
-                    value={this.state.clenliness_rating_active}
+                    value={clenlinessRatingActive}
                     onValueChange={() => {
                       this.setState({
-                        clenliness_rating_active: !this.state
-                          .clenliness_rating_active,
+                        clenlinessRatingActive: !clenlinessRatingActive,
                       });
                     }}
                     tintColors={{ true: '#eaca97' }}
@@ -298,16 +319,16 @@ export default class Search extends Component {
                 <View>
                   <View>
                     <Slider
-                      style={{ width: 150, height: 40 }}
+                      style={style.sliderStyle}
                       step={1}
                       minimumValue={0}
                       maximumValue={5}
                       minimumTrackTintColor="#eaca97"
                       thumbTintColor="#eaca97"
                       maximumTrackTintColor="#eaca97"
-                      value={this.state.value_clenliness}
-                      onValueChange={(value) => this.setState({ value_clenliness: value })}
-                      disabled={!this.state.clenliness_rating_active}
+                      value={valueClenliness}
+                      onValueChange={(value) => this.setState({ valueClenliness: value })}
+                      disabled={!clenlinessRatingActive}
                     />
                   </View>
                 </View>
@@ -321,14 +342,14 @@ export default class Search extends Component {
                     Minimum Quality Rating?
                   </Text>
                   <Text style={style.textCenterBlack}>
-                    {this.state.value_quality}
+                    {valueQuality}
                   </Text>
                 </View>
                 <View>
                   <CheckBox
-                    value={this.state.quality_rating_active}
+                    value={qualityRatingActive}
                     onValueChange={() => {
-                      this.setState({ quality_rating_active: !this.state.quality_rating_active });
+                      this.setState({ qualityRatingActive: !qualityRatingActive });
                     }}
                     tintColors={{ true: '#eaca97' }}
                   />
@@ -336,16 +357,16 @@ export default class Search extends Component {
                 <View>
                   <View>
                     <Slider
-                      style={{ width: 150, height: 40 }}
+                      style={style.sliderStyle}
                       step={1}
                       minimumValue={0}
                       maximumValue={5}
                       minimumTrackTintColor="#eaca97"
                       thumbTintColor="#eaca97"
                       maximumTrackTintColor="#eaca97"
-                      value={this.state.value_quality}
-                      onValueChange={(value) => this.setState({ value_quality: value })}
-                      disabled={!this.state.quality_rating_active}
+                      value={valueQuality}
+                      onValueChange={(value) => this.setState({ valueQuality: value })}
+                      disabled={!qualityRatingActive}
                     />
                   </View>
                 </View>
@@ -355,9 +376,9 @@ export default class Search extends Component {
           <View>
             <Text style={style.textCenterBlack}>Where Would You Like To Search?</Text>
             <Picker
-              selectedValue={this.state.search_in}
-              style={{ height: 50, width: '100%', color: '#fff' }}
-              onValueChange={(itemValue, itemIndex) => this.setState({ search_in: itemValue })}
+              selectedValue={searchIn}
+              style={style.pickerStyle}
+              onValueChange={(itemValue) => this.setState({ searchIn: itemValue })}
             >
               <Picker.Item label="Everywhere" value="everywhere" />
               <Picker.Item label="My Favourite Locations" value="favourite" />
@@ -368,22 +389,20 @@ export default class Search extends Component {
       );
     }
     return <View />;
-  };
+  }
 
   async chooseStyle() {
     // Choose a stylesheet
-    if (await AsyncStorage.getItem('darkMode') === 'true'){
-      this.setState({darkMode: true})
-    }else{
-      this.setState({darkMode: false})
+    if (await AsyncStorage.getItem('darkMode') === 'true') {
+      this.setState({ darkMode: true });
+    } else {
+      this.setState({ darkMode: false });
     }
   }
 
   // Consider Moving this somehow / fixing error
-  // eslint-disable-next-line class-methods-use-this
-  displayStarRating(size, styles, rating, style) {
+  displayStarRating(size, styles, rating) {
     return (
-      // eslint-disable-next-line react/jsx-filename-extension
       <StarRating
         disabled={false}
         fullStarColor="#eaca97"
@@ -396,52 +415,54 @@ export default class Search extends Component {
   }
 
   async createCurl() {
+    const {
+      cafeName, overallRatingActive, valueOverall, priceRatingOverall, valuePrice,
+      qualityRatingActive, valueQuality, clenlinessRatingActive, valueClenliness, searchIn,
+      limit, offset,
+    } = this.state;
+
     if ((await AsyncStorage.getItem('@session_token')) == null) {
       Alert.alert('Please Login To Access This Feature');
     } else {
       let finalCurl = 'http://10.0.2.2:3333/api/1.0.0/find?';
       console.log(finalCurl);
       // Searching By Cafe Name
-      if (this.state.cafe_name != '') {
-        const search_name = this.state.cafe_name.replace(/\s/g, '%20');
-        finalCurl = `${finalCurl}q=${search_name}`;
+      if (cafeName !== '') {
+        const searchName = cafeName.replace(/\s/g, '%20');
+        finalCurl = `${finalCurl}q=${searchName}`;
       }
 
       // Searching By Overall Rating
-      if (this.state.overall_rating_active == true) {
-        finalCurl = `${finalCurl}&overall_rating=${this.state.value_overall}`;
+      if (overallRatingActive === true) {
+        finalCurl = `${finalCurl}&overall_rating=${valueOverall}`;
       }
 
       // Searching By Price Rating
-      if (this.state.price_rating_active == true) {
-        finalCurl = `${finalCurl}&price_rating=${this.state.value_price}`;
-        console.log('Price Rating is true');
+      if (priceRatingOverall === true) {
+        finalCurl = `${finalCurl}&price_rating=${valuePrice}`;
       }
 
       // Searching By Quality Rating
-      if (this.state.quality_rating_active == true) {
-        finalCurl = `${finalCurl}&quality_rating=${this.state.value_quality}`;
-        console.log('Quality Rating is true');
+      if (qualityRatingActive === true) {
+        finalCurl = `${finalCurl}&quality_rating=${valueQuality}`;
       }
       // Searching By Cleanliness Rating
-      if (this.state.clenliness_rating_active == true) {
-        finalCurl = `${finalCurl}&clenliness_rating=${this.state.value_clenliness}`;
-        console.log('Cleaniness Rating is true');
+      if (clenlinessRatingActive === true) {
+        finalCurl = `${finalCurl}&clenliness_rating=${valueClenliness}`;
       }
       // Search In
-      if (this.state.search_in == 'favourite') {
-        finalCurl = `${finalCurl}&search_in=${this.state.search_in}`;
-      } else if (this.state.search_in == 'reviewed') {
-        finalCurl = `${finalCurl}&search_in=${this.state.search_in}`;
+      if (searchIn === 'favourite') {
+        finalCurl = `${finalCurl}&searchIn=${searchIn}`;
+      } else if (searchIn === 'reviewed') {
+        finalCurl = `${finalCurl}&searchIn=${searchIn}`;
       }
-      finalCurl = `${finalCurl}&limit=${this.state.limit}&offset=${this.state.offset}`;
+      finalCurl = `${finalCurl}&limit=${limit}&offset=${offset}`;
 
       this.searchResults(finalCurl);
     }
   }
 
   async searchResults(finalCurl) {
-    console.log('Searching the database for your search queires');
     return fetch(finalCurl, {
       method: 'get',
       headers: {
@@ -470,16 +491,16 @@ export default class Search extends Component {
         }
       })
       .then(async (responseJson) => {
-        console.log('something here');
+        const { offset } = this.state;
         if (responseJson == '') {
           // Handles No Search Results
-          if (this.state.offset - 2 < 0) {
+          if (offset - 2 < 0) {
             Alert.alert('No results found');
           } else {
             // Handles Next Page
             this.setState(
               {
-                offset: this.state.offset - 2,
+                offset: offset - 2,
               },
               () => {
                 Alert.alert('No More Results found');
@@ -499,22 +520,23 @@ export default class Search extends Component {
 
   resetFilters() {
     this.setState({
-      value_overall: 0,
-      value_price: 0,
-      value_clenliness: 0,
-      value_quality: 0,
+      valueOverall: 0,
+      valuePrice: 0,
+      valueClenliness: 0,
+      valueQuality: 0,
     });
   }
 
   render() {
-    const style = this.state.darkMode ? stylesDark : stylesLight;
-    const { navigation } = this.props;
+    const { darkMode, cafeName, advancedFilter } = this.state;
+    const style = darkMode ? stylesDark : stylesLight;
     const searchIcon = <Icon name="search" size={20} color="#fff" />;
-    if (this.state.darkMode === null){
-      return(
+
+    if (darkMode === null) {
+      return (
         <View><Text>Loading</Text></View>
-      )
-    }return (
+      );
+    } return (
       <View style={style.mainContainer}>
         <View style={style.mainHeader}>
           <Text style={style.mainTitle}>Search</Text>
@@ -525,9 +547,9 @@ export default class Search extends Component {
               style={style.searchBar}
               placeholder="Seach By Cafe Name Or Location"
               onChangeText={(text) => {
-                this.setState({ cafe_name: text }), this.setState({ offset: 0 });
+                this.setState({ cafeName: text, offset: 0 });
               }}
-              value={this.state.cafe_name}
+              value={cafeName}
             />
             <TouchableOpacity
               style={style.searchButton}
@@ -540,7 +562,7 @@ export default class Search extends Component {
           </View>
           <TouchableOpacity
             onPress={() => {
-              this.setState({ advancedFilter: !this.state.advancedFilter });
+              this.setState({ advancedFilter: !advancedFilter });
             }}
           >
             <Text style={style.textCenterBlack}>Advanced Search</Text>
@@ -552,3 +574,9 @@ export default class Search extends Component {
     );
   }
 }
+Search.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    addListener: PropTypes.func.isRequired,
+  }).isRequired,
+};

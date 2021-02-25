@@ -1,5 +1,4 @@
-import React, {Component} from 'react';
-
+import React, { Component } from 'react';
 import {
   Text,
   View,
@@ -8,10 +7,11 @@ import {
   Image,
   Alert,
 } from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
+import { ScrollView } from 'react-native-gesture-handler';
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import style from '../../../Styles/stylesheet';
+import PropTypes from 'prop-types';
+import profFilter from '../../../Data/ProfanityFilter.json';
 import stylesLight from '../../../Styles/stylesheet';
 import stylesDark from '../../../Styles/stylesheetDark';
 
@@ -20,50 +20,50 @@ export default class EditReview extends Component {
     super(props);
     this.state = {
       photo: [],
-      review_id: '',
-      location_id: '',
-      clenliness_rating: '',
-      price_rating: '',
-      overall_rating: '',
-      quality_rating: '',
-      review_body: '',
+      reviewID: '',
+      locationID: '',
+      clenlinessRating: '',
+      priceRating: '',
+      overallRating: '',
+      qualityRating: '',
+      reviewBody: '',
 
-      new_clenliness_rating: '',
-      new_price_rating: '',
-      new_overall_rating: '',
-      new_quality_rating: '',
-      new_review_body: '',
+      newClenlinessRating: '',
+      newPriceRating: '',
+      newOverallRating: '',
+      newQualityRating: '',
+      newReviewBody: '',
       darkMode: null,
     };
   }
 
   componentDidMount() {
     this.chooseStyle();
-    const {route} = this.props;
+    const { route } = this.props;
     const {
-      review_id,
-      location_id,
-      clenliness_rating,
-      price_rating,
-      overall_rating,
-      quality_rating,
-      review_body,
+      reviewID,
+      locationID,
+      clenlinessRating,
+      priceRating,
+      overallRating,
+      qualityRating,
+      reviewBody,
     } = route.params;
     this.setState(
       {
-        review_id,
-        location_id,
-        clenliness_rating,
-        price_rating,
-        overall_rating,
-        quality_rating,
-        review_body,
+        reviewID,
+        locationID,
+        clenlinessRating,
+        priceRating,
+        overallRating,
+        qualityRating,
+        reviewBody,
         // Updated Variables
-        new_clenliness_rating: clenliness_rating,
-        new_price_rating: price_rating,
-        new_overall_rating: overall_rating,
-        new_quality_rating: quality_rating,
-        new_review_body: review_body,
+        newClenlinessRating: clenlinessRating,
+        newPriceRating: priceRating,
+        newOverallRating: overallRating,
+        newQualityRating: qualityRating,
+        newReviewBody: reviewBody,
       },
       () => {
         this.displayPhoto();
@@ -73,33 +73,50 @@ export default class EditReview extends Component {
 
   onStarPressOverallRating(rating) {
     this.setState({
-      new_overall_rating: rating,
+      newOverallRating: rating,
     });
   }
 
   onStarPressPrice(rating) {
     this.setState({
-      new_price_rating: rating,
+      newPriceRating: rating,
     });
   }
 
   onStarPressQuality(rating) {
     this.setState({
-      new_quality_rating: rating,
+      newQualityRating: rating,
     });
   }
 
   onStarPressClenliness(rating) {
     this.setState({
-      new_clenliness_rating: rating,
+      newClenlinessRating: rating,
     });
   }
 
+  profanityFilter() {
+    let verify = true;
+    profFilter.profanityKeywords.forEach((item) => {
+      if (this.state.newReviewBody.includes(item)) {
+        verify = false;
+      }
+    });
+    if (verify) {
+      this.patchReview();
+    } else {
+      Alert.alert(
+        'Please Follow Guidlines',
+        'Coffida does not accept any reviews that are not directly related aspects their cafe experience, please ammend your comment.',
+      );
+    }
+  }
+
   async deletePhoto() {
-    const {navigation} = this.props;
+    const { locationID, reviewID } = this.state;
     console.log('Searching the database for your search queires');
     return fetch(
-      `http://10.0.2.2:3333/api/1.0.0/location/${this.state.location_id}/review/${this.state.review_id}/photo`,
+      `http://10.0.2.2:3333/api/1.0.0/location/${locationID}/review/${reviewID}/photo`,
       {
         method: 'delete',
         headers: {
@@ -127,11 +144,11 @@ export default class EditReview extends Component {
 
   async displayPhoto() {
     return fetch(
-      'http://10.0.2.2:3333/api/1.0.0/location/' +
-        this.state.location_id +
-        '/review/' +
-        this.state.review_id +
-        '/photo',
+      `http://10.0.2.2:3333/api/1.0.0/location/${
+        this.state.locationID
+      }/review/${
+        this.state.reviewID
+      }/photo`,
       {
         method: 'get',
         headers: {
@@ -145,12 +162,11 @@ export default class EditReview extends Component {
           return response;
         }
         if (response.status === 404) {
-          Alert.alert(
-            'An Error Occured (Error:404)',
-            'There was an error finding the image for this review, try reloading to fix this issue.',
-          );
+          // Don't want to inform the user of this, as it means there is no photo for the review - logged to console instead.
+          console.log('No Image for this review');
         }
         if (response.status === 500) {
+          // If there is a server error, I want the user to be informed, so I send an alert out.
           Alert.alert(
             'An Error Occured (Error:500)',
             'There was an error finding the image for this review, try reloading to fix this issue.',
@@ -158,7 +174,7 @@ export default class EditReview extends Component {
         }
       })
       .then((responseJson) => {
-        this.setState({photo: responseJson});
+        this.setState({ photo: responseJson });
       })
       .catch((error) => {
         console.log(error);
@@ -166,27 +182,33 @@ export default class EditReview extends Component {
   }
 
   async patchReview() {
+    const { navigation } = this.props;
+    const {
+      newOverallRating, newPriceRating, newQualityRating,
+      newClenlinessRating, reviewBody, newReviewBody, locationID, reviewID,
+      clenlinessRating, priceRating, overallRating, qualityRating,
+    } = this.state;
     console.log('Patch Request Made to Updated User Information');
     const toSend = {};
 
-    if (this.state.clenliness_rating != this.state.new_clenliness_rating) {
-      toSend.clenliness_rating = this.state.new_clenliness_rating;
+    if (clenlinessRating !== newClenlinessRating) {
+      toSend.clenliness_rating = newClenlinessRating;
     }
-    if (this.state.price_rating != this.state.new_price_rating) {
-      toSend.price_rating = this.state.new_price_rating;
+    if (priceRating !== newPriceRating) {
+      toSend.price_rating = newPriceRating;
     }
-    if (this.state.overall_rating != this.state.new_overall_rating) {
-      toSend.overall_rating = this.state.new_overall_rating;
+    if (overallRating !== newOverallRating) {
+      toSend.overall_rating = newOverallRating;
     }
-    if (this.state.quality_rating != this.state.new_quality_rating) {
-      toSend.quality_rating = this.state.new_quality_rating;
+    if (qualityRating !== newQualityRating) {
+      toSend.quality_rating = newQualityRating;
     }
-    if (this.state.review_body != this.state.new_review_body) {
-      toSend.review_body = this.state.new_review_body;
+    if (reviewBody !== newReviewBody) {
+      toSend.review_body = newReviewBody;
     }
 
     return fetch(
-      'http://10.0.2.2:3333/api/1.0.0/location/' + this.state.location_id +'/review/' +this.state.review_id,
+      `http://10.0.2.2:3333/api/1.0.0/location/${locationID}/review/${reviewID}`,
       {
         method: 'patch',
         headers: {
@@ -199,23 +221,23 @@ export default class EditReview extends Component {
       .then((response) => {
         // Add error catching here
         if (response.status === 200) {
-          Alert.alert('Your Review has Been Updated');
-          this.props.navigation.goBack();
+          Alert.alert('Your Review has Been Updated', 'We have updated your review, thanks!');
+          navigation.goBack();
         }
         if (response.status === 400) {
-          Alert.alert('Bad Request 400');
+          Alert.alert('Bad Request 400', 'An error occured, please try again later.');
         }
         if (response.status === 401) {
-          Alert.alert('Unauthorised (401)');
+          Alert.alert('Unauthorised (401)', 'You cannot edit this review, try refreshing, if not contact our team.');
         }
         if (response.status === 403) {
-          Alert.alert('You cannot edit this review');
+          Alert.alert('You cannot edit this review (403)', 'You cannot edit this review, are you logged in?');
         }
         if (response.status === 404) {
-          Alert.alert('Review update not found, please try again(404)');
+          Alert.alert('Review not found, please try again (404)', 'There was an error finding this review, please try again');
         }
         if (response.status === 500) {
-          Alert.alert('There was an erroe connecting, try again (500)');
+          Alert.alert('There was an error connecting, try again (500)', 'There was a server connection error, please try again');
         }
       })
       .catch((error) => {
@@ -224,8 +246,9 @@ export default class EditReview extends Component {
   }
 
   loadImage(style) {
+    const { photo } = this.state;
     // If image is null
-    if (this.state.photo === undefined) {
+    if (photo === undefined) {
       return (
         <View>
           <Text style={style.textCenterBlack}>
@@ -234,37 +257,41 @@ export default class EditReview extends Component {
         </View>
       );
     }
-    console.log(this.state.photo);
     return (
-      <View>
+      <View style={style.imageCenter}>
         <Image
-          style={{width: 100, height: 90, marginTop: 20}}
+          style={style.imageSize}
           source={{
-            uri: this.state.photo.url,
+            uri: photo.url,
           }}
         />
         <TouchableOpacity
           onPress={() => {
             this.deletePhoto();
-          }}>
-          <Text>Delete Photo?</Text>
+          }}
+        >
+          <Text style={style.textCenterBlack}>Delete Photo?</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   async chooseStyle() {
-    if (await AsyncStorage.getItem('darkMode') === 'true'){
-      this.setState({darkMode: true})
-    }else{
-      this.setState({darkMode: false})
+    if (await AsyncStorage.getItem('darkMode') === 'true') {
+      this.setState({ darkMode: true });
+    } else {
+      this.setState({ darkMode: false });
     }
   }
 
   render() {
-    const style = this.state.darkMode ? stylesDark : stylesLight;
+    const {
+      darkMode, newOverallRating, newPriceRating, newQualityRating,
+      newClenlinessRating, reviewBody, newReviewBody,
+    } = this.state;
+    const { navigation } = this.props;
+    const style = darkMode ? stylesDark : stylesLight;
 
-    const {navigation} = this.props;
     return (
       <View style={style.mainContainer}>
         <View style={style.mainHeader}>
@@ -276,7 +303,8 @@ export default class EditReview extends Component {
               style={style.mainButton}
               onPress={() => {
                 navigation.goBack();
-              }}>
+              }}
+            >
               <Text style={style.textCenterWhite}>Go Back</Text>
             </TouchableOpacity>
             <Text style={style.subTitle}>
@@ -290,7 +318,7 @@ export default class EditReview extends Component {
               iconSet="FontAwesome"
               maxStars={5}
               starSize={30}
-              rating={parseInt(this.state.new_overall_rating)}
+              rating={parseInt(newOverallRating, 10)}
               selectedStar={(rating) => this.onStarPressOverallRating(rating)}
               fullStarColor="#eaca97"
             />
@@ -303,7 +331,7 @@ export default class EditReview extends Component {
               iconSet="FontAwesome"
               maxStars={5}
               starSize={30}
-              rating={parseInt(this.state.new_price_rating)}
+              rating={parseInt(newPriceRating, 10)}
               selectedStar={(rating) => this.onStarPressPrice(rating)}
               fullStarColor="#eaca97"
             />
@@ -316,7 +344,7 @@ export default class EditReview extends Component {
               iconSet="FontAwesome"
               maxStars={5}
               starSize={30}
-              rating={parseInt(this.state.new_quality_rating)}
+              rating={parseInt(newQualityRating, 10)}
               selectedStar={(rating) => this.onStarPressQuality(rating)}
               fullStarColor="#eaca97"
             />
@@ -331,7 +359,7 @@ export default class EditReview extends Component {
               iconSet="FontAwesome"
               maxStars={5}
               starSize={30}
-              rating={parseInt(this.state.new_clenliness_rating)}
+              rating={parseInt(newClenlinessRating, 10)}
               selectedStar={(rating) => this.onStarPressClenliness(rating)}
               fullStarColor="#eaca97"
             />
@@ -339,13 +367,13 @@ export default class EditReview extends Component {
               <Text style={style.textCenterBlack}>Update Your Comment: </Text>
               <TextInput
                 style={style.inputBody}
-                placeholder={this.state.review_body}
+                placeholder={reviewBody}
                 multiline
                 onChangeText={(text) => {
-                  this.setState({new_review_body: text});
+                  this.setState({ newReviewBody: text });
                 }}
                 numberOfLines={4}
-                value={this.state.new_review_body}
+                value={newReviewBody}
               />
             </View>
 
@@ -354,8 +382,9 @@ export default class EditReview extends Component {
             <TouchableOpacity
               style={style.mainButton}
               onPress={() => {
-                this.patchReview();
-              }}>
+                this.profanityFilter();
+              }}
+            >
               <Text style={style.textCenterWhite}>Submit Review</Text>
             </TouchableOpacity>
           </ScrollView>
@@ -364,3 +393,11 @@ export default class EditReview extends Component {
     );
   }
 }
+
+EditReview.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    addListener: PropTypes.func.isRequired,
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
+};

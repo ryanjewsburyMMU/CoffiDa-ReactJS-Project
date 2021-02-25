@@ -1,10 +1,15 @@
-import React, {Component, useEffect, useState} from 'react';
-
-import {Text, View, TextInput, TouchableOpacity, Alert} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
+import React, { Component } from 'react';
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  Alert,
+  TextInput,
+} from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import style from '../../../Styles/stylesheet';
+import PropTypes from 'prop-types';
 import stylesLight from '../../../Styles/stylesheet';
 import stylesDark from '../../../Styles/stylesheetDark';
 
@@ -12,23 +17,24 @@ export default class EditProfile extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      orig_first_name: '',
-      orig_last_name: '',
-      orig_email: '',
+      origFirstName: '',
+      origLastName: '',
+      origEmail: '',
 
-      updated_first_name: '',
-      updated_last_name: '',
-      updated_email: '',
+      updatedFirstName: '',
+      updatedLastName: '',
+      updatedEmail: '',
 
       password: '',
-      confirm_password: '',
+      confirmPassword: '',
       darkMode: null,
 
     };
   }
 
   componentDidMount() {
-    this.unsubscribe = this.props.navigation.addListener('focus', () => {
+    const { navigation } = this.props;
+    this.unsubscribe = navigation.addListener('focus', () => {
       this.chooseStyle();
       this.getDetails();
     });
@@ -39,36 +45,40 @@ export default class EditProfile extends Component {
   }
 
   getDetails = async () => {
-    const navigation = this.props.navigation;
     const firstName = await AsyncStorage.getItem('@userName');
     const lastName = await AsyncStorage.getItem('@userLastName');
     const email = await AsyncStorage.getItem('@userEmail');
 
     this.setState({
-      orig_first_name: firstName,
-      orig_last_name: lastName,
-      orig_email: email,
+      origFirstName: firstName,
+      origLastName: lastName,
+      origEmail: email,
 
-      updated_first_name: firstName,
-      updated_last_name: lastName,
-      updated_email: email,
+      updatedFirstName: firstName,
+      updatedLastName: lastName,
+      updatedEmail: email,
     });
   };
 
   async updateInformation() {
+    const { navigation } = this.props;
+    const {
+      origFirstName, updatedFirstName, origLastName, updatedLastName,
+      origEmail, updatedEmail, password, confirmPassword,
+    } = this.state;
     const toSend = {};
 
-    if (this.state.orig_first_name !== this.state.updated_first_name) {
-      toSend['first_name'] = this.state.updated_first_name;
+    if (origFirstName !== updatedFirstName) {
+      toSend.first_name = updatedFirstName;
     }
-    if (this.state.orig_last_name !== this.state.updated_last_name) {
-      toSend['last_name'] = this.state.updated_last_name;
+    if (origLastName !== updatedLastName) {
+      toSend.last_name = updatedLastName;
     }
-    if (this.state.orig_email !== this.state.updated_email) {
-      toSend['email'] = this.state.updated_email;
+    if (origEmail !== updatedEmail) {
+      toSend.email = updatedEmail;
     }
-    if (this.state.password === this.state.confirm_password) {
-      toSend['password'] = this.state.confirm_password;
+    if (password === confirmPassword) {
+      toSend.password = confirmPassword;
     }
 
     return fetch(
@@ -83,7 +93,25 @@ export default class EditProfile extends Component {
       },
     )
       .then((response) => {
-        Alert.alert('Item Updated');
+        if (response.status === 200) {
+          Alert.alert('Your Details have Been Updated', 'We have now updated your details!');
+          navigation.goBack();
+        }
+        if (response.status === 400) {
+          Alert.alert('Bad Request 400', 'An error occured, please try again later.');
+        }
+        if (response.status === 401) {
+          Alert.alert('Unauthorised (401)', 'You cannot edit these details right now, try refreshing, if not contact our team.');
+        }
+        if (response.status === 403) {
+          Alert.alert('You cannot edit this review (403)', 'You cannot edit this review, are you logged in?');
+        }
+        if (response.status === 404) {
+          Alert.alert('User not found, please try again (404)', 'There was an error finding your account, please try again');
+        }
+        if (response.status === 500) {
+          Alert.alert('There was an error connecting, try again (500)', 'There was a server connection error, please try again');
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -91,17 +119,20 @@ export default class EditProfile extends Component {
   }
 
   async chooseStyle() {
-    if (await AsyncStorage.getItem('darkMode') === 'true'){
-      this.setState({darkMode: true})
-    }else{
-      this.setState({darkMode: false})
+    if (await AsyncStorage.getItem('darkMode') === 'true') {
+      this.setState({ darkMode: true });
+    } else {
+      this.setState({ darkMode: false });
     }
   }
 
-
   render() {
-    const style = this.state.darkMode ? stylesDark : stylesLight;
-    const navigation = this.props.navigation;
+    const {
+      darkMode, origFirstName, updatedFirstName, origLastName, updatedLastName,
+      origEmail, updatedEmail, password, confirmPassword,
+    } = this.state;
+    const style = darkMode ? stylesDark : stylesLight;
+    const { navigation } = this.props;
 
     return (// eslint-disable-next-line react/jsx-filename-extension
       <View style={style.mainContainer}>
@@ -113,54 +144,49 @@ export default class EditProfile extends Component {
             <Text style={style.profileTitle}>Your Details:</Text>
             <TouchableOpacity
               style={style.mainButton}
-              onPress={() => navigation.goBack()}>
+              onPress={() => navigation.goBack()}
+            >
               <Text style={style.textCenterWhite}>Go Back</Text>
             </TouchableOpacity>
 
             <Text style={style.regularTextBlack}>First Name: </Text>
             <TextInput
               style={style.inputBody}
-              placeholder={this.state.orig_first_name}
-              onChangeText={(updated_first_name) =>
-                this.setState({updated_first_name})
-              }
-              value={this.state.updated_first_name}
+              placeholder={origFirstName}
+              onChangeText={(updatedFirstNameText) => this.setState({ updatedFirstName: updatedFirstNameText })}
+              value={updatedFirstName}
             />
 
             <Text style={style.regularTextBlack}>Last Name: </Text>
             <TextInput
               style={style.inputBody}
-              placeholder={this.state.orig_last_name}
-              onChangeText={(updated_last_name) =>
-                this.setState({ updated_last_name })
-              }
-              value={this.state.updated_last_name}
+              placeholder={origLastName}
+              onChangeText={(updatedLastNameText) => this.setState({ updatedLastName: updatedLastNameText })}
+              value={updatedLastName}
             />
 
             <Text style={style.regularTextBlack}>E-Mail: </Text>
             <TextInput
               style={style.inputBody}
-              placeholder={this.state.orig_email}
-              onChangeText={(updated_email) => this.setState({updated_email})}
-              value={this.state.updated_email}
+              placeholder={origEmail}
+              onChangeText={(updatedEmailText) => this.setState({ updatedEmail: updatedEmailText })}
+              value={updatedEmail}
             />
 
             <Text style={style.regularTextBlack}>Password: </Text>
             <TextInput
               style={style.inputBody}
               placeholder="Password"
-              onChangeText={(password) => this.setState({password})}
-              value={this.state.password}
+              onChangeText={(passwordText) => this.setState({ password: passwordText })}
+              value={password}
             />
 
             <Text style={style.regularTextBlack}>Confirm Passsword: </Text>
             <TextInput
               style={style.inputBody}
               placeholder="Password"
-              onChangeText={(confirm_password) =>
-                this.setState({ confirm_password })
-              }
-              value={this.state.confirm_password}
+              onChangeText={(confirmPasswordText) => this.setState({ confirmPassword: confirmPasswordText })}
+              value={confirmPassword}
             />
 
             <TouchableOpacity
@@ -176,4 +202,12 @@ export default class EditProfile extends Component {
       </View>
     );
   }
+}
+
+EditProfile.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    addListener: PropTypes.func.isRequired,
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
 };

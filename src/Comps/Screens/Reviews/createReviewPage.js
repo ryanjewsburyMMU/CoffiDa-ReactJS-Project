@@ -10,6 +10,7 @@ import {
 import StarRating from 'react-native-star-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScrollView } from 'react-native-gesture-handler';
+import PropTypes from 'prop-types';
 import profFilter from '../../../Data/ProfanityFilter.json';
 import stylesLight from '../../../Styles/stylesheet';
 import stylesDark from '../../../Styles/stylesheetDark';
@@ -18,8 +19,8 @@ export default class CreateReviewPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      current_id: '',
-      current_name: '',
+      currentID: '',
+      currentName: '',
       overallRating: 0,
       priceRating: 0,
       qualityRating: 0,
@@ -29,12 +30,13 @@ export default class CreateReviewPage extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = this.props.navigation.addListener('focus', () => {
+    const { navigation } = this.props;
+    this.unsubscribe = navigation.addListener('focus', () => {
       this.chooseStyle();
       const { route } = this.props;
       const { id, name } = route.params;
-      this.setState({ current_id: id });
-      this.setState({ current_name: name });
+      this.setState({ currentID: id });
+      this.setState({ currentName: name });
     });
   }
 
@@ -84,9 +86,12 @@ export default class CreateReviewPage extends Component {
   }
 
   async postReview() {
+    const {
+      overallRating, priceRating, qualityRating, clenlinessRating, reviewBody, currentID
+    } = this.state;
     const { navigation } = this.props;
     return fetch(
-      `http://10.0.2.2:3333/api/1.0.0/location/${this.state.current_id}/review`,
+      `http://10.0.2.2:3333/api/1.0.0/location/${this.state.currentID}/review`,
       {
         method: 'post',
         headers: {
@@ -94,11 +99,11 @@ export default class CreateReviewPage extends Component {
           'X-Authorization': await AsyncStorage.getItem('@session_token'),
         },
         body: JSON.stringify({
-          overall_rating: this.state.overallRating,
-          price_rating: this.state.priceRating,
-          quality_rating: this.state.qualityRating,
-          clenliness_rating: this.state.clenlinessRating,
-          review_body: this.state.reviewBody,
+          overall_rating: overallRating,
+          price_rating: priceRating,
+          quality_rating: qualityRating,
+          clenliness_rating: clenlinessRating,
+          review_body: reviewBody,
         }),
       },
     )
@@ -112,15 +117,15 @@ export default class CreateReviewPage extends Component {
                 text: 'Yes',
                 onPress: () => {
                   navigation.navigate('CameraPage', {
-                    id: this.state.current_id,
+                    id: currentID,
                   });
                 },
               },
               {
                 text: 'No',
                 onPress: () => {
-                  navigation.goBack(),
-                  ToastAndroid.show('Review Submitted', ToastAndroid.SHORT);
+                  ToastAndroid.show('Review Submitted', ToastAndroid.SHORT),
+                  navigation.goBack();
                 },
               },
             ],
@@ -157,17 +162,20 @@ export default class CreateReviewPage extends Component {
   }
 
   async chooseStyle() {
-    if (await AsyncStorage.getItem('darkMode') === 'true'){
-      this.setState({darkMode: true})
-    }else{
-      this.setState({darkMode: false})
+    if (await AsyncStorage.getItem('darkMode') === 'true') {
+      this.setState({ darkMode: true });
+    } else {
+      this.setState({ darkMode: false });
     }
   }
 
   render() {
-    const style = this.state.darkMode ? stylesDark : stylesLight;
-
     const { navigation } = this.props;
+    const {
+      darkMode, currentName, overallRating, priceRating, qualityRating, clenlinessRating,
+    } = this.state;
+    const style = darkMode ? stylesDark : stylesLight;
+
 
     return (// eslint-disable-next-line react/jsx-filename-extension
       <View style={style.mainContainer}>
@@ -175,10 +183,15 @@ export default class CreateReviewPage extends Component {
           <Text style={style.mainTitle}>
             Write a Review For
             {' '}
-            {this.state.current_name}
+            {currentName}
           </Text>
         </View>
         <View style={style.mainFooter}>
+          <View style={style.gapBottom}>
+            <TouchableOpacity style={style.mainButton} onPress={() => { navigation.goBack(); }}>
+              <Text style={style.textCenterWhite}>Go Back</Text>
+            </TouchableOpacity>
+          </View>
           <ScrollView>
             <Text style={style.subTitle}>
               How Would You Rate Your Overall Experience?
@@ -191,7 +204,7 @@ export default class CreateReviewPage extends Component {
               iconSet="FontAwesome"
               maxStars={5}
               starSize={30}
-              rating={this.state.overallRating}
+              rating={overallRating}
               selectedStar={(rating) => this.onStarPressOverallRating(rating)}
               fullStarColor="#eaca97"
             />
@@ -204,7 +217,7 @@ export default class CreateReviewPage extends Component {
               iconSet="FontAwesome"
               maxStars={5}
               starSize={30}
-              rating={this.state.priceRating}
+              rating={priceRating}
               selectedStar={(rating) => this.onStarPressPrice(rating)}
               fullStarColor="#eaca97"
             />
@@ -217,7 +230,7 @@ export default class CreateReviewPage extends Component {
               iconSet="FontAwesome"
               maxStars={5}
               starSize={30}
-              rating={this.state.qualityRating}
+              rating={qualityRating}
               selectedStar={(rating) => this.onStarPressQuality(rating)}
               fullStarColor="#eaca97"
             />
@@ -232,7 +245,7 @@ export default class CreateReviewPage extends Component {
               iconSet="FontAwesome"
               maxStars={5}
               starSize={30}
-              rating={this.state.clenlinessRating}
+              rating={clenlinessRating}
               selectedStar={(rating) => this.onStarPressClenliness(rating)}
               fullStarColor="#eaca97"
             />
@@ -261,3 +274,10 @@ export default class CreateReviewPage extends Component {
     );
   }
 }
+CreateReviewPage.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    addListener: PropTypes.func.isRequired,
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
+};

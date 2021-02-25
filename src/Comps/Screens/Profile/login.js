@@ -1,8 +1,18 @@
-/* eslint-disable linebreak-style */
-import React, {Component} from 'react';
-import {Text, View, TouchableOpacity, TextInput, Alert} from 'react-native';
+/* eslint linebreak-style: ["error", "windows"] */
+// This Was Causing An Error That Affected The Whole Page but I Couldn't Fix
+// Can Uncomment to see the errors
+import React, { Component } from 'react';
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  Alert,
+  TextInput,
+} from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import PropTypes from 'prop-types';
+
 import stylesLight from '../../../Styles/stylesheet';
 import stylesDark from '../../../Styles/stylesheetDark';
 
@@ -17,7 +27,8 @@ export default class Login extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = this.props.navigation.addListener('focus', () => {
+    const { navigation } = this.props;
+    this.unsubscribe = navigation.addListener('focus', () => {
       this.chooseStyle();
       this.checkLoggedIn();
     });
@@ -28,7 +39,7 @@ export default class Login extends Component {
   }
 
   checkLoggedIn = async () => {
-    const navigation = this.props.navigation;
+    const { navigation } = this.props;
     const token = await AsyncStorage.getItem('@session_token');
     if (token != null) {
       navigation.navigate('Profile');
@@ -36,15 +47,16 @@ export default class Login extends Component {
   };
 
   async postLogin() {
-    const navigation = this.props.navigation;
+    const { email, password } = this.state;
+    const { navigation } = this.props;
 
     console.log('Post Request Made For Login');
     return fetch('http://10.0.2.2:3333/api/1.0.0/user/login', {
       method: 'post',
-      headers: {'Content-Type': 'application/json'},
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: this.state.email,
-        password: this.state.password,
+        email,
+        password,
       }),
     })
       .then((response) => {
@@ -84,15 +96,16 @@ export default class Login extends Component {
 
   async chooseStyle() {
     if (await AsyncStorage.getItem('darkMode') === 'true') {
-      this.setState({ darkMode: true })
-    }else{
-      this.setState({ darkMode: false })
+      this.setState({ darkMode: true });
+    } else {
+      this.setState({ darkMode: false });
     }
   }
 
   render() {
-    const style = this.state.darkMode ? stylesDark : stylesLight;
-    const navigation = this.props.navigation;
+    const { darkMode } = this.state;
+    const { navigation } = this.props;
+    const style = darkMode ? stylesDark : stylesLight;
 
     return (
       // eslint-disable-next-line react/jsx-filename-extension
@@ -120,12 +133,14 @@ export default class Login extends Component {
             style={style.mainButton}
             onPress={() => {
               this.postLogin();
-            }}>
+            }}
+          >
             <Text style={style.textCenterWhite}>Login</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={style.mainButtonWhite}
-            onPress={() => this.props.navigation.navigate('SignUp')}>
+            onPress={() => navigation.navigate('SignUp')}
+          >
             <Text>Sign Up</Text>
           </TouchableOpacity>
         </View>
@@ -133,3 +148,11 @@ export default class Login extends Component {
     );
   }
 }
+
+Login.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    addListener: PropTypes.func.isRequired,
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
+};

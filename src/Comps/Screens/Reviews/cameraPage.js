@@ -8,6 +8,7 @@ import {
 import { RNCamera } from 'react-native-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import PropTypes from 'prop-types';
 import stylesLight from '../../../Styles/stylesheet';
 import stylesDark from '../../../Styles/stylesheetDark';
 
@@ -137,16 +138,17 @@ export default class CameraPage extends Component {
   }
 
   async chooseStyle() {
-    if (await AsyncStorage.getItem('darkMode') === 'true'){
-      this.setState({darkMode: true})
-    }else{
-      this.setState({darkMode: false})
+    if (await AsyncStorage.getItem('darkMode') === 'true') {
+      this.setState({ darkMode: true });
+    } else {
+      this.setState({ darkMode: false });
     }
   }
 
   render() {
+    const { darkMode } = this.state;
     const camera = <Icon name="camera" size={50} color="#fff" />;
-    const style = this.state.darkMode ? stylesDark : stylesLight;
+    const style = darkMode ? stylesDark : stylesLight;
 
     return (
       <View style={style.displayCamera}>
@@ -157,7 +159,7 @@ export default class CameraPage extends Component {
           captureAudio={false}
           defaultTouchToFocus
           mirrorImage={false}
-          style={{ flex: 1 }}
+          style={style.flexOne}
         />
         <TouchableOpacity
           onPress={() => {
@@ -173,3 +175,10 @@ export default class CameraPage extends Component {
     );
   }
 }
+
+CameraPage.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    addListener: PropTypes.func.isRequired,
+  }).isRequired,
+};

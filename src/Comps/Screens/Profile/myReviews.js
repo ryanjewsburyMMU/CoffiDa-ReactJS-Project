@@ -9,28 +9,34 @@ import {
   FlatList,
 } from 'react-native';
 
-import { ScrollView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StarRating from 'react-native-star-rating';
+import PropTypes from 'prop-types';
 import stylesLight from '../../../Styles/stylesheet';
 import stylesDark from '../../../Styles/stylesheetDark';
 
-export default class App extends Component {
+export default class MyReviews extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user_details: [],
+      userDetails: [],
       darkMode: null,
     };
   }
 
   componentDidMount() {
-    this.chooseStyle();
-    this.getInfo();
+    const { navigation } = this.props;
+    this.unsubscribe = navigation.addListener('focus', () => {
+      this.chooseStyle();
+      this.getInfo();
+    });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
   }
 
   async getInfo() {
-    console.log('Get Request Made For details');
     return fetch(
       `http://10.0.2.2:3333/api/1.0.0/user/${
         await AsyncStorage.getItem('@user_id')}`,
@@ -42,10 +48,23 @@ export default class App extends Component {
         },
       },
     )
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        }
+        if (response.staus === 401) {
+          Alert.alert('Unauthorised Error (401)', 'An error occured when trying to load your data, please ensure you are logged in / reload the app.');
+        }
+        if (response.status === 404) {
+          Alert.alert('User Details Not Found (404)', 'We could not find your details, please try again, and make sure you are logged in!');
+        }
+        if (response.status === 500) {
+          Alert.alert('Connection Error', 'There was a connection error, and we could not load this data, please make sure you are connected to the internet.');
+        }
+      })
       .then(async (responseJson) => {
         this.setState({
-          user_details: responseJson,
+          userDetails: responseJson,
         });
       })
       .catch((error) => {
@@ -138,13 +157,12 @@ export default class App extends Component {
   }
 
   render() {
-    const style = this.state.darkMode ? stylesDark : stylesLight;
+    const { darkMode, userDetails } = this.state;
     const { navigation } = this.props;
 
-    if (
-      this.state.user_details == []
-      && this.state.favourite_locations_id == []
-    ) {
+    const style = darkMode ? stylesDark : stylesLight;
+
+    if (userDetails === []) {
       return (
         <View>
           <Text>Loading</Text>
@@ -158,13 +176,13 @@ export default class App extends Component {
         <View style={style.mainFooter}>
           <View>
             <TouchableOpacity
-              onPress={() => this.props.navigation.goBack()}
+              onPress={() => navigation.goBack()}
               style={style.mainButton}
             >
               <Text style={style.textCenterWhite}>Go Back:</Text>
             </TouchableOpacity>
             <FlatList
-              data={this.state.user_details.reviews}
+              data={userDetails.reviews}
               renderItem={({ item, index }) => (
                 <View style={style.resultContainer}>
                   <Text style={style.containerTitle}>
@@ -179,24 +197,24 @@ export default class App extends Component {
                       starSize={20}
                     />
                   </View>
-                  <Text>
+                  <Text style={style.regularTextBlack}>
                     Review ID:
                     {item.review.review_id}
                   </Text>
-                  <Text>
+                  <Text style={style.regularTextBlack}>
                     Comment:
                     {item.review.review_body}
                   </Text>
                   <TouchableOpacity
                     onPress={() => {
                       navigation.navigate('EditReview', {
-                        review_id: item.review.review_id,
-                        location_id: item.location.location_id,
-                        clenliness_rating: item.review.clenliness_rating,
-                        price_rating: item.review.price_rating,
-                        overall_rating: item.review.overall_rating,
-                        quality_rating: item.review.quality_rating,
-                        review_body: item.review.review_body,
+                        reviewID: item.review.review_id,
+                        locationID: item.location.location_id,
+                        clenlinessRating: item.review.clenliness_rating,
+                        priceRating: item.review.price_rating,
+                        overallRating: item.review.overall_rating,
+                        qualityRating: item.review.quality_rating,
+                        reviewBody: item.review.review_body,
                       });
                     }}
                     style={style.mainButton}
@@ -215,7 +233,7 @@ export default class App extends Component {
                       );
                     }}
                   >
-                    <Text style={style.textCenterWhite}>Delete Review</Text>
+                    <Text style={style.textWhite}>Delete Review</Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -227,3 +245,12 @@ export default class App extends Component {
     );
   }
 }
+
+MyReviews.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    addListener: PropTypes.func.isRequired,
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
+};
+

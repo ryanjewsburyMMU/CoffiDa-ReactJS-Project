@@ -8,7 +8,7 @@ import {
   Alert,
   TextInput,
 } from 'react-native';
-
+import PropTypes from 'prop-types';
 import style from '../../../Styles/stylesheet';
 
 export default class SignUp extends Component {
@@ -17,22 +17,25 @@ export default class SignUp extends Component {
     this.state = {
       email: '',
       password: '',
-      password_confirm: '',
-      first_name: '',
-      last_name: '',
+      passwordConfirm: '',
+      firstName: '',
+      lastName: '',
     };
   }
 
   signUp() {
     const { navigation } = this.props;
+    const {
+      password, passwordConfirm, firstName, lastName, email,
+    } = this.state;
 
     // Check if both passwords entered are the same
-    if (this.state.password === this.state.password_confirm) {
+    if (password === passwordConfirm) {
       const signUpDetails = {
-        first_name: this.state.first_name,
-        last_name: this.state.last_name,
-        email: this.state.email,
-        password: this.state.password,
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        password,
       };
 
       return fetch('http://10.0.2.2:3333/api/1.0.0/user', {
@@ -52,7 +55,7 @@ export default class SignUp extends Component {
           if (response.status === 400) {
             Alert.alert(
               'Sign Up Error',
-              'Please ensure all your details are correct.',
+              'Please you are using a valid email, and your password is longer than 5 characters.',
             );
           }
           if (response.status === 500) {
@@ -85,14 +88,14 @@ export default class SignUp extends Component {
             style={style.signupInput}
             placeholder="First Name"
             onChangeText={(text) => {
-              this.setState({ first_name: text });
+              this.setState({ firstName: text });
             }}
           />
           <TextInput
             style={style.signupInput}
             placeholder="Last Name"
             onChangeText={(text) => {
-              this.setState({ last_name: text });
+              this.setState({ lastName: text });
             }}
           />
           <TextInput
@@ -113,7 +116,7 @@ export default class SignUp extends Component {
             style={style.signupInput}
             placeholder="Confirm Password"
             onChangeText={(text) => {
-              this.setState({ password_confirm: text });
+              this.setState({ passwordConfirm: text });
             }}
           />
           <TouchableOpacity
@@ -123,7 +126,7 @@ export default class SignUp extends Component {
             <Text style={style.textCenterWhite}>Sign Up:</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => this.props.navigation.goBack()}
+            onPress={() => navigation.goBack()}
             style={style.mainButtonWhite}
           >
             <Text>Go Back:</Text>
@@ -133,3 +136,11 @@ export default class SignUp extends Component {
     );
   }
 }
+
+SignUp.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    addListener: PropTypes.func.isRequired,
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
+};

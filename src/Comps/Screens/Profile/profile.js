@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import PropTypes from 'prop-types';
 import stylesLight from '../../../Styles/stylesheet';
 import stylesDark from '../../../Styles/stylesheetDark';
 
@@ -15,13 +16,14 @@ export default class Profile extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user_details: [],
+      userDetails: [],
       darkMode: null,
     };
   }
 
   componentDidMount() {
-    this.unsubscribe = this.props.navigation.addListener('focus', () => {
+    const { navigation } = this.props;
+    this.unsubscribe = navigation.addListener('focus', () => {
       this.chooseStyle();
       this.checkLoggedIn();
     });
@@ -33,8 +35,8 @@ export default class Profile extends Component {
 
   async getInfo() {
     return fetch(
-      'http://10.0.2.2:3333/api/1.0.0/user/' +
-        (await AsyncStorage.getItem('@user_id')),
+      `http://10.0.2.2:3333/api/1.0.0/user/${
+        await AsyncStorage.getItem('@user_id')}`,
       {
         method: 'get',
         headers: {
@@ -43,21 +45,34 @@ export default class Profile extends Component {
         },
       },
     )
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        }
+        if (response.staus === 401) {
+          Alert.alert('Unauthorised Error (401)', 'An error occured when trying to load your data, please ensure you are logged in / reload the app.');
+        }
+        if (response.status === 404) {
+          Alert.alert('User Details Not Found (404)', 'We could not find your details, please try again, and make sure you are logged in!');
+        }
+        if (response.status === 500) {
+          Alert.alert('Connection Error', 'There was a connection error, and we could not load this data, please make sure you are connected to the internet.');
+        }
+      })
       .then(async (responseJson) => {
         this.setState({
-          user_details: responseJson,
+          userDetails: responseJson,
         });
         console.log(responseJson);
         await AsyncStorage.setItem(
           '@userName',
-          this.state.user_details.first_name,
+          responseJson.first_name,
         );
         await AsyncStorage.setItem(
           '@userLastName',
-          this.state.user_details.last_name,
+          responseJson.last_name,
         );
-        await AsyncStorage.setItem('@userEmail', this.state.user_details.email);
+        await AsyncStorage.setItem('@userEmail', responseJson.email);
       })
       .catch((error) => {
         console.log(error);
@@ -65,7 +80,7 @@ export default class Profile extends Component {
   }
 
   checkLoggedIn = async () => {
-    const navigation = this.props.navigation;
+    const { navigation } = this.props;
 
     const token = await AsyncStorage.getItem('@session_token');
     if (token === null) {
@@ -77,7 +92,7 @@ export default class Profile extends Component {
   };
 
   async logout() {
-    const navigation = this.props.navigation;
+    const { navigation } = this.props;
     console.log('Post Request Made For Logout');
     return fetch('http://10.0.2.2:3333/api/1.0.0/user/logout', {
       method: 'post',
@@ -105,37 +120,41 @@ export default class Profile extends Component {
   }
 
   async chooseStyle() {
-    if (await AsyncStorage.getItem('darkMode') === 'true'){
-      this.setState({darkMode: true})
-    }else{
-      this.setState({darkMode: false})
+    if (await AsyncStorage.getItem('darkMode') === 'true') {
+      this.setState({ darkMode: true });
+    } else {
+      this.setState({ darkMode: false });
     }
   }
 
-
   render() {
-    const style = this.state.darkMode ? stylesDark : stylesLight;
+    const { darkMode, userDetails } = this.state;
+    const style = darkMode ? stylesDark : stylesLight;
 
-    const navigation = this.props.navigation;
+    const { navigation } = this.props;
 
     return (// eslint-disable-next-line react/jsx-filename-extension
       <View style={style.mainContainer}>
         <View style={style.mainHeader}>
           <Text style={style.mainTitle}>
-            Hello, {this.state.user_details.first_name}
+            Hello,
+            {' '}
+            {userDetails.first_name}
           </Text>
         </View>
         <View style={style.mainFooter}>
           <Text style={style.profileTitle}>Your Details:</Text>
           <Text style={style.textCenterBlack}>
-            Full Name: {this.state.user_details.first_name}{' '}
-            {this.state.user_details.last_name}
+            Full Name:
+            {' '}
+            {userDetails.first_name}
+            {' '}
+            {userDetails.last_name}
           </Text>
           <Text style={style.textCenterBlack}>
-            E-Mail: {this.state.user_details.email}
-          </Text>
-          <Text style={style.textCenterBlack}>
-            Your Unique ID: {this.state.user_details.user_id}
+            E-Mail:
+            {' '}
+            {userDetails.email}
           </Text>
           <TouchableOpacity
             style={style.mainButtonWhite}
@@ -151,15 +170,9 @@ export default class Profile extends Component {
           </TouchableOpacity>
           <TouchableOpacity
             style={style.mainButtonWhite}
-            onPress={() => navigation.navigate('App')}
+            onPress={() => navigation.navigate('MyReviews')}
           >
             <Text>My Reviews</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={style.mainButtonWhite}
-            onPress={() => console.log('Liked Reviews Possible...')}
-          >
-            <Text>Liked Reviews</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={style.mainButton}
@@ -174,3 +187,10 @@ export default class Profile extends Component {
     );
   }
 }
+Profile.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    addListener: PropTypes.func.isRequired,
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
+};

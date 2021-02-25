@@ -1,4 +1,3 @@
-/* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 
 import {
@@ -10,8 +9,6 @@ import {
   PermissionsAndroid,
   Linking,
   ToastAndroid,
-  Surface,
-  Button
 } from 'react-native';
 
 import StarRating from 'react-native-star-rating';
@@ -22,6 +19,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import DoubleClick from 'react-native-double-tap';
 import Geolocation from 'react-native-geolocation-service';
 import { getDistance } from 'geolib';
+import PropTypes from 'prop-types';
 import stylesLight from '../../../Styles/stylesheet';
 import stylesDark from '../../../Styles/stylesheetDark';
 
@@ -62,7 +60,8 @@ export default class Feed extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = this.props.navigation.addListener('focus', () => {
+    const { navigation } = this.props;
+    this.unsubscribe = navigation.addListener('focus', () => {
       this.chooseStyle();
       this.checkLoggedIn();
       this.findLocation();
@@ -101,7 +100,7 @@ export default class Feed extends Component {
         }
       })
       .then(async (responseJson) => {
-        this.setState({location_data: responseJson});
+        this.setState({ location_data: responseJson });
       })
       .catch((error) => {
         console.log(`errrr = ${error}`);
@@ -138,7 +137,7 @@ export default class Feed extends Component {
   }
 
   findLocation = () => {
-    if (this.state.locationPermission = false) {
+    if (!this.state.locationPermission) {
       this.state.locationPermission = RequestLocationPermission();
       console.log(this.state.locationPermission);
     }
@@ -152,7 +151,7 @@ export default class Feed extends Component {
         });
       },
       (error) => {
-        Alert.alert(error.message);
+        Alert.alert(error.message, 'Some features of this page will not be available unless you have location permissions, you can add these in your phone settings');
       },
       {
         enableHighAccuracy: true,
@@ -163,14 +162,15 @@ export default class Feed extends Component {
   };
 
   async checkLoggedIn() {
-    const {navigation} = this.props;
+    const { navigation } = this.props;
 
     const token = await AsyncStorage.getItem('@session_token');
 
     if (token === null) {
       Alert.alert(
         'Welcome To Coffida',
-        'Please login or create an account to get started!')
+        'Please login or create an account to get started!',
+      );
       navigation.navigate('Profile');
     } else {
       this.getInfo();
@@ -179,8 +179,6 @@ export default class Feed extends Component {
   }
 
   async AddFavourite(locationID) {
-    const {navigation} = this.props;
-
     return fetch(
       `http://10.0.2.2:3333/api/1.0.0/location/${locationID}/favourite`,
       {
@@ -286,7 +284,8 @@ export default class Feed extends Component {
             doubleTap={() => {
               this.AddFavourite(currentID);
             }}
-            delay={200}>
+            delay={200}
+          >
             <Text>{faveIcon}</Text>
           </DoubleClick>
         </View>
@@ -301,7 +300,8 @@ export default class Feed extends Component {
           doubleTap={() => {
             this.AddFavourite(currentID);
           }}
-          delay={200}>
+          delay={200}
+        >
           <Text>{notFaveIcon}</Text>
         </DoubleClick>
       </View>
@@ -317,7 +317,7 @@ export default class Feed extends Component {
       );
     }
     const distance = getDistance(
-      {latitude: this.state.lat, longitude: this.state.long},
+      { latitude: this.state.lat, longitude: this.state.long },
       {
         latitude: lat,
         longitude: long,
@@ -326,12 +326,16 @@ export default class Feed extends Component {
     const miles = Math.round(parseInt(distance) * 0.00062137);
     return (
       <View>
-        <Text style={style.textCenterBlack}>{miles} Miles Away</Text>
+        <Text style={style.textCenterBlack}>
+          {miles}
+          {' '}
+          Miles Away
+        </Text>
       </View>
     );
   }
 
-  async generateMapDirections(destLat, destLong, style) {
+  async generateMapDirections(destLat, destLong) {
     if (this.state.long === '') {
       Alert.alert(
         'No Directions Found',
@@ -343,25 +347,32 @@ export default class Feed extends Component {
     }
   }
 
-  /* eslint-disable */
-
-
   async chooseStyle() {
-    if (await AsyncStorage.getItem('darkMode') === 'true'){
-      this.setState({darkMode: true})
-    }else{
-      this.setState({darkMode: false})
+    if (await AsyncStorage.getItem('darkMode') === 'true') {
+      this.setState({ darkMode: true });
+    } else {
+      this.setState({ darkMode: false });
     }
   }
 
   render() {
     const style = this.state.darkMode ? stylesDark : stylesLight;
 
-    const {navigation} = this.props;
+    const { navigation } = this.props;
     if (this.state.isLoading === true) {
       return (
-        <View>
-          <ActivityIndicator size="large" color="#0000ff" />
+        <View style={style.mainContainer}>
+          <View style={style.mainHeader}>
+            <View style={style.flexRow}>
+              <Text style={style.mainTitle}>Your Feed</Text>
+            </View>
+          </View>
+          <View style={style.mainFooter}>
+            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+              <Text style={style.textCenterBlack}>Your Feed Is Loading...</Text>
+              <ActivityIndicator size="large" color="#eaca97" />
+            </View>
+          </View>
         </View>
       );
     }
@@ -371,8 +382,6 @@ export default class Feed extends Component {
         <View style={style.mainHeader}>
           <View style={style.flexRow}>
             <Text style={style.mainTitle}>Your Feed</Text>
-            {/* <Button title="change style drk" onPress={()=>{this.changeStyleDark()}}/>
-            <Button title="change style lght" onPress={()=>{this.changeStyleLight()}}/> */}
           </View>
         </View>
         <View style={style.mainFooter}>
@@ -406,7 +415,8 @@ export default class Feed extends Component {
                           locationData.longitude,
                           style,
                         );
-                      }}>
+                      }}
+                    >
                       <Text style={style.textCenterBlack}>
                         {' '}
                         {this.findDistance(
@@ -424,9 +434,12 @@ export default class Feed extends Component {
                           name: locationData.location_name,
                           photo_path: locationData.photo_path,
                         });
-                      }}>
+                      }}
+                    >
                       <Text style={style.textCenterWhite}>
-                        See More Information About {locationData.location_name}
+                        See More Information About
+                        {' '}
+                        {locationData.location_name}
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -436,9 +449,12 @@ export default class Feed extends Component {
                           id: locationData.location_id,
                           name: locationData.location_name,
                         });
-                      }}>
+                      }}
+                    >
                       <Text>
-                        Write a Review For {locationData.location_name}
+                        Write a Review For
+                        {' '}
+                        {locationData.location_name}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -451,3 +467,10 @@ export default class Feed extends Component {
     );
   }
 }
+
+Feed.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    addListener: PropTypes.func.isRequired,
+  }).isRequired,
+};

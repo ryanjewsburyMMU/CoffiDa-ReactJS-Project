@@ -11,7 +11,9 @@ import Search from '../Comps/Screens/Main/search';
 import NearMe from '../Comps/Screens/Main/nearMe';
 
 import stylesLight from '.././Styles/stylesheet';
-import stylesDark from '../././Styles/stylesheetDark';
+import stylesDark from '.././Styles/stylesheet';
+// import PropTypes from 'prop-types'
+
 
 const Tab = createBottomTabNavigator();
 
@@ -40,6 +42,7 @@ export default class Home_Tab extends Component {
     } else {
       this.setState({ darkMode: false });
     }
+    console.log("dark mode = " + this.state.darkMode)
   }
 
   render() {
@@ -66,8 +69,8 @@ export default class Home_Tab extends Component {
           activeTintColor: '#eaca97',
           inactiveTintColor: 'gray',
           style: {
-            backgroundColor: style.tabBar.color,
-          }
+            backgroundColor: this.state.darkMode ? '#424242' : '#fff'
+          },
         }}
       >
         <Tab.Screen name="Feed" component={FeedStack} />

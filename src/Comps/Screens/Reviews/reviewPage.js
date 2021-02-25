@@ -307,7 +307,7 @@ export default class ReviewPage extends Component {
   render() {
     const style = this.state.darkMode ? stylesDark : stylesLight;
 
-    const { navigation } = this.props;
+    const navigation = this.props.navigation;
     if (this.state.isLoading == true) {
       return (
         <View>
@@ -321,6 +321,11 @@ export default class ReviewPage extends Component {
           <Text style={style.mainTitle}>{this.state.current_name}</Text>
         </View>
         <View style={style.mainFooter}>
+          <View style={style.gapBottom}>
+            <TouchableOpacity style={style.mainButton} onPress={()=>{navigation.goBack()}}>
+              <Text style={style.textCenterWhite}>Go Back</Text>
+              </TouchableOpacity>
+          </View>
           <FlatList
             data={this.state.location_data.location_reviews}
             ListHeaderComponent={this.locationInformation(style)}

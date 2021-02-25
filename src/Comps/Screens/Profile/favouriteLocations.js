@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StarRating from 'react-native-star-rating';
+import PropTypes from 'prop-types';
 import stylesLight from '../../../Styles/stylesheet';
 import stylesDark from '../../../Styles/stylesheetDark';
 
@@ -16,7 +16,7 @@ export default class FavouriteLocations extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user_details: [],
+      userDetails: [],
       darkMode: null,
     };
   }
@@ -27,10 +27,9 @@ export default class FavouriteLocations extends Component {
   }
 
   async getInfo() {
-    console.log('Get Request Made For details');
     return fetch(
-      'http://10.0.2.2:3333/api/1.0.0/user/' +
-        (await AsyncStorage.getItem('@user_id')),
+      `http://10.0.2.2:3333/api/1.0.0/user/${
+        await AsyncStorage.getItem('@user_id')}`,
       {
         method: 'get',
         headers: {
@@ -42,7 +41,7 @@ export default class FavouriteLocations extends Component {
       .then((response) => response.json())
       .then(async (responseJson) => {
         this.setState({
-          user_details: responseJson,
+          userDetails: responseJson,
         });
       })
       .catch((error) => {
@@ -51,11 +50,11 @@ export default class FavouriteLocations extends Component {
   }
 
   async removeFavourite(locationID) {
-    const navigation = this.props.navigation;
+    const { navigation } = this.props;
 
     console.log('Post Request Made For Add Fave');
     return fetch(
-      'http://10.0.2.2:3333/api/1.0.0/location/' + locationID + '/favourite',
+      `http://10.0.2.2:3333/api/1.0.0/location/${locationID}/favourite`,
       {
         method: 'delete',
         headers: {
@@ -101,7 +100,7 @@ export default class FavouriteLocations extends Component {
   pressDelete(title, locationID) {
     Alert.alert(
       'Are You Sure?',
-      'Are you sure you want to remove ' + title + ' from your favourites?',
+      `Are you sure you want to remove ${title} from your favourites?`,
       [
         {
           text: 'Yes, Remove',
@@ -116,19 +115,19 @@ export default class FavouriteLocations extends Component {
   }
 
   async chooseStyle() {
-    if (await AsyncStorage.getItem('darkMode') === 'true'){
-      this.setState({darkMode: true})
-    }else{
-      this.setState({darkMode: false})
+    if (await AsyncStorage.getItem('darkMode') === 'true') {
+      this.setState({ darkMode: true });
+    } else {
+      this.setState({ darkMode: false });
     }
   }
 
   render() {
-    const style = this.state.darkMode ? stylesDark : stylesLight;
-    const user_data = this.state.user_details;
-    const navigation = this.props.navigation;
+    const { navigation } = this.props;
+    const { userDetails, darkMode } = this.state;
+    const style = darkMode ? stylesDark : stylesLight;
 
-    if (this.state.user_details === "") {
+    if (userDetails === '') {
       return (
         <View><Text>Loading</Text></View>
       );
@@ -139,49 +138,60 @@ export default class FavouriteLocations extends Component {
           <Text style={style.mainTitle}>Favourite Locations</Text>
         </View>
         <View style={style.mainFooter}>
-            <Text style={style.containerTitle}></Text>
+          <Text style={style.containerTitle} />
 
-            <View>
-              <TouchableOpacity
-                onPress={() => this.props.navigation.goBack()}
-                style={style.mainButton}>
-                <Text style={style.textCenterWhite}>Go Back:</Text>
-              </TouchableOpacity>
-              <View style={style.gapTop}></View>
-              <FlatList
-                data={this.state.user_details.favourite_locations}
-                renderItem={({item, index}) => (
-                  <View style={style.resultContainer}>
-                    <Text style={style.containerTitle}>
-                      {item.location_name}
-                    </Text>
-                    <Text style={style.regularTextBlack}>Overall Rating</Text>
-                    <View style={style.starContainer}>
-                      <StarRating
-                        disabled={false}
-                        fullStarColor="#eaca97"
-                        maxStars={5}
-                        rating={item.avg_overall_rating}
-                        starSize={20}
-                      />
-                    </View>
-                    <TouchableOpacity
-                      style={style.deleteFavourite}
-                      onPress={() => {
-                        this.pressDelete(item.location_name, item.location_id);
-                      }}>
-                      <Text style={style.textCenterBlack}>
-                        Remove From Favourites
-                      </Text>
-                    </TouchableOpacity>
+          <View>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={style.mainButton}
+            >
+              <Text style={style.textCenterWhite}>Go Back:</Text>
+            </TouchableOpacity>
+            <View style={style.gapTop} />
+            <FlatList
+              data={userDetails.favourite_locations}
+              renderItem={({ item, index }) => (
+                <View style={style.resultContainer}>
+                  <Text style={style.containerTitle}>
+                    {item.location_name}
+                  </Text>
+                  <Text style={style.regularTextBlack}>{item.location_town}</Text>
+
+                  <Text style={style.regularTextBlack}>Overall Rating</Text>
+                  <View style={style.starContainer}>
+                    <StarRating
+                      disabled={false}
+                      fullStarColor="#eaca97"
+                      maxStars={5}
+                      rating={item.avg_overall_rating}
+                      starSize={20}
+                    />
                   </View>
-                )}
-                keyExtractor={(item, index) => index.toString()}
-              />
-            </View>
+                  <TouchableOpacity
+                    style={style.deleteFavourite}
+                    onPress={() => {
+                      this.pressDelete(item.location_name, item.location_id);
+                    }}
+                  >
+                    <Text style={style.textCenterBlack}>
+                      Remove From Favourites
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          </View>
         </View>
       </View>
     );
   }
 }
 
+FavouriteLocations.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    addListener: PropTypes.func.isRequired,
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
+};

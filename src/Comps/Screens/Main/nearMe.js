@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component } from 'react';
 
 import {
   Text,
@@ -7,12 +7,11 @@ import {
   Linking,
   Alert,
   PermissionsAndroid,
-  Button
+  FlatList,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import StarRating from 'react-native-star-rating';
-
+import PropTypes from 'prop-types';
 import Geolocation from 'react-native-geolocation-service';
 import { getDistance } from 'geolib';
 import stylesLight from '../../../Styles/stylesheet';
@@ -24,17 +23,15 @@ async function RequestLocationPermission() {
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
       {
         title: 'Location Permission',
-        message: 'Something Here',
-        buttonNeutral: 'Nah son, maybe in time ya get me?',
-        buttonNegative: 'Mate get out of here',
-        buttonPositive: 'Yeah lard go on then',
+        message: 'CoffiDa would like to access your location',
+        buttonNegative: 'No',
+        buttonPositive: 'Yes',
       },
     );
     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
       return true;
-    }else{
-    return false;
     }
+    return false;
   } catch (error) {
     Alert.alert(error);
   }
@@ -48,19 +45,15 @@ export default class NearMe extends Component {
       long: '',
       lat: '',
       location_data: [],
-      closest_location: [],
+      orderedLocations: [],
       locationDidLoad: false,
-      closest_distance: '',
-      closest_lat: 0,
-      closest_long: 0,
       darkMode: false,
-
     };
   }
 
-
   componentDidMount() {
-    this.unsubscribe = this.props.navigation.addListener('focus', () => {
+    const { navigation } = this.props;
+    this.unsubscribe = navigation.addListener('focus', () => {
       this.chooseStyle();
       this.findLocation();
       this.getLocations();
@@ -72,34 +65,34 @@ export default class NearMe extends Component {
   }
 
   handleNearestLocations() {
-    const locationDistances = [];
-    this.state.location_data.forEach((item) => {
-      const currentDistance = getDistance(
-        { latitude: this.state.lat, longitude: this.state.long },
-        {
-          latitude: item.latitude,
-          longitude: item.longitude,
-        },
-      );
-      locationDistances.push({
-        id: item.location_id,
-        distance: currentDistance,
-        lat: item.latitude,
-        long: item.longitude,
+    if (this.state.location_data.length === 0) {
+      Alert.alert('An Error Occured', 'When trying to get this data we encountered a problem, a refresh should fix this');
+    } else {
+      const locationDistances = [];
+      this.state.location_data.forEach((item) => {
+        const currentDistance = getDistance(
+          { latitude: this.state.lat, longitude: this.state.long },
+          {
+            latitude: item.latitude,
+            longitude: item.longitude,
+          },
+        );
+        locationDistances.push({
+          id: item.location_id,
+          name: item.location_name,
+          overall_rating: item.avg_overall_rating,
+          distance: Math.round(currentDistance * 0.00062137),
+          lat: item.latitude,
+          long: item.longitude,
+        });
       });
-      console.log(item.longitude, item.latitude);
-    });
-    const result = locationDistances.reduce((res, obj) => (obj.distance < res.distance ? obj : res));
-    this.setState(
-      {
-        closest_distance: Math.round(parseInt(result.distance) * 0.00062137),
-        closest_lat: result.lat,
-        closest_long: result.long,
-      },
-      () => {
-        this.getLocationInfo(result.id);
-      },
-    );
+
+      const newlist = locationDistances.sort((a, b) => (a.distance) - (b.distance));
+      this.setState({
+        orderedLocations: newlist,
+        locationDidLoad: true,
+      });
+    }
   }
 
   async getLocations() {
@@ -184,7 +177,7 @@ export default class NearMe extends Component {
         });
       },
       (error) => {
-        Alert.alert("Please Enable Location Services",""+ error.message);
+        Alert.alert('Please Enable Location Services', `${error.message}`);
       },
       {
         enableHighAccuracy: true,
@@ -224,24 +217,54 @@ export default class NearMe extends Component {
 
   async chooseStyle() {
     // Choose a stylesheet
-    if (await AsyncStorage.getItem('darkMode') === 'true'){
-      this.setState({darkMode: true})
-    }else{
-      this.setState({darkMode: false})
+    if (await AsyncStorage.getItem('darkMode') === 'true') {
+      this.setState({ darkMode: true });
+    } else {
+      this.setState({ darkMode: false });
     }
   }
- 
+
+  listHeader(style) {
+    return (
+      <View style={style.gapTop}>
+        <Text style={style.textCenterBlack}>
+          Great! We found
+          {this.state.orderedLocations.length}
+          {' '}
+          locations
+        </Text>
+        <Text style={style.textCenterBlack}>
+          {' '}
+          Your Closest Location Is
+          {this.state.orderedLocations[0].name}
+          , and it is only
+          {this.state.orderedLocations[0].distance}
+          {' '}
+          Miles Away
+          {'\n'}
+        </Text>
+      </View>
+    );
+  }
+
   render() {
-    const style = this.state.darkMode ? stylesDark : stylesLight;
+    const { darkMode } = this.state;
+    const style = darkMode ? stylesDark : stylesLight;
     const { navigation } = this.props;
-    if (this.state.long === '') {
+    const { locationDidLoad, orderedLocations, long } = this.state;
+
+    if (long === '') {
       return (
         <View style={style.mainContainer}>
           <View style={style.mainHeader}>
             <Text style={style.mainTitle}>Near Me</Text>
           </View>
           <View style={style.mainFooter}>
-            <Text>Please Wait while we load this page...</Text>
+            <Text style={style.textCenterBlack}>Please Wait while we load this page...</Text>
+            <Text style={style.textCenterBlack}>
+              If this page does not load, please ensure you have location
+              services turned on in your phone settings.
+            </Text>
             {this.findLocation()}
           </View>
         </View>
@@ -262,62 +285,52 @@ export default class NearMe extends Component {
           >
             <Text style={style.textCenterWhite}>Find me a coffee shop!</Text>
           </TouchableOpacity>
-          {this.state.locationDidLoad ? (
-            <View style={style.gapTop}>
-              <Text style={style.textCenterBlack}>
-                Great! We Found You a cafe!
-              </Text>
-              <Text style={style.textCenterBlack}>
-                It is
-                {' '}
-                {this.state.closest_distance}
-                {' '}
-                miles away!
-                {' '}
-                {'\n'}
-              </Text>
-              <View style={style.resultContainer}>
-                <View style={style.alignCenter}>
-                  <Text style={style.containerTitle}>
-                    {this.state.closest_location.location_name}
-                  </Text>
-                  <Text>Overall Rating</Text>
-                  <Text>
-                    {this.displayStarRating(
-                      20,
-                      style.starContainer,
-                      this.state.closest_location.avg_overall_rating,
-                    )}
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  style={style.mainButton}
-                  onPress={() => {
-                    this.generateMapDirections(
-                      this.state.closest_lat,
-                      this.state.closest_long,
-                    );
-                  }}
-                >
-                  <Text style={style.textCenterWhite}>Take me there!</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={style.mainButtonWhite}
-                  onPress={() => {
-                    navigation.navigate('ReviewPage', {
-                      id: this.state.closest_location.location_id,
-                      name: this.state.closest_location.location_name,
-                      photo_path: this.state.closest_location.photo_path,
-                    });
-                  }}
-                >
-                  <Text>View This Page On Your Feed?</Text>
-                </TouchableOpacity>
-              </View>
+          {locationDidLoad ? (
+            <View style={style.flexOne}>
+              <FlatList
+                data={orderedLocations}
+                ListHeaderComponent={this.listHeader(style)}
+                renderItem={({ item, index }) => (
+                  <View style={style.resultContainer}>
+                    <Text style={style.containerTitle}>{item.name}</Text>
+                    <Text style={style.regularTextBlack}>
+                      {item.distance}
+                      {' '}
+                      Miles Away
+                    </Text>
+                    <Text style={style.regularTextBlack}>Overall Rating:</Text>
+                    <Text>
+                      {this.displayStarRating(
+                        20,
+                        style.starContainer,
+                        item.overall_rating,
+                      )}
+                    </Text>
+                    <TouchableOpacity style={style.mainButton} onPress={() => { this.generateMapDirections(item.lat, item.long); }}>
+                      <Text style={style.textCenterWhite}>Take Me There</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={style.mainButtonWhite}
+                      onPress={() => {
+                        navigation.navigate('ReviewPage', {
+                          id: item.id,
+                          name: item.name,
+                        });
+                      }}
+                    >
+                      <Text>View This Cafe on My Feed</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+                keyExtractor={(item, index) => index.toString()}
+              />
             </View>
           ) : (
             <View>
-              <Text />
+              <Text style={style.textCenterBlack}>
+                Please be sure to have location
+                services activated, you can do this via Settings, if not already allowed.
+              </Text>
             </View>
           )}
         </View>
@@ -325,3 +338,10 @@ export default class NearMe extends Component {
     );
   }
 }
+
+NearMe.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    addListener: PropTypes.func.isRequired,
+  }).isRequired,
+};
