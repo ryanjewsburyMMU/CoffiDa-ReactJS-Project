@@ -188,6 +188,9 @@ export default class MyReviews extends Component {
                   <Text style={style.containerTitle}>
                     {item.location.location_name}
                   </Text>
+                  <Text>
+                    {item.location.location_town}
+                  </Text>
                   <Text style={style.regularTextBlack}>
                     Comment:
                     {' '}

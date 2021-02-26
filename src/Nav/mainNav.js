@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import HomeTab from './homeTab';
 import Settings from '../Comps/Screens/Settings/settings';
 import ProfileStack from './profileStack';
+
 const Drawer = createDrawerNavigator();
 
 export default class MainNav extends Component {

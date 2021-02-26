@@ -120,7 +120,20 @@ export default class Feed extends Component {
         },
       },
     )
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        }
+        if (response.staus === 401) {
+          Alert.alert('Unauthorised Error (401)', 'An error occured when trying to load your data, please ensure you are logged in / reload the app.');
+        }
+        if (response.status === 404) {
+          Alert.alert('User Details Not Found (404)', 'We could not find your details, please try again, and make sure you are logged in!');
+        }
+        if (response.status === 500) {
+          Alert.alert('Connection Error', 'There was a connection error, and we could not load this data, please make sure you are connected to the internet.');
+        }
+      })
       .then(async (responseJson) => {
         this.setState({
           favourite_locations: responseJson.favourite_locations,
@@ -388,85 +401,85 @@ export default class Feed extends Component {
           </View>
         </View>
         <View style={style.mainFooter}>
-            <View>
-              <FlatList
-                data={this.state.location_data}
-                renderItem={({ item, index }) => (
-                  <View key={index}>
-                    <View style={style.feedContainer}>
-                      <Text style={style.locationTitle}>
+          <View>
+            <FlatList
+              data={this.state.location_data}
+              renderItem={({ item, index }) => (
+                <View key={index}>
+                  <View style={style.feedContainer}>
+                    <Text style={style.locationTitle}>
+                      {item.location_name}
+                    </Text>
+                    <Text style={style.textCenterGrey}>
+                      {item.location_town}
+                    </Text>
+                    <Text style={style.textCenterBlack}>Overall Rating</Text>
+                    <StarRating
+                      disabled={false}
+                      fullStarColor={style.starColour.color}
+                      maxStars={5}
+                      rating={item.avg_overall_rating}
+                      starSize={25}
+                    />
+                  </View>
+                  <View style={style.alignCenter}>
+                    <Text style={style.textCenterBlack}>Favourite This Location?</Text>
+                    <Text>{this.isFavourited(item.location_id, style)}</Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        this.generateMapDirections(
+                          item.latitude,
+                          item.longitude,
+                          style,
+                        );
+                      }}
+                    >
+                      <Text style={style.textCenterBlack}>
+                        {' '}
+                        {this.findDistance(
+                          item.latitude,
+                          item.longitude,
+                          style,
+                        )}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={style.mainButton}
+                      onPress={() => {
+                        navigation.navigate('ReviewPage', {
+                          id: item.location_id,
+                          name: item.location_name,
+                          photo_path: item.photo_path,
+                        });
+                      }}
+                    >
+                      <Text style={style.textCenterWhite}>
+                        See More Information About
+                        {' '}
                         {item.location_name}
                       </Text>
-                      <Text style={style.textCenterGrey}>
-                        {item.location_town}
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={style.mainButtonWhite}
+                      onPress={() => {
+                        navigation.navigate('CreateReviewPage', {
+                          id: item.location_id,
+                          name: item.location_name,
+                        });
+                      }}
+                    >
+                      <Text>
+                        Write a Review For
+                        {' '}
+                        {item.location_name}
                       </Text>
-                      <Text style={style.textCenterBlack}>Overall Rating</Text>
-                      <StarRating
-                        disabled={false}
-                        fullStarColor={style.starColour.color}
-                        maxStars={5}
-                        rating={item.avg_overall_rating}
-                        starSize={25}
-                      />
-                    </View>
-                    <View style={style.alignCenter}>
-                      <Text style={style.textCenterBlack}>Favourite This Location?</Text>
-                      <Text>{this.isFavourited(item.location_id, style)}</Text>
-                      <TouchableOpacity
-                        onPress={() => {
-                          this.generateMapDirections(
-                            item.latitude,
-                            item.longitude,
-                            style,
-                          );
-                        }}
-                      >
-                        <Text style={style.textCenterBlack}>
-                          {' '}
-                          {this.findDistance(
-                            item.latitude,
-                            item.longitude,
-                            style,
-                          )}
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={style.mainButton}
-                        onPress={() => {
-                          navigation.navigate('ReviewPage', {
-                            id: item.location_id,
-                            name: item.location_name,
-                            photo_path: item.photo_path,
-                          });
-                        }}
-                      >
-                        <Text style={style.textCenterWhite}>
-                          See More Information About
-                          {' '}
-                          {item.location_name}
-                        </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={style.mainButtonWhite}
-                        onPress={() => {
-                          navigation.navigate('CreateReviewPage', {
-                            id: item.location_id,
-                            name: item.location_name,
-                          });
-                        }}
-                      >
-                        <Text>
-                          Write a Review For
-                          {' '}
-                          {item.location_name}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
+                    </TouchableOpacity>
                   </View>
-                )}
-                keyExtractor={(item, index) => index.toString()}
-              />
-            </View>
+                </View>
+              )}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          </View>
         </View>
       </View>
     );

@@ -47,7 +47,20 @@ export default class CameraPage extends Component {
         },
       },
     )
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        }
+        if (response.staus === 401) {
+          Alert.alert('Unauthorised Error (401)', 'An error occured when trying to load your data, please ensure you are logged in / reload the app.');
+        }
+        if (response.status === 404) {
+          Alert.alert('User Details Not Found (404)', 'We could not find your details, please try again, and make sure you are logged in!');
+        }
+        if (response.status === 500) {
+          Alert.alert('Connection Error', 'There was a connection error, and we could not load this data, please make sure you are connected to the internet.');
+        }
+      })
       .then(async (responseJson) => {
         const newList = [];
         responseJson.reviews.forEach((item) => {
