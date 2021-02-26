@@ -50,9 +50,6 @@ export default class FavouriteLocations extends Component {
   }
 
   async removeFavourite(locationID) {
-    const { navigation } = this.props;
-
-    console.log('Post Request Made For Add Fave');
     return fetch(
       `http://10.0.2.2:3333/api/1.0.0/location/${locationID}/favourite`,
       {
@@ -161,7 +158,7 @@ export default class FavouriteLocations extends Component {
                   <View style={style.starContainer}>
                     <StarRating
                       disabled={false}
-                      fullStarColor="#eaca97"
+                      fullStarColor={style.starColour.color}
                       maxStars={5}
                       rating={item.avg_overall_rating}
                       starSize={20}

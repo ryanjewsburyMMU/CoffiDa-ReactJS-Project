@@ -8,6 +8,7 @@ import {
   Alert,
   PermissionsAndroid,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import StarRating from 'react-native-star-rating';
@@ -187,21 +188,16 @@ export default class NearMe extends Component {
     );
   };
 
-  // Consider Moving this somehow / fixing error
-  // eslint-disable-next-line class-methods-use-this
-  displayStarRating(size, styles, rating) {
-    return (
-      // eslint-disable-next-line react/jsx-filename-extension
-      <StarRating
-        disabled={false}
-        fullStarColor="#eaca97"
-        maxStars={5}
-        rating={rating}
-        starSize={size}
-        style={styles}
-      />
-    );
-  }
+  displayStarRating = (size, styles, rating, style) => (
+    <StarRating
+      disabled={false}
+      fullStarColor={style.starColour.color}
+      maxStars={5}
+      rating={rating}
+      starSize={size}
+      style={styles}
+    />
+  )
 
   async generateMapDirections(destLat, destLong) {
     if (this.state.longitude === '') {
@@ -225,20 +221,24 @@ export default class NearMe extends Component {
   }
 
   listHeader(style) {
+    const { orderedLocations } = this.state;
     return (
       <View style={style.gapTop}>
         <Text style={style.textCenterBlack}>
           Great! We found
-          {this.state.orderedLocations.length}
+          {' '}
+          {orderedLocations.length}
           {' '}
           locations
         </Text>
         <Text style={style.textCenterBlack}>
           {' '}
           Your Closest Location Is
-          {this.state.orderedLocations[0].name}
+          {' '}
+          {orderedLocations[0].name}
           , and it is only
-          {this.state.orderedLocations[0].distance}
+          {' '}
+          {orderedLocations[0].distance}
           {' '}
           Miles Away
           {'\n'}
@@ -265,6 +265,7 @@ export default class NearMe extends Component {
               If this page does not load, please ensure you have location
               services turned on in your phone settings.
             </Text>
+            <ActivityIndicator size="large" color="#eaca97" />
             {this.findLocation()}
           </View>
         </View>
@@ -304,6 +305,7 @@ export default class NearMe extends Component {
                         20,
                         style.starContainer,
                         item.overall_rating,
+                        style,
                       )}
                     </Text>
                     <TouchableOpacity style={style.mainButton} onPress={() => { this.generateMapDirections(item.lat, item.long); }}>

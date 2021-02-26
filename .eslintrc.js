@@ -3,7 +3,6 @@ module.exports = {
   extends: 'airbnb',
   parser: 'babel-eslint',
   rules: {
-    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     'linebreak-style': ['error', 'windows'],
   },
   plugins: ['react', 'react-native'],
@@ -19,5 +18,8 @@ module.exports = {
     'react-native/no-color-literals': 2,
     'react-native/no-raw-text': 2,
     'react-native/no-single-element-style-arrays': 2,
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "react/prefer-stateless-function": 0
+
   },
 };

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  ToastAndroid,
 } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import StarRating from 'react-native-star-rating';
@@ -143,11 +144,12 @@ export default class EditReview extends Component {
   }
 
   async displayPhoto() {
+    const { locationID, reviewID } = this.state;
     return fetch(
       `http://10.0.2.2:3333/api/1.0.0/location/${
-        this.state.locationID
+        locationID
       }/review/${
-        this.state.reviewID
+        reviewID
       }/photo`,
       {
         method: 'get',
@@ -162,8 +164,8 @@ export default class EditReview extends Component {
           return response;
         }
         if (response.status === 404) {
-          // Don't want to inform the user of this, as it means there is no photo for the review - logged to console instead.
-          console.log('No Image for this review');
+          // Don't want to inform the user of this, as it means there is no photo for the review.
+          ToastAndroid.show('No Images With This Review', ToastAndroid.SHORT);
         }
         if (response.status === 500) {
           // If there is a server error, I want the user to be informed, so I send an alert out.
@@ -307,86 +309,88 @@ export default class EditReview extends Component {
             >
               <Text style={style.textCenterWhite}>Go Back</Text>
             </TouchableOpacity>
-            <Text style={style.subTitle}>
-              How Would You Rate Your Overall Experience?
-            </Text>
-            <StarRating
-              disabled={false}
-              emptyStar="star-o"
-              fullStar="star"
-              halfStar="star-half"
-              iconSet="FontAwesome"
-              maxStars={5}
-              starSize={30}
-              rating={parseInt(newOverallRating, 10)}
-              selectedStar={(rating) => this.onStarPressOverallRating(rating)}
-              fullStarColor="#eaca97"
-            />
-            <Text style={style.subTitle}>How Would You Rate The Price?</Text>
-            <StarRating
-              disabled={false}
-              emptyStar="star-o"
-              fullStar="star"
-              halfStar="star-half"
-              iconSet="FontAwesome"
-              maxStars={5}
-              starSize={30}
-              rating={parseInt(newPriceRating, 10)}
-              selectedStar={(rating) => this.onStarPressPrice(rating)}
-              fullStarColor="#eaca97"
-            />
-            <Text style={style.subTitle}>How Would You Rate The Quality?</Text>
-            <StarRating
-              disabled={false}
-              emptyStar="star-o"
-              fullStar="star"
-              halfStar="star-half"
-              iconSet="FontAwesome"
-              maxStars={5}
-              starSize={30}
-              rating={parseInt(newQualityRating, 10)}
-              selectedStar={(rating) => this.onStarPressQuality(rating)}
-              fullStarColor="#eaca97"
-            />
-            <Text style={style.subTitle}>
-              How Would You Rate The Clenliness?
-            </Text>
-            <StarRating
-              disabled={false}
-              emptyStar="star-o"
-              fullStar="star"
-              halfStar="star-half"
-              iconSet="FontAwesome"
-              maxStars={5}
-              starSize={30}
-              rating={parseInt(newClenlinessRating, 10)}
-              selectedStar={(rating) => this.onStarPressClenliness(rating)}
-              fullStarColor="#eaca97"
-            />
-            <View style={style.gap}>
-              <Text style={style.textCenterBlack}>Update Your Comment: </Text>
-              <TextInput
-                style={style.inputBody}
-                placeholder={reviewBody}
-                multiline
-                onChangeText={(text) => {
-                  this.setState({ newReviewBody: text });
+            <View style={{ padding: 30 }}>
+              <Text style={style.subTitle}>
+                How Would You Rate Your Overall Experience?
+              </Text>
+              <StarRating
+                disabled={false}
+                emptyStar="star-o"
+                fullStar="star"
+                halfStar="star-half"
+                iconSet="FontAwesome"
+                maxStars={5}
+                starSize={30}
+                rating={parseInt(newOverallRating, 10)}
+                selectedStar={(rating) => this.onStarPressOverallRating(rating)}
+                fullStarColor={style.starColour.color}
+                />
+              <Text style={style.subTitle}>How Would You Rate The Price?</Text>
+              <StarRating
+                disabled={false}
+                emptyStar="star-o"
+                fullStar="star"
+                halfStar="star-half"
+                iconSet="FontAwesome"
+                maxStars={5}
+                starSize={30}
+                rating={parseInt(newPriceRating, 10)}
+                selectedStar={(rating) => this.onStarPressPrice(rating)}
+                fullStarColor={style.starColour.color}
+                />
+              <Text style={style.subTitle}>How Would You Rate The Quality?</Text>
+              <StarRating
+                disabled={false}
+                emptyStar="star-o"
+                fullStar="star"
+                halfStar="star-half"
+                iconSet="FontAwesome"
+                maxStars={5}
+                starSize={30}
+                rating={parseInt(newQualityRating, 10)}
+                selectedStar={(rating) => this.onStarPressQuality(rating)}
+                fullStarColor={style.starColour.color}
+                />
+              <Text style={style.subTitle}>
+                How Would You Rate The Clenliness?
+              </Text>
+              <StarRating
+                disabled={false}
+                emptyStar="star-o"
+                fullStar="star"
+                halfStar="star-half"
+                iconSet="FontAwesome"
+                maxStars={5}
+                starSize={30}
+                rating={parseInt(newClenlinessRating, 10)}
+                selectedStar={(rating) => this.onStarPressClenliness(rating)}
+                fullStarColor={style.starColour.color}
+                />
+              <View style={style.gapTop}>
+                <Text style={style.textCenterBlack}>Update Your Comment: </Text>
+                <TextInput
+                  style={style.inputBody}
+                  placeholder={reviewBody}
+                  multiline
+                  onChangeText={(text) => {
+                    this.setState({ newReviewBody: text });
+                  }}
+                  numberOfLines={4}
+                  value={newReviewBody}
+                />
+              </View>
+
+              {this.loadImage(style)}
+
+              <TouchableOpacity
+                style={style.mainButton}
+                onPress={() => {
+                  this.profanityFilter();
                 }}
-                numberOfLines={4}
-                value={newReviewBody}
-              />
+              >
+                <Text style={style.textCenterWhite}>Submit Review</Text>
+              </TouchableOpacity>
             </View>
-
-            {this.loadImage(style)}
-
-            <TouchableOpacity
-              style={style.mainButton}
-              onPress={() => {
-                this.profanityFilter();
-              }}
-            >
-              <Text style={style.textCenterWhite}>Submit Review</Text>
-            </TouchableOpacity>
           </ScrollView>
         </View>
       </View>
@@ -399,5 +403,8 @@ EditReview.propTypes = {
     navigate: PropTypes.func.isRequired,
     addListener: PropTypes.func.isRequired,
     goBack: PropTypes.func.isRequired,
+  }).isRequired,
+  route: PropTypes.shape({
+    params: PropTypes.object.isRequired,
   }).isRequired,
 };

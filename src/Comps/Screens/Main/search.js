@@ -7,6 +7,7 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import Slider from '@react-native-community/slider';
@@ -15,6 +16,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Picker } from '@react-native-picker/picker';
 import StarRating from 'react-native-star-rating';
 import PropTypes from 'prop-types';
+import { ScrollView } from 'react-native-gesture-handler';
 import stylesLight from '../../../Styles/stylesheet';
 import stylesDark from '../../../Styles/stylesheetDark';
 
@@ -104,10 +106,221 @@ export default class Search extends Component {
     }
   };
 
+  // Consider Moving this somehow / fixing error
+  displayStarRating = (size, styles, rating, style) => (
+    <StarRating
+      disabled={false}
+      fullStarColor={style.starColour.color}
+      maxStars={5}
+      rating={rating}
+      starSize={size}
+      style={styles}
+    />
+  )
+
+  async chooseStyle() {
+    // Choose a stylesheet
+    if (await AsyncStorage.getItem('darkMode') === 'true') {
+      this.setState({ darkMode: true });
+    } else {
+      this.setState({ darkMode: false });
+    }
+  }
+
+  advancedSearch(style) {
+    const {
+      advancedFilter, valueOverall, overallRatingActive, valuePrice, priceRatingOverall,
+      valueClenliness, clenlinessRatingActive, valueQuality, qualityRatingActive, searchIn,
+
+    } = this.state;
+    if (advancedFilter === true) {
+      return (
+        // eslint-disable-next-line react/jsx-filename-extension
+        <View>
+          <ScrollView>
+            <View style={style.flexRow}>
+              <View style={style.flexOne}>
+                <View style={style.filterRow}>
+                  <View>
+                    <Text style={style.textCenterBlack}>
+                      Minimum Overall Rating?
+                    </Text>
+                    <Text style={style.textCenterBlack}>
+                      {valueOverall}
+                    </Text>
+                  </View>
+                  <View>
+                    <CheckBox
+                      value={overallRatingActive}
+                      onValueChange={() => {
+                        this.setState({
+                          overallRatingActive: !overallRatingActive,
+                        });
+                      }}
+                      tintColors={{ true: '#eaca97' }}
+                    />
+                  </View>
+                  <View>
+                    <View>
+                      <Slider
+                        style={style.sliderStyle}
+                        step={1}
+                        minimumValue={0}
+                        maximumValue={5}
+                        minimumTrackTintColor="#eaca97"
+                        thumbTintColor="#eaca97"
+                        maximumTrackTintColor="#eaca97"
+                        value={valueOverall}
+                        onValueChange={(value) => this.setState({ valueOverall: value })}
+                        disabled={!overallRatingActive}
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+
+              <View style={style.flexOne}>
+                <View style={style.filterRow}>
+                  <View>
+                    <Text style={style.textCenterBlack}>
+                      Minimum Price Rating?
+                    </Text>
+                    <Text style={style.textCenterBlack}>
+                      {valuePrice}
+                    </Text>
+                  </View>
+                  <View>
+                    <CheckBox
+                      value={priceRatingOverall}
+                      onValueChange={() => {
+                        this.setState({
+                          priceRatingOverall: !priceRatingOverall,
+                        });
+                      }}
+                      tintColors={{ true: '#eaca97' }}
+                    />
+                  </View>
+                  <View>
+                    <View>
+                      <Slider
+                        style={style.sliderStyle}
+                        step={1}
+                        minimumValue={0}
+                        maximumValue={5}
+                        minimumTrackTintColor="#eaca97"
+                        thumbTintColor="#eaca97"
+                        maximumTrackTintColor="#eaca97"
+                        value={valuePrice}
+                        onValueChange={(value) => this.setState({ valuePrice: value })}
+                        disabled={!priceRatingOverall}
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View style={style.flexRow}>
+              <View style={style.flexOne}>
+                <View style={style.filterRow}>
+                  <View>
+                    <Text style={style.textCenterBlack}>
+                      Min Cleanliness Rating?
+                    </Text>
+                    <Text style={style.textCenterBlack}>
+                      {valueClenliness}
+                    </Text>
+                  </View>
+                  <View>
+                    <CheckBox
+                      value={clenlinessRatingActive}
+                      onValueChange={() => {
+                        this.setState({
+                          clenlinessRatingActive: !clenlinessRatingActive,
+                        });
+                      }}
+                      tintColors={{ true: '#eaca97' }}
+                    />
+                  </View>
+                  <View>
+                    <View>
+                      <Slider
+                        style={style.sliderStyle}
+                        step={1}
+                        minimumValue={0}
+                        maximumValue={5}
+                        minimumTrackTintColor="#eaca97"
+                        thumbTintColor="#eaca97"
+                        maximumTrackTintColor="#eaca97"
+                        value={valueClenliness}
+                        onValueChange={(value) => this.setState({ valueClenliness: value })}
+                        disabled={!clenlinessRatingActive}
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+              {/* SECOND ROW */}
+              <View style={style.flexOne}>
+                <View style={style.filterRow}>
+                  <View>
+                    <Text style={style.textCenterBlack}>
+                      Minimum Quality Rating?
+                    </Text>
+                    <Text style={style.textCenterBlack}>
+                      {valueQuality}
+                    </Text>
+                  </View>
+                  <View>
+                    <CheckBox
+                      value={qualityRatingActive}
+                      onValueChange={() => {
+                        this.setState({ qualityRatingActive: !qualityRatingActive });
+                      }}
+                      tintColors={{ true: '#eaca97' }}
+                    />
+                  </View>
+                  <View>
+                    <View>
+                      <Slider
+                        style={style.sliderStyle}
+                        step={1}
+                        minimumValue={0}
+                        maximumValue={5}
+                        minimumTrackTintColor="#eaca97"
+                        thumbTintColor="#eaca97"
+                        maximumTrackTintColor="#eaca97"
+                        value={valueQuality}
+                        onValueChange={(value) => this.setState({ valueQuality: value })}
+                        disabled={!qualityRatingActive}
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View>
+              <Text style={style.textCenterBlack}>Where Would You Like To Search?</Text>
+              <Picker
+                selectedValue={searchIn}
+                style={style.pickerStyle}
+                onValueChange={(itemValue) => this.setState({ searchIn: itemValue })}
+              >
+                <Picker.Item label="Everywhere" value="everywhere" />
+                <Picker.Item label="My Favourite Locations" value="favourite" />
+                <Picker.Item label="My Reviews" value="reviewed" />
+              </Picker>
+            </View>
+          </ScrollView>
+        </View>
+      );
+    }
+    return <View />;
+  }
+
   presentResults(style) {
     const { searchResponse, offset } = this.state;
 
-    if (searchResponse === '') {
+    if (searchResponse == '') {
       return (
         <View />
       );
@@ -157,6 +370,7 @@ export default class Search extends Component {
                           20,
                           style.starContainer,
                           item.avg_overall_rating,
+                          style,
                         )}
                       </Text>
                     </View>
@@ -167,6 +381,7 @@ export default class Search extends Component {
                           20,
                           style.starContainer,
                           item.avg_clenliness_rating,
+                          style,
                         )}
                       </Text>
                     </View>
@@ -179,6 +394,7 @@ export default class Search extends Component {
                           20,
                           style.starContainer,
                           item.avg_price_rating,
+                          style,
                         )}
                       </Text>
                     </View>
@@ -189,6 +405,7 @@ export default class Search extends Component {
                           20,
                           style.starContainer,
                           item.avg_quality_rating,
+                          style,
                         )}
                       </Text>
                     </View>
@@ -200,217 +417,6 @@ export default class Search extends Component {
           keyExtractor={(item, index) => index.toString()}
         />
       </View>
-    );
-  }
-
-  advancedSearch(style) {
-    const {
-      advancedFilter, valueOverall, overallRatingActive, valuePrice, priceRatingOverall,
-      valueClenliness, clenlinessRatingActive, valueQuality, qualityRatingActive, searchIn,
-
-    } = this.state;
-    if (advancedFilter === true) {
-      return (
-        // eslint-disable-next-line react/jsx-filename-extension
-        <View>
-          <View style={style.flexRow}>
-            <View style={style.flexOne}>
-              <View style={style.filterRow}>
-                <View>
-                  <Text style={style.textCenterBlack}>
-                    Minimum Overall Rating?
-                  </Text>
-                  <Text style={style.textCenterBlack}>
-                    {valueOverall}
-                  </Text>
-                </View>
-                <View>
-                  <CheckBox
-                    value={overallRatingActive}
-                    onValueChange={() => {
-                      this.setState({
-                        overallRatingActive: !overallRatingActive,
-                      });
-                    }}
-                    tintColors={{ true: '#eaca97' }}
-                  />
-                </View>
-                <View>
-                  <View>
-                    <Slider
-                      style={style.sliderStyle}
-                      step={1}
-                      minimumValue={0}
-                      maximumValue={5}
-                      minimumTrackTintColor="#eaca97"
-                      thumbTintColor="#eaca97"
-                      maximumTrackTintColor="#eaca97"
-                      value={valueOverall}
-                      onValueChange={(value) => this.setState({ valueOverall: value })}
-                      disabled={!overallRatingActive}
-                    />
-                  </View>
-                </View>
-              </View>
-            </View>
-
-            <View style={style.flexOne}>
-              <View style={style.filterRow}>
-                <View>
-                  <Text style={style.textCenterBlack}>
-                    Minimum Price Rating?
-                  </Text>
-                  <Text style={style.textCenterBlack}>
-                    {valuePrice}
-                  </Text>
-                </View>
-                <View>
-                  <CheckBox
-                    value={priceRatingOverall}
-                    onValueChange={() => {
-                      this.setState({
-                        priceRatingOverall: !priceRatingOverall,
-                      });
-                    }}
-                    tintColors={{ true: '#eaca97' }}
-                  />
-                </View>
-                <View>
-                  <View>
-                    <Slider
-                      style={style.sliderStyle}
-                      step={1}
-                      minimumValue={0}
-                      maximumValue={5}
-                      minimumTrackTintColor="#eaca97"
-                      thumbTintColor="#eaca97"
-                      maximumTrackTintColor="#eaca97"
-                      value={valuePrice}
-                      onValueChange={(value) => this.setState({ valuePrice: value })}
-                      disabled={!priceRatingOverall}
-                    />
-                  </View>
-                </View>
-              </View>
-            </View>
-          </View>
-          <View style={style.flexRow}>
-            <View style={style.flexOne}>
-              <View style={style.filterRow}>
-                <View>
-                  <Text style={style.textCenterBlack}>
-                    Min Cleanliness Rating?
-                  </Text>
-                  <Text style={style.textCenterBlack}>
-                    {valueClenliness}
-                  </Text>
-                </View>
-                <View>
-                  <CheckBox
-                    value={clenlinessRatingActive}
-                    onValueChange={() => {
-                      this.setState({
-                        clenlinessRatingActive: !clenlinessRatingActive,
-                      });
-                    }}
-                    tintColors={{ true: '#eaca97' }}
-                  />
-                </View>
-                <View>
-                  <View>
-                    <Slider
-                      style={style.sliderStyle}
-                      step={1}
-                      minimumValue={0}
-                      maximumValue={5}
-                      minimumTrackTintColor="#eaca97"
-                      thumbTintColor="#eaca97"
-                      maximumTrackTintColor="#eaca97"
-                      value={valueClenliness}
-                      onValueChange={(value) => this.setState({ valueClenliness: value })}
-                      disabled={!clenlinessRatingActive}
-                    />
-                  </View>
-                </View>
-              </View>
-            </View>
-            {/* SECOND ROW */}
-            <View style={style.flexOne}>
-              <View style={style.filterRow}>
-                <View>
-                  <Text style={style.textCenterBlack}>
-                    Minimum Quality Rating?
-                  </Text>
-                  <Text style={style.textCenterBlack}>
-                    {valueQuality}
-                  </Text>
-                </View>
-                <View>
-                  <CheckBox
-                    value={qualityRatingActive}
-                    onValueChange={() => {
-                      this.setState({ qualityRatingActive: !qualityRatingActive });
-                    }}
-                    tintColors={{ true: '#eaca97' }}
-                  />
-                </View>
-                <View>
-                  <View>
-                    <Slider
-                      style={style.sliderStyle}
-                      step={1}
-                      minimumValue={0}
-                      maximumValue={5}
-                      minimumTrackTintColor="#eaca97"
-                      thumbTintColor="#eaca97"
-                      maximumTrackTintColor="#eaca97"
-                      value={valueQuality}
-                      onValueChange={(value) => this.setState({ valueQuality: value })}
-                      disabled={!qualityRatingActive}
-                    />
-                  </View>
-                </View>
-              </View>
-            </View>
-          </View>
-          <View>
-            <Text style={style.textCenterBlack}>Where Would You Like To Search?</Text>
-            <Picker
-              selectedValue={searchIn}
-              style={style.pickerStyle}
-              onValueChange={(itemValue) => this.setState({ searchIn: itemValue })}
-            >
-              <Picker.Item label="Everywhere" value="everywhere" />
-              <Picker.Item label="My Favourite Locations" value="favourite" />
-              <Picker.Item label="My Reviews" value="reviewed" />
-            </Picker>
-          </View>
-        </View>
-      );
-    }
-    return <View />;
-  }
-
-  async chooseStyle() {
-    // Choose a stylesheet
-    if (await AsyncStorage.getItem('darkMode') === 'true') {
-      this.setState({ darkMode: true });
-    } else {
-      this.setState({ darkMode: false });
-    }
-  }
-
-  // Consider Moving this somehow / fixing error
-  displayStarRating(size, styles, rating) {
-    return (
-      <StarRating
-        disabled={false}
-        fullStarColor="#eaca97"
-        maxStars={5}
-        rating={rating}
-        starSize={size}
-        style={styles}
-      />
     );
   }
 
@@ -452,9 +458,9 @@ export default class Search extends Component {
       }
       // Search In
       if (searchIn === 'favourite') {
-        finalCurl = `${finalCurl}&searchIn=${searchIn}`;
+        finalCurl = `${finalCurl}&search_in=${searchIn}`;
       } else if (searchIn === 'reviewed') {
-        finalCurl = `${finalCurl}&searchIn=${searchIn}`;
+        finalCurl = `${finalCurl}&search_in=${searchIn}`;
       }
       finalCurl = `${finalCurl}&limit=${limit}&offset=${offset}`;
 
@@ -534,7 +540,19 @@ export default class Search extends Component {
 
     if (darkMode === null) {
       return (
-        <View><Text>Loading</Text></View>
+        <View style={style.mainContainer}>
+          <View style={style.mainHeader}>
+            <View style={style.flexRow}>
+              <Text style={style.mainTitle}>Search</Text>
+            </View>
+          </View>
+          <View style={style.mainFooter}>
+            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+              <Text style={style.textCenterBlack}>Search Is Loading...</Text>
+              <ActivityIndicator size="large" color="#eaca97" />
+            </View>
+          </View>
+        </View>
       );
     } return (
       <View style={style.mainContainer}>

@@ -16,8 +16,8 @@ export default class CameraPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      current_id: 0,
-      review_id: 0,
+      currentID: 0,
+      reviewID: 0,
       darkMode: null,
     };
   }
@@ -28,7 +28,7 @@ export default class CameraPage extends Component {
     const { id } = route.params;
     this.setState(
       {
-        current_id: id,
+        currentID: id,
       },
       () => {
         this.getInfo();
@@ -54,7 +54,7 @@ export default class CameraPage extends Component {
           newList.push(item.review.review_id);
         });
         const highestValue = Math.max.apply(Math, newList);
-        this.setState({ review_id: highestValue });
+        this.setState({ reviewID: highestValue });
       })
       .catch((error) => {
         console.log(error);
@@ -83,8 +83,9 @@ export default class CameraPage extends Component {
 
   async postPhoto(data) {
     const { navigation } = this.props;
+    const { currentID, reviewID } = this.state;
     return fetch(
-      `http://10.0.2.2:3333/api/1.0.0/location/${this.state.current_id}/review/${this.state.review_id}/photo`,
+      `http://10.0.2.2:3333/api/1.0.0/location/${currentID}/review/${reviewID}/photo`,
       {
         method: 'post',
         headers: {

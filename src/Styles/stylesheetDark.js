@@ -71,6 +71,9 @@ export default StyleSheet.create({
   flexOne: {
     flex: 1,
   },
+  flexTwo: {
+    flex: 2,
+  },
   flexEnd: {
     flex: 1,
     alignItems: 'flex-end',
@@ -305,7 +308,7 @@ export default StyleSheet.create({
     marginTop: 10,
   },
   inputBody: {
-    backgroundColor: '#bdc3c7',
+    backgroundColor: '#424242',
     marginTop: 10,
     marginBottom: 10,
     borderColor: '#fff',
@@ -355,6 +358,14 @@ imageSize:{
     height: 180,
     marginTop: 20
 },
+
+// View Image Page
+
+    viewImageSize:{
+      width: '100%',
+      height: '90%',
+      marginTop: 20 
+  },
 
   // Tab Bar
   tabBar:{

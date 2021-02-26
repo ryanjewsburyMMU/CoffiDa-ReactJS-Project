@@ -149,10 +149,10 @@ export default class MyReviews extends Component {
   }
 
   async chooseStyle() {
-    if (await AsyncStorage.getItem('darkMode') === 'true'){
-      this.setState({darkMode: true})
-    }else{
-      this.setState({darkMode: false})
+    if (await AsyncStorage.getItem('darkMode') === 'true') {
+      this.setState({ darkMode: true });
+    } else {
+      this.setState({ darkMode: false });
     }
   }
 
@@ -188,21 +188,9 @@ export default class MyReviews extends Component {
                   <Text style={style.containerTitle}>
                     {item.location.location_name}
                   </Text>
-                  <View style={style.starContainer}>
-                    <StarRating
-                      disabled={false}
-                      fullStarColor="#eaca97"
-                      maxStars={5}
-                      rating={item.location.avg_overall_rating}
-                      starSize={20}
-                    />
-                  </View>
-                  <Text style={style.regularTextBlack}>
-                    Review ID:
-                    {item.review.review_id}
-                  </Text>
                   <Text style={style.regularTextBlack}>
                     Comment:
+                    {' '}
                     {item.review.review_body}
                   </Text>
                   <TouchableOpacity
@@ -253,4 +241,3 @@ MyReviews.propTypes = {
     goBack: PropTypes.func.isRequired,
   }).isRequired,
 };
-

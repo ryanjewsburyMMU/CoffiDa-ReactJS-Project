@@ -134,7 +134,7 @@ export default class EditProfile extends Component {
     const style = darkMode ? stylesDark : stylesLight;
     const { navigation } = this.props;
 
-    return (// eslint-disable-next-line react/jsx-filename-extension
+    return (
       <View style={style.mainContainer}>
         <View style={style.mainHeader}>
           <Text style={style.mainTitle}>Edit Details</Text>
@@ -153,6 +153,7 @@ export default class EditProfile extends Component {
             <TextInput
               style={style.inputBody}
               placeholder={origFirstName}
+              placeholderTextColor={style.textCenterBlack.color}
               onChangeText={(updatedFirstNameText) => this.setState({ updatedFirstName: updatedFirstNameText })}
               value={updatedFirstName}
             />

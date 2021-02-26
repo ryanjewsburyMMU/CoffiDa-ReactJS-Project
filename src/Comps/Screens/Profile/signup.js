@@ -9,6 +9,7 @@ import {
   TextInput,
 } from 'react-native';
 import PropTypes from 'prop-types';
+import { ScrollView } from 'react-native-gesture-handler';
 import style from '../../../Styles/stylesheet';
 
 export default class SignUp extends Component {
@@ -64,7 +65,7 @@ export default class SignUp extends Component {
           }
         })
         .catch((errors) => {
-          console.log('Error');
+          console.log(errors);
         });
     }
     Alert.alert(
@@ -77,60 +78,63 @@ export default class SignUp extends Component {
     const { navigation } = this.props;
 
     return (
-      // eslint-disable-next-line react/jsx-filename-extension
       <View style={style.mainContainer}>
         <View style={style.mainHeader}>
           <Text style={style.mainTitle}>Sign Up</Text>
         </View>
         <View style={style.mainFooter}>
-          <Text style={style.signupTitle}>Create An Account:</Text>
-          <TextInput
-            style={style.signupInput}
-            placeholder="First Name"
-            onChangeText={(text) => {
-              this.setState({ firstName: text });
-            }}
-          />
-          <TextInput
-            style={style.signupInput}
-            placeholder="Last Name"
-            onChangeText={(text) => {
-              this.setState({ lastName: text });
-            }}
-          />
-          <TextInput
-            style={style.signupInput}
-            placeholder="Email"
-            onChangeText={(text) => {
-              this.setState({ email: text });
-            }}
-          />
-          <TextInput
-            style={style.signupInput}
-            placeholder="Password"
-            onChangeText={(text) => {
-              this.setState({ password: text });
-            }}
-          />
-          <TextInput
-            style={style.signupInput}
-            placeholder="Confirm Password"
-            onChangeText={(text) => {
-              this.setState({ passwordConfirm: text });
-            }}
-          />
-          <TouchableOpacity
-            onPress={() => this.signUp()}
-            style={style.mainButton}
-          >
-            <Text style={style.textCenterWhite}>Sign Up:</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={style.mainButtonWhite}
-          >
-            <Text>Go Back:</Text>
-          </TouchableOpacity>
+          <ScrollView>
+            <Text style={style.signupTitle}>Create An Account:</Text>
+            <TextInput
+              style={style.signupInput}
+              placeholder="First Name"
+              onChangeText={(text) => {
+                this.setState({ firstName: text });
+              }}
+            />
+            <TextInput
+              style={style.signupInput}
+              placeholder="Last Name"
+              onChangeText={(text) => {
+                this.setState({ lastName: text });
+              }}
+            />
+            <TextInput
+              style={style.signupInput}
+              placeholder="Email"
+              onChangeText={(text) => {
+                this.setState({ email: text });
+              }}
+            />
+            <TextInput
+             secureTextEntry={true}
+              style={style.signupInput}
+              placeholder="Password"
+              onChangeText={(text) => {
+                this.setState({ password: text });
+              }}
+            />
+            <TextInput
+              secureTextEntry={true}
+              style={style.signupInput}
+              placeholder="Confirm Password"
+              onChangeText={(text) => {
+                this.setState({ passwordConfirm: text });
+              }}
+            />
+            <TouchableOpacity
+              onPress={() => this.signUp()}
+              style={style.mainButton}
+            >
+              <Text style={style.textCenterWhite}>Sign Up:</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={style.mainButtonWhite}
+            >
+              <Text>Go Back:</Text>
+            </TouchableOpacity>
+          </ScrollView>
         </View>
       </View>
     );

@@ -93,7 +93,6 @@ export default class Profile extends Component {
 
   async logout() {
     const { navigation } = this.props;
-    console.log('Post Request Made For Logout');
     return fetch('http://10.0.2.2:3333/api/1.0.0/user/logout', {
       method: 'post',
       headers: {
@@ -180,7 +179,7 @@ export default class Profile extends Component {
               this.logout();
             }}
           >
-            <Text>Sign Out</Text>
+            <Text style={style.textWhite}>Sign Out</Text>
           </TouchableOpacity>
         </View>
       </View>

@@ -69,9 +69,10 @@ export default class CreateReviewPage extends Component {
   }
 
   profanityFilter() {
+    const { reviewBody } = this.state;
     let verify = true;
     profFilter.profanityKeywords.forEach((item) => {
-      if (this.state.reviewBody.includes(item)) {
+      if (reviewBody.includes(item)) {
         verify = false;
       }
     });
@@ -87,11 +88,11 @@ export default class CreateReviewPage extends Component {
 
   async postReview() {
     const {
-      overallRating, priceRating, qualityRating, clenlinessRating, reviewBody, currentID
+      overallRating, priceRating, qualityRating, clenlinessRating, reviewBody, currentID,
     } = this.state;
     const { navigation } = this.props;
     return fetch(
-      `http://10.0.2.2:3333/api/1.0.0/location/${this.state.currentID}/review`,
+      `http://10.0.2.2:3333/api/1.0.0/location/${currentID}/review`,
       {
         method: 'post',
         headers: {
@@ -124,7 +125,7 @@ export default class CreateReviewPage extends Component {
               {
                 text: 'No',
                 onPress: () => {
-                  ToastAndroid.show('Review Submitted', ToastAndroid.SHORT),
+                  ToastAndroid.show('Review Submitted', ToastAndroid.SHORT);
                   navigation.goBack();
                 },
               },
@@ -176,7 +177,6 @@ export default class CreateReviewPage extends Component {
     } = this.state;
     const style = darkMode ? stylesDark : stylesLight;
 
-
     return (// eslint-disable-next-line react/jsx-filename-extension
       <View style={style.mainContainer}>
         <View style={style.mainHeader}>
@@ -193,81 +193,100 @@ export default class CreateReviewPage extends Component {
             </TouchableOpacity>
           </View>
           <ScrollView>
-            <Text style={style.subTitle}>
-              How Would You Rate Your Overall Experience?
-            </Text>
-            <StarRating
-              disabled={false}
-              emptyStar="star-o"
-              fullStar="star"
-              halfStar="star-half"
-              iconSet="FontAwesome"
-              maxStars={5}
-              starSize={30}
-              rating={overallRating}
-              selectedStar={(rating) => this.onStarPressOverallRating(rating)}
-              fullStarColor="#eaca97"
-            />
-            <Text style={style.subTitle}>How Would You Rate The Price?</Text>
-            <StarRating
-              disabled={false}
-              emptyStar="star-o"
-              fullStar="star"
-              halfStar="star-half"
-              iconSet="FontAwesome"
-              maxStars={5}
-              starSize={30}
-              rating={priceRating}
-              selectedStar={(rating) => this.onStarPressPrice(rating)}
-              fullStarColor="#eaca97"
-            />
-            <Text style={style.subTitle}>How Would You Rate The Quality?</Text>
-            <StarRating
-              disabled={false}
-              emptyStar="star-o"
-              fullStar="star"
-              halfStar="star-half"
-              iconSet="FontAwesome"
-              maxStars={5}
-              starSize={30}
-              rating={qualityRating}
-              selectedStar={(rating) => this.onStarPressQuality(rating)}
-              fullStarColor="#eaca97"
-            />
-            <Text style={style.subTitle}>
-              How Would You Rate The Clenliness?
-            </Text>
-            <StarRating
-              disabled={false}
-              emptyStar="star-o"
-              fullStar="star"
-              halfStar="star-half"
-              iconSet="FontAwesome"
-              maxStars={5}
-              starSize={30}
-              rating={clenlinessRating}
-              selectedStar={(rating) => this.onStarPressClenliness(rating)}
-              fullStarColor="#eaca97"
-            />
-            <Text style={style.textCenterBlack}>Please Leave a Comment: </Text>
-            <TextInput
-              style={style.inputBody}
-              placeholder="Provide More Details About Your Visit"
-              multiline
-              onChangeText={(text) => {
-                this.setState({ reviewBody: text });
-              }}
-              numberOfLines={4}
-            />
+            <View style={{padding: 30}}>
+              <Text style={style.subTitle}>
+                How Would You Rate Your Overall Experience?
+                {' '}
+                {'\n'}
+              </Text>
+              <StarRating
+                disabled={false}
+                emptyStar="star-o"
+                fullStar="star"
+                halfStar="star-half"
+                iconSet="FontAwesome"
+                maxStars={5}
+                starSize={30}
+                rating={overallRating}
+                selectedStar={(rating) => this.onStarPressOverallRating(rating)}
+                fullStarColor="#eaca97"
+              />
+              <Text style={style.subTitle}>
+                {'\n'}
+                How Would You Rate The Price?
+                {' '}
+                {'\n'}
+              </Text>
+              <StarRating
+                disabled={false}
+                emptyStar="star-o"
+                fullStar="star"
+                halfStar="star-half"
+                iconSet="FontAwesome"
+                maxStars={5}
+                starSize={30}
+                rating={priceRating}
+                selectedStar={(rating) => this.onStarPressPrice(rating)}
+                fullStarColor="#eaca97"
+              />
+              <Text style={style.subTitle}>
+                {'\n'}
+                How Would You Rate The Quality?
+                {' '}
+                {'\n'}
+              </Text>
+              <StarRating
+                disabled={false}
+                emptyStar="star-o"
+                fullStar="star"
+                halfStar="star-half"
+                iconSet="FontAwesome"
+                maxStars={5}
+                starSize={30}
+                rating={qualityRating}
+                selectedStar={(rating) => this.onStarPressQuality(rating)}
+                fullStarColor="#eaca97"
+              />
+              <Text style={style.subTitle}>
+                {'\n'}
+                How Would You Rate The Cleanliness?
+                {'\n'}
+              </Text>
+              <StarRating
+                disabled={false}
+                emptyStar="star-o"
+                fullStar="star"
+                halfStar="star-half"
+                iconSet="FontAwesome"
+                maxStars={5}
+                starSize={30}
+                rating={clenlinessRating}
+                selectedStar={(rating) => this.onStarPressClenliness(rating)}
+                fullStarColor="#eaca97"
+              />
+              <View style={style.gapTop}>
+                <Text style={style.textCenterBlack}>Please Leave a Comment: </Text>
+                <TextInput
+                  style={style.inputBody}
+                  placeholder="Provide More Details About Your Visit"
+                  multiline
+                  placeholderTextColor={style.textCenterBlack.color}
+                  onChangeText={(text) => {
+                    this.setState({ reviewBody: text });
+                  }}
+                  numberOfLines={4}
+                />
 
-            <TouchableOpacity
-              style={style.mainButton}
-              onPress={() => {
-                this.profanityFilter();
-              }}
-            >
-              <Text style={style.textCenterWhite}>Submit Review</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={style.mainButton}
+                  onPress={() => {
+                    this.profanityFilter();
+                  }}
+                >
+                  <Text style={style.textCenterWhite}>Submit Review</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </ScrollView>
         </View>
       </View>

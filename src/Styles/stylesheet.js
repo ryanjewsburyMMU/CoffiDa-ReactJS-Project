@@ -74,6 +74,9 @@ export default StyleSheet.create({
     flexOne: {
         flex: 1
     },
+    flexTwo: {
+        flex: 2,
+      },
     flexEnd: {
         flex: 1,
         alignItems: 'flex-end'
@@ -354,10 +357,18 @@ export default StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center' 
     },
+    // Edit Review
     imageSize:{
         width: 200,
         height: 180,
         marginTop: 20
+    },
+
+    // View Image page
+    viewImageSize:{
+        width: '100%',
+        height: '90%',
+        marginTop: 20 
     },
 
     // Tab Bar
@@ -374,7 +385,7 @@ export default StyleSheet.create({
     pickerStyle:{
         height: 50,
         width: '100%',
-        color: '#fff'
+        color: '#000'
     },
 
     textWhite:{

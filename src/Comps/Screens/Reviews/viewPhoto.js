@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import PropTypes from 'prop-types';
 import stylesLight from '../../../Styles/stylesheet';
 import stylesDark from '../../../Styles/stylesheetDark';
 
@@ -11,8 +12,8 @@ export default class ViewPhoto extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      review_id: 0,
-      location_id: 0,
+      reviewID: 0,
+      locationID: 0,
       photo: [],
       darkMode: null,
     };
@@ -24,8 +25,8 @@ export default class ViewPhoto extends Component {
     const { id, review_id } = route.params;
     this.setState(
       {
-        location_id: id,
-        review_id,
+        locationID: id,
+        reviewID: review_id,
       },
       () => {
         this.search_results();
@@ -34,10 +35,11 @@ export default class ViewPhoto extends Component {
   }
 
   async search_results() {
+    const { locationID, reviewID } = this.state;
     const { navigation } = this.props;
     console.log('Searching the database for your search queires');
     return fetch(
-      `http://10.0.2.2:3333/api/1.0.0/location/${this.state.location_id}/review/${this.state.review_id}/photo`,
+      `http://10.0.2.2:3333/api/1.0.0/location/${locationID}/review/${reviewID}/photo`,
       {
         method: 'get',
         headers: {
@@ -59,7 +61,7 @@ export default class ViewPhoto extends Component {
         }
       })
       .then((responseJson) => {
-        if (responseJson == undefined) {
+        if (responseJson === undefined) {
           Alert.alert('No Images', 'There are no images for this review.', [
             { text: 'Okay', onPress: navigation.goBack() },
           ]);
@@ -73,19 +75,19 @@ export default class ViewPhoto extends Component {
   }
 
   async chooseStyle() {
-    if (await AsyncStorage.getItem('darkMode') === 'true'){
-      this.setState({darkMode: true})
-    }else{
-      this.setState({darkMode: false})
+    if (await AsyncStorage.getItem('darkMode') === 'true') {
+      this.setState({ darkMode: true });
+    } else {
+      this.setState({ darkMode: false });
     }
   }
 
   render() {
-    const style = this.state.darkMode ? stylesDark : stylesLight;
+    const { darkMode, photo } = this.state;
+    const style = darkMode ? stylesDark : stylesLight;
     const { navigation } = this.props;
-    console.log(this.state.photo);
 
-    if (this.state.photo === '') {
+    if (photo === '') {
       return (
         <View>
           <ActivityIndicator />
@@ -107,9 +109,9 @@ export default class ViewPhoto extends Component {
             <Text style={style.textCenterWhite}>Go Back</Text>
           </TouchableOpacity>
           <Image
-            style={{ width: '100%', height: '90%', marginTop: 20 }}
+            style={style.viewImageSize}
             source={{
-              uri: this.state.photo.url,
+              uri: photo.url,
             }}
           />
         </View>
@@ -117,3 +119,10 @@ export default class ViewPhoto extends Component {
     );
   }
 }
+ViewPhoto.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    addListener: PropTypes.func.isRequired,
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
+};

@@ -49,8 +49,6 @@ export default class Login extends Component {
   async postLogin() {
     const { email, password } = this.state;
     const { navigation } = this.props;
-
-    console.log('Post Request Made For Login');
     return fetch('http://10.0.2.2:3333/api/1.0.0/user/login', {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
@@ -123,6 +121,7 @@ export default class Login extends Component {
             }}
           />
           <TextInput
+            secureTextEntry={true}
             style={style.loginInput}
             placeholder="Password"
             onChangeText={(text) => {

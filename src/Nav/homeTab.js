@@ -1,23 +1,16 @@
 import 'react-native-gesture-handler';
-import { NavigationContainer } from '@react-navigation/native';
 import React, { Component } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import PropTypes from 'prop-types';
 import FeedStack from './feedStack';
 import Search from '../Comps/Screens/Main/search';
 import NearMe from '../Comps/Screens/Main/nearMe';
 
-import stylesLight from '.././Styles/stylesheet';
-import stylesDark from '.././Styles/stylesheet';
-// import PropTypes from 'prop-types'
-
-
 const Tab = createBottomTabNavigator();
 
-export default class Home_Tab extends Component {
+export default class HomeTab extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -26,7 +19,8 @@ export default class Home_Tab extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = this.props.navigation.addListener('focus', () => {
+    const { navigation } = this.props;
+    this.unsubscribe = navigation.addListener('focus', () => {
       this.chooseStyle();
     });
   }
@@ -42,11 +36,10 @@ export default class Home_Tab extends Component {
     } else {
       this.setState({ darkMode: false });
     }
-    console.log("dark mode = " + this.state.darkMode)
   }
 
   render() {
-    const style = this.state.darkMode ? stylesDark : stylesLight;
+    const { darkMode } = this.state;
 
     return (
       // eslint-disable-next-line react/jsx-filename-extension
@@ -55,11 +48,11 @@ export default class Home_Tab extends Component {
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
 
-            if (route.name == 'Feed') {
+            if (route.name === 'Feed') {
               iconName = focused ? 'home' : 'home-outline';
-            } else if (route.name == 'Search') {
+            } else if (route.name === 'Search') {
               iconName = focused ? 'search' : 'search-outline';
-            } else if (route.name == 'Near Me') {
+            } else if (route.name === 'Near Me') {
               iconName = focused ? 'radio' : 'radio-outline';
             }
             return <Ionicons name={iconName} size={size} color={color} />;
@@ -69,7 +62,7 @@ export default class Home_Tab extends Component {
           activeTintColor: '#eaca97',
           inactiveTintColor: 'gray',
           style: {
-            backgroundColor: this.state.darkMode ? '#424242' : '#fff'
+            backgroundColor: darkMode ? '#424242' : '#fff',
           },
         }}
       >
@@ -81,3 +74,10 @@ export default class Home_Tab extends Component {
     );
   }
 }
+
+HomeTab.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    addListener: PropTypes.func.isRequired,
+  }).isRequired,
+};

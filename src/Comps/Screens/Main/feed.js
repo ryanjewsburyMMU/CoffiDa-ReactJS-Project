@@ -9,6 +9,7 @@ import {
   PermissionsAndroid,
   Linking,
   ToastAndroid,
+  FlatList,
 } from 'react-native';
 
 import StarRating from 'react-native-star-rating';
@@ -64,7 +65,6 @@ export default class Feed extends Component {
     this.unsubscribe = navigation.addListener('focus', () => {
       this.chooseStyle();
       this.checkLoggedIn();
-      this.findLocation();
     });
   }
 
@@ -175,6 +175,7 @@ export default class Feed extends Component {
     } else {
       this.getInfo();
       this.getLocations();
+      this.findLocation();
     }
   }
 
@@ -271,10 +272,11 @@ export default class Feed extends Component {
   }
 
   isFavourited(currentID, style) {
+    const { favourite_locations_id } = this.state;
     const faveIcon = <Icon name="heart" size={30} color={style.faveColour.color} />;
     const notFaveIcon = <Icon name="heart-o" size={30} color={style.faveColour.color} />;
 
-    if (this.state.favourite_locations_id.includes(currentID) === true) {
+    if (favourite_locations_id.includes(currentID) === true) {
       return (
         <View>
           <DoubleClick
@@ -308,8 +310,9 @@ export default class Feed extends Component {
     );
   }
 
-  findDistance(lat, long, style) {
-    if (this.state.long === '') {
+  findDistance(latitude_, longitude_, style) {
+    const { lat, long } = this.state;
+    if (long === '') {
       return (
         <View>
           <Text style={style.textCenterBlack}>Calculating Distance...</Text>
@@ -317,13 +320,13 @@ export default class Feed extends Component {
       );
     }
     const distance = getDistance(
-      { latitude: this.state.lat, longitude: this.state.long },
+      { latitude: lat, longitude: long },
       {
-        latitude: lat,
-        longitude: long,
+        latitude: latitude_,
+        longitude: longitude_,
       },
     );
-    const miles = Math.round(parseInt(distance) * 0.00062137);
+    const miles = Math.round(parseInt(distance, 10) * 0.00062137);
     return (
       <View>
         <Text style={style.textCenterBlack}>
@@ -356,10 +359,10 @@ export default class Feed extends Component {
   }
 
   render() {
-    const style = this.state.darkMode ? stylesDark : stylesLight;
-
+    const { darkMode, isLoading } = this.state;
+    const style = darkMode ? stylesDark : stylesLight;
     const { navigation } = this.props;
-    if (this.state.isLoading === true) {
+    if (isLoading === true) {
       return (
         <View style={style.mainContainer}>
           <View style={style.mainHeader}>
@@ -385,83 +388,85 @@ export default class Feed extends Component {
           </View>
         </View>
         <View style={style.mainFooter}>
-          <ScrollView>
             <View>
-              {this.state.location_data.map((locationData, index) => (
-                <View key={index}>
-                  <View style={style.feedContainer}>
-                    <Text style={style.locationTitle}>
-                      {locationData.location_name}
-                    </Text>
-                    <Text style={style.textCenterGrey}>
-                      {locationData.location_town}
-                    </Text>
-                    <Text style={style.textCenterBlack}>Overall Rating</Text>
-                    <StarRating
-                      disabled={false}
-                      fullStarColor={style.starColour.color}
-                      maxStars={5}
-                      rating={locationData.avg_overall_rating}
-                      starSize={25}
-                    />
+              <FlatList
+                data={this.state.location_data}
+                renderItem={({ item, index }) => (
+                  <View key={index}>
+                    <View style={style.feedContainer}>
+                      <Text style={style.locationTitle}>
+                        {item.location_name}
+                      </Text>
+                      <Text style={style.textCenterGrey}>
+                        {item.location_town}
+                      </Text>
+                      <Text style={style.textCenterBlack}>Overall Rating</Text>
+                      <StarRating
+                        disabled={false}
+                        fullStarColor={style.starColour.color}
+                        maxStars={5}
+                        rating={item.avg_overall_rating}
+                        starSize={25}
+                      />
+                    </View>
+                    <View style={style.alignCenter}>
+                      <Text style={style.textCenterBlack}>Favourite This Location?</Text>
+                      <Text>{this.isFavourited(item.location_id, style)}</Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          this.generateMapDirections(
+                            item.latitude,
+                            item.longitude,
+                            style,
+                          );
+                        }}
+                      >
+                        <Text style={style.textCenterBlack}>
+                          {' '}
+                          {this.findDistance(
+                            item.latitude,
+                            item.longitude,
+                            style,
+                          )}
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={style.mainButton}
+                        onPress={() => {
+                          navigation.navigate('ReviewPage', {
+                            id: item.location_id,
+                            name: item.location_name,
+                            photo_path: item.photo_path,
+                          });
+                        }}
+                      >
+                        <Text style={style.textCenterWhite}>
+                          See More Information About
+                          {' '}
+                          {item.location_name}
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={style.mainButtonWhite}
+                        onPress={() => {
+                          navigation.navigate('CreateReviewPage', {
+                            id: item.location_id,
+                            name: item.location_name,
+                          });
+                        }}
+                      >
+                        <Text>
+                          Write a Review For
+                          {' '}
+                          {item.location_name}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                  <View style={style.alignCenter}>
-                    <Text style={style.textCenterBlack}>Favourite This Location?</Text>
-                    <Text>{this.isFavourited(locationData.location_id, style)}</Text>
-                    <TouchableOpacity
-                      onPress={() => {
-                        this.generateMapDirections(
-                          locationData.latitude,
-                          locationData.longitude,
-                          style,
-                        );
-                      }}
-                    >
-                      <Text style={style.textCenterBlack}>
-                        {' '}
-                        {this.findDistance(
-                          locationData.latitude,
-                          locationData.longitude,
-                          style,
-                        )}
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={style.mainButton}
-                      onPress={() => {
-                        navigation.navigate('ReviewPage', {
-                          id: locationData.location_id,
-                          name: locationData.location_name,
-                          photo_path: locationData.photo_path,
-                        });
-                      }}
-                    >
-                      <Text style={style.textCenterWhite}>
-                        See More Information About
-                        {' '}
-                        {locationData.location_name}
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={style.mainButtonWhite}
-                      onPress={() => {
-                        navigation.navigate('CreateReviewPage', {
-                          id: locationData.location_id,
-                          name: locationData.location_name,
-                        });
-                      }}
-                    >
-                      <Text>
-                        Write a Review For
-                        {' '}
-                        {locationData.location_name}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ))}
+                )}
+                keyExtractor={(item, index) => index.toString()}
+              />
             </View>
-          </ScrollView>
         </View>
       </View>
     );
