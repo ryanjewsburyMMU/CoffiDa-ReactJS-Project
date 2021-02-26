@@ -14,6 +14,7 @@ rather than using this.props.navigation
 we would have:
 
 const { navigation } = this.props
+
 and then a prop type validation at the bottom of each page like the following: 
 PAGENAME.propTypes = {
   navigation: PropTypes.shape({
